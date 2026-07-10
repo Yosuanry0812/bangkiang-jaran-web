@@ -43,8 +43,13 @@
         <div class="flex justify-between items-center px-gutter py-md max-w-container-max mx-auto w-full">
             <a href="{{ route('landing') }}" class="font-display text-headline-sm font-bold text-primary">Bangkiang Jaran</a>
             <div class="flex items-center gap-md">
-                <a href="{{ route('login') }}" class="font-body text-label-md text-primary hover:bg-primary/5 transition-colors px-4 py-2 rounded-xl">Login</a>
-                <a href="{{ route('register') }}" class="font-body text-label-md bg-primary-container text-white px-6 py-2 rounded-xl shadow-sm hover:-translate-y-0.5 transition-transform">Register</a>
+                <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
+                   class="font-body text-label-md text-primary hover:bg-primary/5 transition-colors px-4 py-2 rounded-xl flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">language</span>
+                    {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                </a>
+                <a href="{{ route('login') }}" class="font-body text-label-md text-primary hover:bg-primary/5 transition-colors px-4 py-2 rounded-xl">{{ __('messages.login') }}</a>
+                <a href="{{ route('register') }}" class="font-body text-label-md bg-primary-container text-white px-6 py-2 rounded-xl shadow-sm hover:-translate-y-0.5 transition-transform">{{ __('messages.register') }}</a>
             </div>
         </div>
     </nav>

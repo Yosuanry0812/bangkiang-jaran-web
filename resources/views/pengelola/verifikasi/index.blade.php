@@ -1,12 +1,12 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Verifikasi Pembayaran')
+@section('title', __('messages.verification_title'))
 
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">Verifikasi Pembayaran</h1>
-            <p class="text-sm text-stone-500 mt-0.5">Validasi pembayaran pemesanan tiket</p>
+            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.verification_title') }}</h1>
+            <p class="text-sm text-stone-500 mt-0.5">{{ __('messages.verification_desc') }}</p>
         </div>
     </div>
 
@@ -15,14 +15,14 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-stone-200 bg-stone-50 text-left">
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Kode Booking</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">User</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Tiket</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Tanggal</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Total</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Status</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Pembayaran</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Aksi</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_user') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_ticket') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_date') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_total') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_status') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_payment_status') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,18 +55,18 @@
                             };
                         @endphp
                         <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $pc }}">
-                            {{ ucfirst($p->pembayaran->status ?? 'Belum Bayar') }}
+                            {{ ucfirst($p->pembayaran->status ?? __('messages.pending')) }}
                         </span>
                         </td>
                         <td class="py-3.5 px-4">
                             <a href="{{ route('pengelola.verifikasi.show', $p->id_pemesanan) }}" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-sm font-medium transition-colors">
                                 <span class="material-symbols-outlined text-base">visibility</span>
-                                Detail
+                                {{ __('messages.detail') }}
                             </a>
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="8" class="py-10 text-center text-stone-400">Belum ada pemesanan</td></tr>
+                    <tr><td colspan="8" class="py-10 text-center text-stone-400">{{ __('messages.no_verification_data') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

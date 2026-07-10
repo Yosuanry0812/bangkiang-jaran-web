@@ -36,9 +36,9 @@
     {{-- Breadcrumb (no-print) --}}
     <div class="max-w-md mx-auto mb-md no-print">
         <nav class="font-body text-caption text-on-surface-variant flex items-center gap-2">
-            <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="hover:text-primary transition-colors">Riwayat</a>
+            <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="hover:text-primary transition-colors">{{ __('messages.history') }}</a>
             <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-            <span class="text-primary">E-Ticket</span>
+            <span class="text-primary">{{ __('messages.view_eticket') }}</span>
         </nav>
     </div>
 
@@ -54,12 +54,12 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div class="absolute bottom-md left-md right-md text-white flex justify-between items-end">
                     <div>
-                        <p class="font-body text-label-md opacity-80 uppercase tracking-widest mb-xs">E-Ticket Masuk</p>
+                        <p class="font-body text-label-md opacity-80 uppercase tracking-widest mb-xs">{{ __('messages.eticket_label') }}</p>
                         <h2 class="font-display text-headline-sm">Bangkiang Jaran</h2>
                     </div>
                     <div class="bg-primary-container text-white px-3 py-1 rounded-full backdrop-blur-md">
                         <span class="material-symbols-outlined text-[20px] align-middle mr-1">forest</span>
-                        <span class="font-body text-label-md align-middle">{{ $pemesanan->tiket->nama_tiket ?? 'Standard' }}</span>
+                        <span class="font-body text-label-md align-middle">{{ $pemesanan->tiket->nama_tiket ?? __('messages.standard_ticket') }}</span>
                     </div>
                 </div>
             </div>
@@ -68,20 +68,20 @@
             <div class="p-lg bg-surface-container-lowest">
                 <div class="grid grid-cols-2 gap-y-md gap-x-sm mb-lg">
                     <div>
-                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">Visitor Name</p>
+                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">{{ __('messages.visitor_name') }}</p>
                         <p class="font-body text-body-md font-semibold text-on-surface">{{ $pemesanan->user->name ?? Auth::user()->name ?? '-' }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">Booking ID</p>
+                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">{{ __('messages.booking_id') }}</p>
                         <p class="font-body text-body-md font-semibold text-primary">{{ $pemesanan->kode_booking }}</p>
                     </div>
                     <div>
-                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">Visit Date</p>
+                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">{{ __('messages.visit_date_label') }}</p>
                         <p class="font-body text-body-md font-semibold text-on-surface">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d M Y') }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">Party Size</p>
-                        <p class="font-body text-body-md font-semibold text-on-surface">{{ $pemesanan->jumlah }} tiket</p>
+                        <p class="font-body text-caption text-outline mb-xs uppercase tracking-wider">{{ __('messages.party_size') }}</p>
+                        <p class="font-body text-body-md font-semibold text-on-surface">{{ __('messages.ticket_count', ['count' => $pemesanan->jumlah]) }}</p>
                     </div>
                 </div>
             </div>
@@ -98,7 +98,7 @@
                         <span class="material-symbols-outlined text-[64px] text-outline opacity-50">qr_code</span>
                     </div>
                 </div>
-                <p class="font-body text-caption text-center text-outline max-w-[200px]">Scan this code at the main gate terminal to enter.</p>
+                <p class="font-body text-caption text-center text-outline max-w-[200px]">{{ __('messages.scan_code_desc') }}</p>
             </div>
         </div>
 
@@ -107,12 +107,12 @@
             <button onclick="window.print()"
                     class="w-full bg-primary-container text-white font-body text-label-md py-4 rounded-xl flex items-center justify-center gap-sm hover:-translate-y-0.5 transition-transform card-shadow">
                 <span class="material-symbols-outlined">download</span>
-                Download PDF
+                {{ __('messages.download_pdf') }}
             </button>
             <a href="{{ route('wisatawan.pemesanan.riwayat') }}"
                class="w-full border border-primary-container text-primary font-body text-label-md py-4 rounded-xl flex items-center justify-center gap-sm hover:bg-primary/5 transition-colors">
                 <span class="material-symbols-outlined">history</span>
-                Kembali ke Riwayat
+                {{ __('messages.back_to_history') }}
             </a>
         </div>
     </div>

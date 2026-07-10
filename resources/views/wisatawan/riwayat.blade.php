@@ -5,8 +5,8 @@
     <main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-xl">
         {{-- Header --}}
         <header class="mb-xl text-center md:text-left">
-            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-sm">My Bookings</h1>
-            <p class="font-body text-body-lg text-on-surface-variant max-w-2xl">Review your upcoming adventures and past visits to the lush tranquility of Bangkiang Jaran.</p>
+            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-sm">{{ __('messages.my_bookings') }}</h1>
+            <p class="font-body text-body-lg text-on-surface-variant max-w-2xl">{{ __('messages.my_bookings_desc') }}</p>
         </header>
 
         @if(isset($pemesanan) && $pemesanan->count() > 0)
@@ -21,23 +21,23 @@
             {{-- Filters / Summary Sidebar --}}
             <aside class="lg:col-span-3 space-y-md">
                 <div class="bg-surface-container-low rounded-2xl p-lg sticky top-[100px]">
-                    <h3 class="font-display text-headline-sm text-primary mb-md">Status Summary</h3>
+                    <h3 class="font-display text-headline-sm text-primary mb-md">{{ __('messages.status_summary') }}</h3>
                     <ul class="space-y-sm">
                         <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
                             <span class="font-body text-body-md text-on-surface flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-green-600"></span> Selesai
+                                <span class="w-3 h-3 rounded-full bg-green-600"></span> {{ __('messages.completed') }}
                             </span>
                             <span class="font-body text-label-md font-bold">{{ $selesai }}</span>
                         </li>
                         <li class="flex justify-between items-center py-2 border-b border-outline-variant/30">
                             <span class="font-body text-body-md text-on-surface flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-tertiary-container"></span> Pending
+                                <span class="w-3 h-3 rounded-full bg-tertiary-container"></span> {{ __('messages.pending') }}
                             </span>
                             <span class="font-body text-label-md font-bold">{{ $pending }}</span>
                         </li>
                         <li class="flex justify-between items-center py-2">
                             <span class="font-body text-body-md text-on-surface flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-error"></span> Dibatalkan
+                                <span class="w-3 h-3 rounded-full bg-error"></span> {{ __('messages.cancelled') }}
                             </span>
                             <span class="font-body text-label-md font-bold">{{ $dibatalkan }}</span>
                         </li>
@@ -56,19 +56,19 @@
                                 <span class="font-body text-label-md text-outline">{{ $item->kode_booking }}</span>
                                 @if($item->status == 'pending')
                                 <span class="bg-tertiary-container/10 text-tertiary-container px-3 py-1 rounded-full font-body text-caption flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]">schedule</span> Pending
+                                    <span class="material-symbols-outlined text-[16px]">schedule</span> {{ __('messages.pending') }}
                                 </span>
                                 @elseif($item->status == 'diproses')
                                 <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-body text-caption flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]">hourglass_empty</span> Diproses
+                                    <span class="material-symbols-outlined text-[16px]">hourglass_empty</span> {{ __('messages.processing') }}
                                 </span>
                                 @elseif($item->status == 'selesai')
                                 <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full font-body text-caption flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> Selesai
+                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> {{ __('messages.completed') }}
                                 </span>
                                 @elseif($item->status == 'dibatalkan')
                                 <span class="bg-error/10 text-error px-3 py-1 rounded-full font-body text-caption flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[16px]">cancel</span> Dibatalkan
+                                    <span class="material-symbols-outlined text-[16px]">cancel</span> {{ __('messages.cancelled') }}
                                 </span>
                                 @endif
                             </div>
@@ -82,7 +82,7 @@
                                 Rp{{ number_format($item->total_harga, 0, ',', '.') }}
                             </span>
                             <span class="font-body text-label-md text-primary flex items-center gap-1 mt-2 hover:underline">
-                                View Details <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                                {{ __('messages.view_details') }} <span class="material-symbols-outlined text-[18px]">expand_more</span>
                             </span>
                         </div>
                     </div>
@@ -92,26 +92,26 @@
                         @if($item->status == 'dibatalkan')
                         <div>
                             <h4 class="font-body text-label-md text-on-error-container mb-2 flex items-center gap-2">
-                                <span class="material-symbols-outlined">info</span> Reason for Rejection
+                                <span class="material-symbols-outlined">info</span> {{ __('messages.reason_rejection') }}
                             </h4>
-                            <p class="font-body text-body-md text-on-surface">Pemesanan ini telah dibatalkan.</p>
+                            <p class="font-body text-body-md text-on-surface">{{ __('messages.booking_cancelled') }}</p>
                         </div>
                         @else
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
                             <div>
-                                <h4 class="font-body text-label-md text-outline mb-2">Booking Details</h4>
-                                <p class="font-body text-body-md text-on-background">{{ $item->jumlah }} tiket</p>
+                                <h4 class="font-body text-label-md text-outline mb-2">{{ __('messages.booking_details') }}</h4>
+                                <p class="font-body text-body-md text-on-background">{{ __('messages.ticket_count', ['count' => $item->jumlah]) }}</p>
                                 <p class="font-body text-body-md text-on-background">{{ $item->tiket->nama_tiket ?? '-' }}</p>
                             </div>
                             <div class="flex gap-md">
                                 <a href="{{ route('wisatawan.pemesanan.detail', $item->id_pemesanan) }}"
                                    class="flex-1 py-sm rounded-xl border border-primary text-primary font-body text-label-md hover:bg-primary/5 transition-colors flex justify-center items-center gap-2">
-                                    <span class="material-symbols-outlined">visibility</span> Lihat E-Ticket
+                                    <span class="material-symbols-outlined">visibility</span> {{ __('messages.view_eticket_btn') }}
                                 </a>
                                 @if(in_array($item->status, ['pending', 'diproses']))
                                 <a href="{{ route('wisatawan.pembayaran.create', $item->id_pemesanan) }}"
                                    class="flex-1 py-sm rounded-xl bg-primary text-white font-body text-label-md hover:opacity-90 transition-opacity flex justify-center items-center gap-2">
-                                    <span class="material-symbols-outlined">payments</span> Bayar
+                                    <span class="material-symbols-outlined">payments</span> {{ __('messages.pay_btn') }}
                                 </a>
                                 @endif
                             </div>
@@ -128,12 +128,12 @@
             <div class="w-20 h-20 mx-auto mb-md rounded-2xl bg-background flex items-center justify-center">
                 <span class="material-symbols-outlined text-4xl text-outline">receipt_long</span>
             </div>
-            <p class="font-display text-headline-sm text-on-background mb-sm">Belum Ada Pemesanan</p>
-            <p class="font-body text-body-md text-on-surface-variant mb-lg">Mulai pesan tiket sekarang untuk menikmati keindahan Bangkiang Jaran Waterfall</p>
+            <p class="font-display text-headline-sm text-on-background mb-sm">{{ __('messages.no_bookings') }}</p>
+            <p class="font-body text-body-md text-on-surface-variant mb-lg">{{ __('messages.no_bookings_desc') }}</p>
             <a href="{{ route('tiket.index') }}"
                class="inline-flex items-center gap-2 bg-primary-container text-white font-body text-label-md px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm">
                 <span class="material-symbols-outlined text-sm">confirmation_number</span>
-                Pesan Tiket Sekarang
+                {{ __('messages.book_now_from_history') }}
             </a>
         </div>
         @endif

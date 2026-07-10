@@ -7,8 +7,8 @@
     ════════════════════════════════════════════════════════════════ --}}
     <section class="max-w-container-max mx-auto px-gutter md:px-lg py-xl mt-lg">
         <div class="text-center md:text-left">
-            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-md">Sejarah &amp; Informasi</h1>
-            <p class="font-body text-body-lg text-on-surface-variant max-w-2xl">Discover the roots of Bangkiang Jaran, a hidden gem in Gianyar, where nature and local heritage intertwine beautifully.</p>
+            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-md">{{ __('messages.history_info') }}</h1>
+            <p class="font-body text-body-lg text-on-surface-variant max-w-2xl">{{ __('messages.history_info_desc') }}</p>
         </div>
     </section>
 
@@ -63,8 +63,8 @@
     ════════════════════════════════════════════════════════════════ --}}
     <section class="max-w-container-max mx-auto px-gutter pb-xl">
         <div class="text-center mb-lg">
-            <h2 class="font-display text-headline-md text-primary mb-sm">Lokasi</h2>
-            <p class="font-body text-body-md text-on-surface-variant">Desa Bakbakan, Kecamatan Gianyar, Kabupaten Gianyar, Bali</p>
+            <h2 class="font-display text-headline-md text-primary mb-sm">{{ __('messages.location_title') }}</h2>
+            <p class="font-body text-body-md text-on-surface-variant">{{ __('messages.location_desc') }}</p>
         </div>
         <div class="rounded-2xl overflow-hidden card-shadow h-[350px]">
             <iframe

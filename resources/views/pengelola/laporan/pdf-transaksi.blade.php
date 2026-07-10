@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Transaksi Bangkiang Jaran Waterfall</title>
+    <title>{{ __('messages.transaction_report_title') }} - Bangkiang Jaran Waterfall</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -17,21 +17,21 @@
 </head>
 <body>
     <div class="header">
-        <h1>Laporan Transaksi</h1>
+        <h1>{{ __('messages.transaction_report_title') }}</h1>
         <p>Bangkiang Jaran Waterfall</p>
-        <p>Periode: {{ request('periode_awal') ?? 'Semua' }} - {{ request('periode_akhir') ?? 'Semua' }}</p>
+        <p>{{ __('messages.period') }} {{ request('periode_awal') ?? __('messages.all') }} - {{ request('periode_akhir') ?? __('messages.all') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Booking</th>
-                <th>User</th>
-                <th>Tiket</th>
-                <th>Tgl Bayar</th>
-                <th>Metode</th>
-                <th>Total</th>
+                <th>{{ __('messages.th_booking_code') }}</th>
+                <th>{{ __('messages.th_user') }}</th>
+                <th>{{ __('messages.th_ticket') }}</th>
+                <th>{{ __('messages.payment_date') }}</th>
+                <th>{{ __('messages.method_label') }}</th>
+                <th>{{ __('messages.th_total') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -46,15 +46,15 @@
                 <td>Rp {{ number_format($t->total, 0, ',', '.') }}</td>
             </tr>
             @empty
-            <tr><td colspan="7" style="text-align:center">Tidak ada data</td></tr>
+            <tr><td colspan="7" style="text-align:center">{{ __('messages.no_data') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 
-    <div class="grand-total">Grand Total: Rp {{ number_format($total ?? 0, 0, ',', '.') }}</div>
+    <div class="grand-total">{{ __('messages.grand_total_label') }}: Rp {{ number_format($total ?? 0, 0, ',', '.') }}</div>
 
     <div class="footer">
-        Dicetak pada: {{ now()->format('d/m/Y H:i') }}
+        {{ __('messages.printed_on') }} {{ now()->format('d/m/Y H:i') }}
     </div>
 </body>
 </html>

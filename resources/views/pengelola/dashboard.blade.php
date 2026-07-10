@@ -1,5 +1,5 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Dashboard - Panel Pengelola')
+@section('title', __('messages.dashboard_title') . ' - ' . __('messages.panel_title'))
 
 @push('styles')
 @endpush
@@ -8,8 +8,8 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">Dashboard</h1>
-            <p class="text-sm text-stone-500 mt-0.5">Overview pengelolaan Bangkiang Jaran</p>
+            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.dashboard_title') }}</h1>
+            <p class="text-sm text-stone-500 mt-0.5">{{ __('messages.dashboard_desc') }}</p>
         </div>
     </div>
 
@@ -19,7 +19,7 @@
                 <span class="material-symbols-outlined text-2xl">groups</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">Pengunjung Hari Ini</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">{{ __('messages.visitors_today') }}</p>
                 <p class="text-2xl font-bold text-stone-800 mt-1">{{ $pengunjungHariIni ?? 0 }}</p>
             </div>
         </div>
@@ -28,7 +28,7 @@
                 <span class="material-symbols-outlined text-2xl">payments</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">Pendapatan Bulan Ini</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">{{ __('messages.monthly_revenue') }}</p>
                 <p class="text-2xl font-bold text-stone-800 mt-1">Rp {{ number_format($pendapatanBulanIni ?? 0, 0, ',', '.') }}</p>
             </div>
         </div>
@@ -37,7 +37,7 @@
                 <span class="material-symbols-outlined text-2xl">hourglass_empty</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">Pemesanan Pending</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">{{ __('messages.pending_bookings') }}</p>
                 <p class="text-2xl font-bold text-stone-800 mt-1">{{ $pemesananPending ?? 0 }}</p>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 <span class="material-symbols-outlined text-2xl">travel_explore</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">Total Wisatawan</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-stone-500">{{ __('messages.total_visitors') }}</p>
                 <p class="text-2xl font-bold text-stone-800 mt-1">{{ $totalWisatawan ?? 0 }}</p>
             </div>
         </div>
@@ -54,23 +54,23 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-2xl shadow-sm p-6">
-            <h2 class="font-heading text-lg font-semibold text-stone-800 mb-4">Grafik Kunjungan</h2>
+            <h2 class="font-heading text-lg font-semibold text-stone-800 mb-4">{{ __('messages.visit_chart') }}</h2>
             <div class="max-w-sm mx-auto">
                 <canvas id="chartKunjungan" height="260"></canvas>
             </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6">
-            <h2 class="font-heading text-lg font-semibold text-stone-800 mb-4">Pemesanan Terbaru</h2>
+            <h2 class="font-heading text-lg font-semibold text-stone-800 mb-4">{{ __('messages.recent_bookings') }}</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-stone-200 text-left">
-                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">Kode Booking</th>
-                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">User</th>
-                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">Tiket</th>
-                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">Status</th>
-                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3">Tanggal</th>
+                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">{{ __('messages.th_booking_code') }}</th>
+                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">{{ __('messages.th_user') }}</th>
+                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">{{ __('messages.th_ticket') }}</th>
+                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3 pr-4">{{ __('messages.th_status') }}</th>
+                            <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3">{{ __('messages.th_date') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -96,7 +96,7 @@
                             <td class="py-3 text-stone-500 text-xs">{{ $p->created_at->format('d/m/Y H:i') }}</td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" class="py-8 text-center text-stone-400">Belum ada pemesanan</td></tr>
+                        <tr><td colspan="5" class="py-8 text-center text-stone-400">{{ __('messages.no_recent_bookings') }}</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -142,7 +142,7 @@
                             let total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                             let val = ctx.parsed;
                             let pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                            return ' ' + val + ' tiket (' + pct + '%)';
+                            return ' ' + val + ' {{ __('messages.tickets') }} (' + pct + '%)';
                         }
                     }
                 }

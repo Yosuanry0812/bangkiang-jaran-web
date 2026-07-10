@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Kunjungan Bangkiang Jaran Waterfall</title>
+    <title>{{ __('messages.visit_report_title') }} - Bangkiang Jaran Waterfall</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -17,22 +17,22 @@
 </head>
 <body>
     <div class="header">
-        <h1>Laporan Kunjungan</h1>
+        <h1>{{ __('messages.visit_report_title') }}</h1>
         <p>Bangkiang Jaran Waterfall</p>
-        <p>Periode: {{ request('periode_awal') ?? 'Semua' }} - {{ request('periode_akhir') ?? 'Semua' }}</p>
+        <p>{{ __('messages.period') }} {{ request('periode_awal') ?? __('messages.all') }} - {{ request('periode_akhir') ?? __('messages.all') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Kode Booking</th>
-                <th>User</th>
-                <th>Tiket</th>
-                <th>Tanggal</th>
-                <th>Jumlah</th>
-                <th>Total</th>
-                <th>Status</th>
+                <th>{{ __('messages.th_booking_code') }}</th>
+                <th>{{ __('messages.th_user') }}</th>
+                <th>{{ __('messages.th_ticket') }}</th>
+                <th>{{ __('messages.th_date') }}</th>
+                <th>{{ __('messages.quantity_label') }}</th>
+                <th>{{ __('messages.th_total') }}</th>
+                <th>{{ __('messages.th_status') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -48,15 +48,15 @@
                 <td>{{ ucfirst($k->status) }}</td>
             </tr>
             @empty
-            <tr><td colspan="8" style="text-align:center">Tidak ada data</td></tr>
+            <tr><td colspan="8" style="text-align:center">{{ __('messages.no_data') }}</td></tr>
             @endforelse
         </tbody>
     </table>
 
-    <div class="total">Total Pengunjung: {{ $total ?? 0 }}</div>
+    <div class="total">{{ __('messages.total_visitors_label') }}: {{ $total ?? 0 }}</div>
 
     <div class="footer">
-        Dicetak pada: {{ now()->format('d/m/Y H:i') }}
+        {{ __('messages.printed_on') }} {{ now()->format('d/m/Y H:i') }}
     </div>
 </body>
 </html>

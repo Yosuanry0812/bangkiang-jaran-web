@@ -8,14 +8,14 @@
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-30"></div>
         <div class="relative z-10 text-center px-gutter max-w-container-max mx-auto w-full">
             <nav class="font-body text-caption text-on-surface-variant mb-2 flex items-center justify-center gap-2">
-                <a href="{{ url('/') }}" class="hover:text-primary transition-colors">Beranda</a>
+                <a href="{{ url('/') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_home') }}</a>
                 <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-                <a href="{{ route('tiket.index') }}" class="hover:text-primary transition-colors">Tiket</a>
+                <a href="{{ route('tiket.index') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
                 <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-                <span class="text-primary">Pemesanan</span>
+                <span class="text-primary">{{ __('messages.breadcrumb_booking') }}</span>
             </nav>
-            <h1 class="font-display text-headline-md text-on-background">Secure Your Visit</h1>
-            <p class="font-body text-body-md text-on-surface-variant">Complete your booking for a serene experience at Bangkiang Jaran Waterfall.</p>
+            <h1 class="font-display text-headline-md text-on-background">{{ __('messages.secure_your_visit') }}</h1>
+            <p class="font-body text-body-md text-on-surface-variant">{{ __('messages.secure_your_visit_desc') }}</p>
         </div>
     </section>
 
@@ -43,16 +43,16 @@
                     <div class="bg-primary-container/10 border border-primary-container/20 rounded-2xl p-md flex items-center gap-md">
                         <span class="material-symbols-outlined text-primary text-2xl">confirmation_number</span>
                         <div>
-                            <p class="font-body text-label-md text-primary">Tiket Dipilih</p>
+                            <p class="font-body text-label-md text-primary">{{ __('messages.selected_ticket') }}</p>
                             <p class="font-display text-headline-sm text-on-background">{{ $selectedTiket->nama_tiket }}</p>
-                            <p class="font-body text-body-md text-primary">Rp{{ number_format($selectedTiket->harga, 0, ',', '.') }} / orang</p>
+                            <p class="font-body text-body-md text-primary">Rp{{ number_format($selectedTiket->harga, 0, ',', '.') }} {{ __('messages.per_person') }}</p>
                         </div>
                     </div>
                     @endif
 
                     {{-- Ticket Selection --}}
                     <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
-                        <h2 class="font-display text-headline-sm text-on-background mb-md">Pilih Tiket</h2>
+                        <h2 class="font-display text-headline-sm text-on-background mb-md">{{ __('messages.select_ticket') }}</h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
                             @if(isset($selectedTiket))
                             @php
@@ -71,7 +71,7 @@
                                     <span class="font-body text-label-md text-on-surface">{{ $t->nama_tiket }}</span>
                                     <span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
                                 </div>
-                                <p class="font-body text-body-md text-on-surface-variant mb-sm flex-grow z-10">Akses penuh ke area wisata.</p>
+                                <p class="font-body text-body-md text-on-surface-variant mb-sm flex-grow z-10">{{ __('messages.ticket_description') }}</p>
                                 <span class="font-display text-headline-sm text-primary z-10">Rp{{ number_format($t->harga, 0, ',', '.') }}</span>
                             </label>
                             @endforeach
@@ -84,7 +84,7 @@
                         <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
                             <label for="tgl_kunjungan" class="font-body text-label-md text-on-surface-variant mb-2 flex items-center gap-2">
                                 <span class="material-symbols-outlined text-primary text-sm">calendar_month</span>
-                                Tanggal Kunjungan
+                                {{ __('messages.visit_date') }}
                             </label>
                             <input type="date" name="tgl_kunjungan" id="tgl_kunjungan" value="{{ $tanggal ?? date('Y-m-d') }}"
                                    class="w-full bg-background border border-outline-variant text-on-background rounded-xl px-4 py-3 font-body text-body-md focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none">
@@ -92,12 +92,12 @@
                         <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
                             <label class="font-body text-label-md text-on-surface-variant mb-2 flex items-center gap-2">
                                 <span class="material-symbols-outlined text-primary text-sm">group</span>
-                                Jumlah Tiket
+                                {{ __('messages.ticket_quantity') }}
                             </label>
                             <div class="flex items-center justify-between py-sm border-b border-outline-variant last:border-0">
                                 <div>
-                                    <p class="font-body text-label-md text-on-surface">Adults</p>
-                                    <p class="font-body text-caption text-on-surface-variant">Age 12+</p>
+                                        <p class="font-body text-label-md text-on-surface">{{ __('messages.adults') }}</p>
+                                    <p class="font-body text-caption text-on-surface-variant">{{ __('messages.age_12_plus') }}</p>
                                 </div>
                                 <div class="flex items-center gap-md">
                                     <button type="button" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors"
@@ -126,11 +126,11 @@
                                  alt="Bangkiang Jaran Waterfall">
                         </div>
                         <div class="p-lg space-y-md">
-                            <h3 class="font-display text-headline-sm text-on-background">Booking Summary</h3>
+                            <h3 class="font-display text-headline-sm text-on-background">{{ __('messages.booking_summary') }}</h3>
                             <div class="space-y-sm">
                                 <div class="flex justify-between items-start">
                                     <div class="flex flex-col">
-                                        <span class="font-body text-label-md text-on-surface" x-text="selectedTicketName || '{{ $selectedTiket->nama_tiket ?? 'Tiket' }}'">{{ $selectedTiket->nama_tiket ?? 'Tiket' }}</span>
+                                        <span class="font-body text-label-md text-on-surface" x-text="selectedTicketName || '{{ $selectedTiket->nama_tiket ?? __('messages.tickets') }}'">{{ $selectedTiket->nama_tiket ?? 'Tiket' }}</span>
                                         <span class="font-body text-caption text-on-surface-variant" x-text="selectedDate || '{{ isset($tanggal) ? \Carbon\Carbon::parse($tanggal)->format('M d, Y') : date('M d, Y') }}'">{{ isset($tanggal) ? \Carbon\Carbon::parse($tanggal)->format('M d, Y') : date('M d, Y') }}</span>
                                     </div>
                                     <span class="font-body text-body-md text-on-surface" x-text="'Rp' + harga.toLocaleString('id-ID')">Rp{{ number_format($selectedTiket->harga ?? 0, 0, ',', '.') }}</span>
@@ -138,15 +138,15 @@
                             </div>
                             <div class="border-t border-outline-variant pt-md space-y-sm">
                                 <div class="flex justify-between items-center">
-                                    <span class="font-body text-body-md text-on-surface-variant">Subtotal</span>
+                                    <span class="font-body text-body-md text-on-surface-variant">{{ __('messages.subtotal') }}</span>
                                     <span class="font-body text-body-md text-on-surface" x-text="'Rp' + (harga * jumlah).toLocaleString('id-ID')">Rp{{ number_format(($selectedTiket->harga ?? 0) * 1, 0, ',', '.') }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="font-body text-body-md text-on-surface-variant">Taxes &amp; Fees</span>
+                                    <span class="font-body text-body-md text-on-surface-variant">{{ __('messages.taxes_fees') }}</span>
                                     <span class="font-body text-body-md text-on-surface">Rp{{ number_format(round(($selectedTiket->harga ?? 0) * 0.1), 0, ',', '.') }}</span>
                                 </div>
                                 <div class="flex justify-between items-center pt-md">
-                                    <span class="font-display text-headline-sm text-on-background">Total</span>
+                                    <span class="font-display text-headline-sm text-on-background">{{ __('messages.total') }}</span>
                                     <span class="font-display text-headline-sm text-primary" x-text="'Rp' + ((harga * jumlah) + Math.round((harga * jumlah) * 0.1)).toLocaleString('id-ID')">
                                         Rp{{ number_format(round(($selectedTiket->harga ?? 0) * 1 * 1.1), 0, ',', '.') }}
                                     </span>
@@ -154,9 +154,9 @@
                             </div>
                             <button type="submit"
                                     class="w-full bg-primary-container text-white font-body text-label-md px-6 py-4 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
-                                Lanjut ke Pembayaran
+                                {{ __('messages.proceed_to_payment') }}
                             </button>
-                            <p class="font-body text-caption text-center text-on-surface-variant">You won't be charged yet.</p>
+                            <p class="font-body text-caption text-center text-on-surface-variant">{{ __('messages.no_charge_yet') }}</p>
                         </div>
                     </div>
                 </div>

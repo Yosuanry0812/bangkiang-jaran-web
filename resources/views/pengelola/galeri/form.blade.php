@@ -1,12 +1,12 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Tambah Foto Galeri')
+@section('title', __('messages.add_media'))
 
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">Tambah Foto Galeri</h1>
-            <p class="text-sm text-stone-500 mt-0.5">Upload foto baru ke galeri</p>
+            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.add_media') }}</h1>
+            <p class="text-sm text-stone-500 mt-0.5">{{ __('messages.manage_gallery_desc') }}</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
 
             <div class="space-y-5">
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">File Gambar</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">{{ __('messages.file_image') }}</label>
                     <div class="relative">
                         <input type="file" name="file" id="fileInput" required onchange="previewFile(event)"
                             accept="image/*"
@@ -25,14 +25,14 @@
                     @error('file') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
 
                     <div class="mt-3" id="previewFoto" style="display:none">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">Preview</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">{{ __('messages.preview') }}</p>
                         <img id="previewImg" class="max-h-48 rounded-xl border border-stone-200" alt="Preview">
                     </div>
-                    <p class="text-xs text-stone-400 mt-1.5">Format: JPG, JPEG, PNG. Maks 5MB.</p>
+                    <p class="text-xs text-stone-400 mt-1.5">{{ __('messages.format_hint') }}</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">Keterangan</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">{{ __('messages.description_label') }}</label>
                     <input type="text" name="keterangan" value="{{ old('keterangan') }}"
                         class="w-full border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-stone-800 placeholder-stone-400">
                     @error('keterangan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -41,11 +41,11 @@
                 <div class="flex gap-3 pt-2">
                     <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                         <span class="material-symbols-outlined text-base">upload</span>
-                    Simpan
+                    {{ __('messages.save') }}
                     </button>
                     <a href="{{ route('pengelola.galeri.index') }}" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                         <span class="material-symbols-outlined text-base">arrow_back</span>
-                        Kembali
+                        {{ __('messages.back') }}
                     </a>
                 </div>
             </div>

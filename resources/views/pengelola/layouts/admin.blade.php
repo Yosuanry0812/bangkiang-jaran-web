@@ -44,7 +44,7 @@
                     <span class="material-symbols-outlined text-3xl text-emerald-400">nature</span>
                     <div>
                         <span class="font-heading font-bold text-lg leading-tight block">Bangkiang Jaran</span>
-                        <span class="text-[10px] text-emerald-300/80 uppercase tracking-widest font-medium">Panel Pengelola</span>
+                        <span class="text-[10px] text-emerald-300/80 uppercase tracking-widest font-medium">{{ __('messages.panel_title') }}</span>
                     </div>
                 </a>
                 <button id="closeSidebar" class="lg:hidden p-1.5 rounded-lg hover:bg-emerald-800/50 transition-colors">
@@ -55,43 +55,40 @@
             <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
                 <a href="{{ route('pengelola.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.dashboard')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.dashboard')) text-emerald-300 @endif">dashboard</span>
-                    Dashboard
+                    {{ __('messages.dashboard_nav') }}
                 </a>
                 <a href="{{ route('pengelola.tiket.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.tiket*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.tiket*')) text-emerald-300 @endif">confirmation_number</span>
-                    Kelola Tiket
+                    {{ __('messages.manage_tickets') }}
                 </a>
                 <a href="{{ route('pengelola.galeri.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.galeri*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.galeri*')) text-emerald-300 @endif">photo_library</span>
-                    Kelola Galeri
+                    {{ __('messages.manage_gallery') }}
                 </a>
                 <a href="{{ route('pengelola.konten.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.konten*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.konten*')) text-emerald-300 @endif">article</span>
-                    Kelola Konten
+                    {{ __('messages.manage_content') }}
                 </a>
                 <div class="border-t border-emerald-800/30 my-3"></div>
                 <a href="{{ route('pengelola.verifikasi.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.verifikasi*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.verifikasi*')) text-emerald-300 @endif">verified_user</span>
-                    Verifikasi
+                    {{ __('messages.verification') }}
                 </a>
                 <a href="{{ route('pengelola.laporan.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.laporan*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.laporan*')) text-emerald-300 @endif">monitoring</span>
-                    Laporan
+                    {{ __('messages.reports') }}
                 </a>
                 <a href="{{ route('pengelola.user.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 @if(Route::is('pengelola.user*')) bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 @else text-emerald-200 hover:bg-emerald-800/50 hover:text-white @endif">
                     <span class="material-symbols-outlined @if(Route::is('pengelola.user*')) text-emerald-300 @endif">group</span>
-                    User
+                    {{ __('messages.manage_users') }}
                 </a>
             </nav>
 
             <div class="px-3 py-4 border-t border-emerald-800/30">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-emerald-300 hover:bg-red-900/30 hover:text-red-300 transition-all duration-200">
-                        <span class="material-symbols-outlined">logout</span>
-                        Logout
-                    </button>
-                </form>
+                <a href="{{ route('logout.get') }}" class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-emerald-300 hover:bg-red-900/30 hover:text-red-300 transition-all duration-200">
+                    <span class="material-symbols-outlined">logout</span>
+                    {{ __('messages.logout_admin') }}
+                </a>
             </div>
         </aside>
 
@@ -105,11 +102,16 @@
                             <span class="material-symbols-outlined">menu</span>
                         </button>
                         <h1 class="text-sm font-semibold text-stone-700 hidden sm:block">
-                            @yield('title', 'Dashboard')
+                            @yield('title', __('messages.dashboard_title'))
                         </h1>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-sm text-stone-500 hidden sm:block">{{ Auth::user()->name ?? 'Pengelola' }}</span>
+                        <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
+                           class="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium text-stone-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors">
+                            <span class="material-symbols-outlined text-base">language</span>
+                            {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                        </a>
+                        <span class="text-sm text-stone-500 hidden sm:block">{{ Auth::user()->name ?? __('messages.dashboard_nav') }}</span>
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-stone-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors">
                                 <span class="material-symbols-outlined">account_circle</span>
@@ -118,15 +120,12 @@
                             <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-stone-200 py-1 z-50 overflow-hidden">
                                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors">
                                     <span class="material-symbols-outlined text-base">settings</span>
-                                    Profil
+                                    {{ __('messages.profile_link') }}
                                 </a>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-red-50 hover:text-red-600 transition-colors">
-                                        <span class="material-symbols-outlined text-base">logout</span>
-                                        Logout
-                                    </button>
-                                </form>
+                                <a href="{{ route('logout.get') }}" class="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-stone-700 hover:bg-red-50 hover:text-red-600 transition-colors">
+                                    <span class="material-symbols-outlined text-base">logout</span>
+                                    {{ __('messages.logout_admin') }}
+                                </a>
                             </div>
                         </div>
                     </div>

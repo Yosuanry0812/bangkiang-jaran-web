@@ -85,6 +85,24 @@ Route::middleware('auth')->group(function () {
 // ========== BREEZE AUTH ROUTES ==========
 require __DIR__ . '/auth.php';
 
+// ========== LANGUAGE SWITCH ==========
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['id', 'en'])) {
+        session()->put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
+
+// ========== LOGOUT (GET fallback buat CSRF expired) ==========
+Route::get('/logout', function () {
+    if (auth()->check()) {
+        auth()->logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+    }
+    return redirect('/');
+})->name('logout.get');
+
 // Redirect after login berdasarkan role
 Route::get('/redirect-after-login', function () {
     if (auth()->user()->role === 'pengelola') {

@@ -4,8 +4,8 @@
 <div class="bg-background min-h-screen">
     <div class="max-w-container-max mx-auto px-gutter py-xl">
         <header class="mb-xl text-center md:text-left max-w-3xl">
-            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-md">Galeri Keindahan Alam</h1>
-            <p class="font-body text-body-lg text-on-surface-variant">Explore the majestic beauty of Bangkiang Jaran Waterfall. A visual journey through our lush tropical paradise, capturing serene moments and grounded luxury.</p>
+            <h1 class="font-display text-display-mobile md:text-display-lg text-primary mb-md">{{ __('messages.gallery_title') }}</h1>
+            <p class="font-body text-body-lg text-on-surface-variant">{{ __('messages.gallery_desc') }}</p>
         </header>
 
         <section class="grid grid-cols-1 md:grid-cols-4 grid-rows-[auto] gap-md md:gap-lg">
@@ -26,7 +26,7 @@
         @if($galeri->count() > 6)
         <div class="mt-xl flex justify-center">
             <button class="font-body text-label-md border-[1.5px] border-primary text-primary px-lg py-sm rounded-xl hover:bg-primary/5 transition-colors duration-300">
-                Load More
+                {{ __('messages.load_more') }}
             </button>
         </div>
         @endif

@@ -5,11 +5,11 @@
     {{-- Header --}}
     <section class="max-w-container-max mx-auto mb-md">
         <nav class="font-body text-caption text-on-surface-variant flex items-center gap-2">
-            <a href="{{ url('/') }}" class="hover:text-primary transition-colors">Beranda</a>
+            <a href="{{ url('/') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_home') }}</a>
             <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-            <a href="{{ route('tiket.index') }}" class="hover:text-primary transition-colors">Tiket</a>
+            <a href="{{ route('tiket.index') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
             <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-            <span class="text-primary">Detail Tiket</span>
+            <span class="text-primary">{{ __('messages.breadcrumb_detail') }}</span>
         </nav>
     </section>
 
@@ -26,16 +26,16 @@
                         Rp{{ number_format($tiket->harga, 0, ',', '.') }}
                     </p>
                     <div class="flex items-center gap-2">
-                        <span class="font-body text-body-md text-on-surface-variant">Status:</span>
+                        <span class="font-body text-body-md text-on-surface-variant">{{ __('messages.ticket_status') }}</span>
                         @if($tiket->status == 'aktif')
                         <span class="font-body text-label-md text-green-600 flex items-center gap-1">
                             <span class="w-2 h-2 rounded-full bg-green-600"></span>
-                            Tersedia
+                            {{ __('messages.ticket_available') }}
                         </span>
                         @else
                         <span class="font-body text-label-md text-red-600 flex items-center gap-1">
                             <span class="w-2 h-2 rounded-full bg-red-600"></span>
-                            Tidak Tersedia
+                            {{ __('messages.ticket_unavailable') }}
                         </span>
                         @endif
                     </div>
@@ -43,7 +43,7 @@
                     <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $tiket->id_tiket]) }}"
                        class="inline-flex items-center gap-2 bg-primary-container text-white font-body text-label-md px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm">
                         <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                        Pesan Sekarang
+                        {{ __('messages.book_now_btn') }}
                     </a>
                     @endif
                 </div>
@@ -52,20 +52,20 @@
                 <div class="bg-background rounded-2xl p-lg">
                     <h3 class="font-display text-headline-sm text-on-background mb-md flex items-center gap-2">
                         <span class="material-symbols-outlined text-primary text-sm">checklist</span>
-                        Fasilitas Tiket Ini
+                        {{ __('messages.facilities_title') }}
                     </h3>
                     <ul class="space-y-sm">
                         <li class="flex items-start gap-2 font-body text-body-md text-on-surface-variant">
                             <span class="material-symbols-outlined text-sm text-primary shrink-0 mt-0.5">check_circle</span>
-                            Akses masuk ke area wisata
+                            {{ __('messages.facility_access_entry') }}
                         </li>
                         <li class="flex items-start gap-2 font-body text-body-md text-on-surface-variant">
                             <span class="material-symbols-outlined text-sm text-primary shrink-0 mt-0.5">check_circle</span>
-                            Tiket berlaku sesuai tanggal kunjungan
+                            {{ __('messages.facility_valid_date') }}
                         </li>
                         <li class="flex items-start gap-2 font-body text-body-md text-on-surface-variant">
                             <span class="material-symbols-outlined text-sm text-primary shrink-0 mt-0.5">check_circle</span>
-                            Free akses ke fasilitas umum
+                            {{ __('messages.facility_free_access') }}
                         </li>
                     </ul>
                 </div>
@@ -75,7 +75,7 @@
         <div class="mt-md text-center">
             <a href="{{ route('tiket.index') }}" class="font-body text-label-md text-primary hover:underline inline-flex items-center gap-1">
                 <span class="material-symbols-outlined text-sm">arrow_back</span>
-                Kembali ke Daftar Tiket
+                {{ __('messages.back_to_tickets') }}
             </a>
         </div>
     </div>

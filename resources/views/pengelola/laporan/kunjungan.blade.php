@@ -1,15 +1,15 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Laporan Kunjungan')
+@section('title', __('messages.visit_report_title'))
 
 @section('content')
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">Laporan Kunjungan</h1>
+            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.visit_report_title') }}</h1>
             <p class="text-sm text-stone-500 mt-0.5">
-                Periode: {{ $periode_awal ? \Carbon\Carbon::parse($periode_awal)->format('d/m/Y') : 'Semua' }}
+                {{ __('messages.period') }} {{ $periode_awal ? \Carbon\Carbon::parse($periode_awal)->format('d/m/Y') : __('messages.all') }}
                 -
-                {{ $periode_akhir ? \Carbon\Carbon::parse($periode_akhir)->format('d/m/Y') : 'Semua' }}
+                {{ $periode_akhir ? \Carbon\Carbon::parse($periode_akhir)->format('d/m/Y') : __('messages.all') }}
             </p>
         </div>
         <a href="{{ route('pengelola.laporan.kunjungan', array_merge(request()->all(), ['export' => 'pdf'])) }}"
@@ -24,7 +24,7 @@
             <span class="material-symbols-outlined text-2xl">groups</span>
         </div>
         <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Total Pengunjung</p>
+            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">{{ __('messages.total_visitors_label') }}</p>
             <p class="text-2xl font-bold text-emerald-900">{{ $total ?? 0 }}</p>
         </div>
     </div>
@@ -34,13 +34,13 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-stone-200 bg-stone-50 text-left">
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Kode Booking</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">User</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Tiket</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Tanggal</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Jumlah</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Total</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">Status</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_user') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_ticket') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_date') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.quantity_label') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_total') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_status') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,7 +66,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="py-10 text-center text-stone-400">Tidak ada data kunjungan</td></tr>
+                    <tr><td colspan="7" class="py-10 text-center text-stone-400">{{ __('messages.no_data_visit') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -75,7 +75,7 @@
 
     <a href="{{ route('pengelola.laporan.index') }}" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-sm font-medium transition-colors">
         <span class="material-symbols-outlined text-base">arrow_back</span>
-        Kembali ke Laporan
+        {{ __('messages.back_to_reports') }}
     </a>
 </div>
 @endsection

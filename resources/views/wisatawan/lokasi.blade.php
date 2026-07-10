@@ -4,8 +4,8 @@
 <div class="bg-background min-h-screen flex flex-col">
     {{-- Hero Title --}}
     <section class="w-full pt-xl pb-lg px-gutter max-w-container-max mx-auto text-center">
-        <h1 class="font-display text-display-mobile md:text-display-lg text-on-background mb-4">Find Your Serenity</h1>
-        <p class="font-body text-body-lg text-on-surface-variant max-w-2xl mx-auto">Nestled in the lush landscapes of Gianyar, Bangkiang Jaran is your perfect escape into nature's embrace.</p>
+        <h1 class="font-display text-display-mobile md:text-display-lg text-on-background mb-4">{{ __('messages.find_serenity') }}</h1>
+        <p class="font-body text-body-lg text-on-surface-variant max-w-2xl mx-auto">{{ __('messages.find_serenity_desc') }}</p>
     </section>
 
     {{-- Interactive Map Section --}}
@@ -37,29 +37,29 @@
                         <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-sm text-primary">
                             <span class="material-symbols-outlined">route</span>
                         </div>
-                        <h3 class="font-body text-label-md text-outline mb-xs">Distance</h3>
-                        <p class="font-body text-body-md text-on-surface font-medium">Kira-kira 15km dari Ubud</p>
+                        <h3 class="font-body text-label-md text-outline mb-xs">{{ __('messages.info_distance') }}</h3>
+                        <p class="font-body text-body-md text-on-surface font-medium">{{ __('messages.dist_from_ubud') }}</p>
                     </div>
                     <div class="flex flex-col items-center md:items-start pt-6 md:pt-0 md:px-lg">
                         <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-sm text-primary">
                             <span class="material-symbols-outlined">schedule</span>
                         </div>
-                        <h3 class="font-body text-label-md text-outline mb-xs">Time</h3>
-                        <p class="font-body text-body-md text-on-surface font-medium">30-45 menit berkendara</p>
+                        <h3 class="font-body text-label-md text-outline mb-xs">{{ __('messages.info_time') }}</h3>
+                        <p class="font-body text-body-md text-on-surface font-medium">{{ __('messages.travel_time_detail') }}</p>
                     </div>
                     <div class="flex flex-col items-center md:items-start pt-6 md:pt-0 md:pl-lg">
                         <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-sm text-primary">
                             <span class="material-symbols-outlined">directions_car</span>
                         </div>
-                        <h3 class="font-body text-label-md text-outline mb-xs">Route</h3>
-                        <p class="font-body text-body-md text-on-surface font-medium">Akses mudah melalui jalan aspal</p>
+                        <h3 class="font-body text-label-md text-outline mb-xs">{{ __('messages.info_route') }}</h3>
+                        <p class="font-body text-body-md text-on-surface font-medium">{{ __('messages.easy_access_detail') }}</p>
                     </div>
                 </div>
                 <div class="mt-lg flex justify-center border-t border-outline-variant/30 pt-md">
                     <a href="https://www.google.com/maps?q=-8.511979,115.328486" target="_blank"
                        class="bg-primary-container text-white font-body text-label-md px-8 py-4 rounded-xl flex items-center gap-sm hover:-translate-y-1 transition-transform shadow-sm group">
                         <span class="material-symbols-outlined group-hover:animate-pulse">map</span>
-                        Buka di Google Maps
+                        {{ __('messages.open_in_gmaps') }}
                     </a>
                 </div>
             </div>

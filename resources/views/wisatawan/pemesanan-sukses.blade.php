@@ -8,32 +8,32 @@
             <span class="material-symbols-outlined text-4xl text-primary">check_circle</span>
         </div>
 
-        <h1 class="font-display text-headline-md text-on-background mb-sm">Pemesanan Berhasil!</h1>
-        <p class="font-body text-body-md text-on-surface-variant mb-lg">Simpan kode booking Anda untuk referensi</p>
+        <h1 class="font-display text-headline-md text-on-background mb-sm">{{ __('messages.booking_success') }}</h1>
+        <p class="font-body text-body-md text-on-surface-variant mb-lg">{{ __('messages.booking_success_desc') }}</p>
 
         @if(isset($pemesanan))
         {{-- Booking Code --}}
         <div class="bg-background rounded-xl p-md mb-lg">
-            <p class="font-body text-caption text-on-surface-variant mb-1">Kode Booking</p>
+            <p class="font-body text-caption text-on-surface-variant mb-1">{{ __('messages.booking_code') }}</p>
             <p class="font-mono text-headline-md text-primary tracking-widest">{{ $pemesanan->kode_booking }}</p>
         </div>
 
         {{-- Summary --}}
         <div class="grid grid-cols-2 gap-sm mb-lg text-left">
             <div class="bg-background rounded-xl p-md">
-                <p class="font-body text-caption text-on-surface-variant">Tiket</p>
+                <p class="font-body text-caption text-on-surface-variant">{{ __('messages.ticket_label') }}</p>
                 <p class="font-body text-label-md text-on-background">{{ $pemesanan->tiket->nama_tiket ?? '-' }}</p>
             </div>
             <div class="bg-background rounded-xl p-md">
-                <p class="font-body text-caption text-on-surface-variant">Tanggal</p>
+                <p class="font-body text-caption text-on-surface-variant">{{ __('messages.date_label') }}</p>
                 <p class="font-body text-label-md text-on-background">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d M Y') }}</p>
             </div>
             <div class="bg-background rounded-xl p-md">
-                <p class="font-body text-caption text-on-surface-variant">Jumlah</p>
-                <p class="font-body text-label-md text-on-background">{{ $pemesanan->jumlah }} tiket</p>
+                <p class="font-body text-caption text-on-surface-variant">{{ __('messages.quantity_label') }}</p>
+                <p class="font-body text-label-md text-on-background">{{ __('messages.ticket_count', ['count' => $pemesanan->jumlah]) }}</p>
             </div>
             <div class="bg-background rounded-xl p-md">
-                <p class="font-body text-caption text-on-surface-variant">Total</p>
+                <p class="font-body text-caption text-on-surface-variant">{{ __('messages.total_label') }}</p>
                 <p class="font-body text-label-md text-primary">Rp{{ number_format($pemesanan->total_harga, 0, ',', '.') }}</p>
             </div>
         </div>
@@ -56,13 +56,13 @@
             <a href="{{ route('wisatawan.pembayaran.create', $pemesanan->id_pemesanan) }}"
                class="bg-primary-container text-white font-body text-label-md px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-sm">payments</span>
-                Upload Bukti Pembayaran
+                {{ __('messages.upload_payment') }}
             </a>
             @endif
             <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}"
                class="bg-surface-container-low text-on-background font-body text-label-md px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-sm">confirmation_number</span>
-                Lihat E-Ticket
+                {{ __('messages.view_eticket') }}
             </a>
         </div>
         @endif
@@ -70,7 +70,7 @@
         <div class="mt-lg">
             <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="font-body text-label-md text-primary hover:underline inline-flex items-center gap-1">
                 <span class="material-symbols-outlined text-sm">history</span>
-                Lihat Riwayat Pemesanan
+                {{ __('messages.view_booking_history') }}
             </a>
         </div>
     </div>

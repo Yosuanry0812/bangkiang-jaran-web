@@ -1,0 +1,93 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "9router/personal-combo",
+  "small_model": "9router/personal-combo",
+  "instructions": ["AGENTS.md"],
+  "provider": {
+    "9router": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "9router",
+      "options": {
+        "baseURL": "http://localhost:20128/v1"
+      },
+      "models": {
+        "personal-combo": {
+          "name": "Personal Combo / MiMo Auto (execution)",
+          "attachment": true,
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          }
+        }
+      }
+    }
+  },
+  "command": {
+    "plan": {
+      "template": "$ARGUMENTS",
+      "description": "Plan mode - MiMo/personal-combo read-only planning",
+      "agent": "plan"
+    },
+    "dev": {
+      "template": "[BUILD MODE] $ARGUMENTS",
+      "description": "Build/fix with personal-combo",
+      "agent": "build"
+    }
+  },
+  "agent": {
+    "plan": {
+      "model": "9router/personal-combo",
+      "description": "Plan - MiMo/personal-combo read-only planning",
+      "mode": "primary",
+      "prompt": "Kamu plan agent READ-ONLY. Buat rencana singkat: file mana, apa yang diubah, langkah-langkah. Maksimal 10 baris per file. Tidak ada kode panjang."
+    },
+    "build": {
+      "model": "9router/personal-combo",
+      "description": "Build/Fix - personal-combo untuk coding execution",
+      "mode": "primary",
+      "prompt": "Kamu build agent. Eksekusi kode sesuai requirement. Hemat token: jangan ulang konteks, langsung kerjakan. Setelah selesai beri ringkasan file yang diubah dan cara test."
+    },
+  },
+  "default_agent": "build",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 6,
+    "reserved": 4000
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      "*.log",
+      "*.tmp",
+      "__pycache__/**",
+      ".next/**",
+      "build/**",
+      ".opencode/cache/**"
+    ]
+  },
+  "snapshot": false,
+  "permission": {
+    "read": "allow",
+    "edit": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "bash": "allow",
+    "task": "allow",
+    "external_directory": "allow",
+    "todowrite": "allow",
+    "question": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "lsp": "allow",
+    "doom_loop": "allow",
+    "skill": "allow"
+  },
+  "server": {
+    "port": 4096,
+    "hostname": "0.0.0.0",
+    "ssh_timeout": 300000
+  }}

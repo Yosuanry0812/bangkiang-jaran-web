@@ -25,7 +25,7 @@ class LaporanController extends Controller
         $periode_awal = $request->periode_awal;
         $periode_akhir = $request->periode_akhir;
 
-        $data = Pemesanan::with(['user', 'tiket', 'pembayaran'])
+        $data = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
             ->whereBetween('tgl_kunjungan', [$periode_awal, $periode_akhir])
             ->orderBy('tgl_kunjungan')
             ->get();
@@ -55,7 +55,7 @@ class LaporanController extends Controller
         $periode_awal = $request->periode_awal;
         $periode_akhir = $request->periode_akhir;
 
-        $data = Pembayaran::with('pemesanan.user', 'pemesanan.tiket')
+        $data = Pembayaran::with('pemesanan.user', 'pemesanan.tiket', 'pemesanan.detailPemesanan')
             ->where('status', 'valid')
             ->whereBetween('tgl_bayar', [$periode_awal, $periode_akhir])
             ->orderBy('tgl_bayar')

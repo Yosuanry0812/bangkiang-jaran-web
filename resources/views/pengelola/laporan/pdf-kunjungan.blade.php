@@ -41,7 +41,12 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $k->kode_booking }}</td>
                 <td>{{ $k->user->name ?? '-' }}</td>
-                <td>{{ $k->tiket->nama_tiket ?? '-' }}</td>
+                <td>
+                    @php
+                        $tSum = $k->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->nama_tiket)->implode(', ');
+                    @endphp
+                    {{ $tSum ?: ($k->tiket->nama_tiket ?? '-') }}
+                </td>
                 <td>{{ $k->tgl_kunjungan ? \Carbon\Carbon::parse($k->tgl_kunjungan)->format('d/m/Y') : '-' }}</td>
                 <td>{{ $k->jumlah }}</td>
                 <td>Rp {{ number_format($k->total_harga, 0, ',', '.') }}</td>

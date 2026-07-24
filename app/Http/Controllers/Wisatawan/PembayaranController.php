@@ -18,7 +18,7 @@ class PembayaranController extends Controller
             ->findOrFail($id_pemesanan);
 
         if ($pemesanan->pembayaran) {
-            return redirect()->route('pemesanan.detail', $pemesanan->id_pemesanan)
+            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
                 ->with('info', 'Pembayaran sudah pernah diajukan.');
         }
 
@@ -46,34 +46,39 @@ class PembayaranController extends Controller
         ]);
 
         // Handle file upload aman
-        if ($request->hasFile('bukti_bayar')) {
-            $file = $request->file('bukti_bayar');
-
-            // Validasi MIME type asli
-            $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
-            if (!in_array($file->getMimeType(), $allowedMimes)) {
-                return back()->withErrors(['bukti_bayar' => 'Tipe file tidak valid.'])->withInput();
-            }
-
-            // Rename dengan nama acak
-            $filename = 'bukti_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('public/bukti', $filename);
-            $pathDisplay = str_replace('public/', '', $path);
+        if (!$request->hasFile('bukti_bayar')) {
+            return back()->withErrors(['bukti_bayar' => 'File bukti pembayaran tidak ditemukan.'])->withInput();
         }
+
+        $file = $request->file('bukti_bayar');
+
+        // Validasi MIME type asli
+        $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+        if (!in_array($file->getMimeType(), $allowedMimes)) {
+            return back()->withErrors(['bukti_bayar' => 'Tipe file tidak valid. Gunakan JPG, PNG, atau PDF.'])->withInput();
+        }
+
+        // Rename dengan nama acak
+        $filename = 'bukti_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('public/bukti', $filename);
+
+        if (!$path) {
+            return back()->withErrors(['bukti_bayar' => 'Gagal menyimpan file. Coba lagi.'])->withInput();
+        }
+
+        // Strip the 'public/' prefix so the path is relative to storage/app/public
+        $pathDisplay = ltrim(str_replace('public', '', $path), '/');
 
         Pembayaran::create([
             'id_pemesanan' => $pemesanan->id_pemesanan,
             'total'        => $pemesanan->total_harga,
             'metode'       => $request->metode,
-            'bukti_bayar'  => $pathDisplay ?? null,
+            'bukti_bayar'  => $pathDisplay,
             'status'       => 'pending',
             'tgl_bayar'    => now()->toDateString(),
         ]);
 
-        // Update status pemesanan jadi 'diproses'
-        $pemesanan->update(['status' => 'diproses']);
-
-        return redirect()->route('pemesanan.detail', $pemesanan->id_pemesanan)
+        return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
             ->with('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi pengelola.');
     }
 }

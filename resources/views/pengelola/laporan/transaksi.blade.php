@@ -5,8 +5,8 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.transaction_report_title') }}</h1>
-            <p class="text-sm text-stone-500 mt-0.5">
+            <h1 class="font-heading text-2xl font-bold text-gray-500-800">{{ __('messages.transaction_report_title') }}</h1>
+            <p class="text-sm text-gray-500-500 mt-0.5">
                 {{ __('messages.period') }} {{ $periode_awal ? \Carbon\Carbon::parse($periode_awal)->format('d/m/Y') : __('messages.all') }}
                 -
                 {{ $periode_akhir ? \Carbon\Carbon::parse($periode_akhir)->format('d/m/Y') : __('messages.all') }}
@@ -33,27 +33,32 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-stone-200 bg-stone-50 text-left">
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_user') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_ticket') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.payment_date') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.method_label') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_total') }}</th>
+                    <tr class="border-b border-gray-300-200 bg-stone-50 text-left">
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_user') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_ticket') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.payment_date') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.method_label') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_total') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($data ?? [] as $t)
-                    <tr class="border-b border-stone-100 hover:bg-stone-50 transition-colors">
-                        <td class="py-3.5 px-4 font-mono text-stone-700">{{ $t->pemesanan->kode_booking ?? '-' }}</td>
-                        <td class="py-3.5 px-4 text-stone-600">{{ $t->pemesanan->user->name ?? '-' }}</td>
-                        <td class="py-3.5 px-4 text-stone-600">{{ $t->pemesanan->tiket->nama_tiket ?? '-' }}</td>
-                        <td class="py-3.5 px-4 text-stone-500 text-xs">{{ $t->created_at ? \Carbon\Carbon::parse($t->created_at)->format('d/m/Y') : '-' }}</td>
-                        <td class="py-3.5 px-4 text-stone-700">{{ $t->metode ?? '-' }}</td>
-                        <td class="py-3.5 px-4 text-stone-700 font-medium">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
+                    <tr class="border-b border-gray-300-100 hover:bg-stone-50 transition-colors">
+                        <td class="py-3.5 px-4 font-mono text-gray-500-700">{{ $t->pemesanan->kode_booking ?? '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-600">{{ $t->pemesanan->user->name ?? '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-600">
+                            @php
+                                $tSum = $t->pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', ');
+                            @endphp
+                            {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
+                        </td>
+                        <td class="py-3.5 px-4 text-gray-500-500 text-xs">{{ $t->created_at ? \Carbon\Carbon::parse($t->created_at)->format('d/m/Y') : '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-700">{{ $t->metode ?? '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-700 font-medium">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" class="py-10 text-center text-stone-400">{{ __('messages.no_data_transaction') }}</td></tr>
+                    <tr><td colspan="6" class="py-10 text-center text-gray-500-400">{{ __('messages.no_data_transaction') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

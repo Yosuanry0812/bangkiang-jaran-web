@@ -5,8 +5,8 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-stone-800">{{ __('messages.manage_content_title') }}</h1>
-            <p class="text-sm text-stone-500 mt-0.5">{{ __('messages.manage_content_desc') }}</p>
+            <h1 class="font-heading text-2xl font-bold text-gray-500-800">{{ __('messages.manage_content_title') }}</h1>
+            <p class="text-sm text-gray-500-500 mt-0.5">{{ __('messages.manage_content_desc') }}</p>
         </div>
         <a href="{{ route('pengelola.konten.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
             <span class="material-symbols-outlined text-base">add</span>
@@ -18,22 +18,22 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-stone-200 bg-stone-50 text-left">
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_title') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_type') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_content') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_status') }}</th>
-                        <th class="text-xs font-semibold uppercase tracking-wider text-stone-500 py-3.5 px-4">{{ __('messages.th_action') }}</th>
+                    <tr class="border-b border-gray-300-200 bg-stone-50 text-left">
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_title') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_type') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_content') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_status') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($konten as $k)
-                    <tr class="border-b border-stone-100 hover:bg-stone-50 transition-colors">
-                        <td class="py-3.5 px-4 font-medium text-stone-800">{{ $k->judul }}</td>
+                    <tr class="border-b border-gray-300-100 hover:bg-stone-50 transition-colors">
+                        <td class="py-3.5 px-4 font-medium text-gray-500-800">{{ $k->judul }}</td>
                         <td class="py-3.5 px-4">
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-teal-100 text-teal-700">{{ ucfirst($k->jenis) }}</span>
                         </td>
-                        <td class="py-3.5 px-4 text-stone-500 max-w-xs truncate">{{ Str::limit(strip_tags($k->isi), 100) }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-500 max-w-xs truncate">{{ Str::limit(strip_tags($k->isi), 100) }}</td>
                         <td class="py-3.5 px-4">
                             @if ($k->deleted_at)
                                 <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">{{ __('messages.deleted_status') }}</span>
@@ -59,13 +59,13 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="py-10 text-center text-stone-400">{{ __('messages.no_content') }}</td></tr>
+                    <tr><td colspan="5" class="py-10 text-center text-gray-500-400">{{ __('messages.no_content') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
         @if (method_exists($konten, 'links'))
-        <div class="p-4 border-t border-stone-200">
+        <div class="p-4 border-t border-gray-300-200">
             {{ $konten->links() }}
         </div>
         @endif

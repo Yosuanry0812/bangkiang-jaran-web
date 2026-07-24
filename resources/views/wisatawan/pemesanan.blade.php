@@ -1,167 +1,244 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-background min-h-screen" x-data="{ harga: {{ $selectedTiket->harga ?? 0 }}, jumlah: 1 }">
-    {{-- Header --}}
-    <section class="relative h-48 flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-background/40 to-background"></div>
-        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-30"></div>
-        <div class="relative z-10 text-center px-gutter max-w-container-max mx-auto w-full">
-            <nav class="font-body text-caption text-on-surface-variant mb-2 flex items-center justify-center gap-2">
-                <a href="{{ url('/') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_home') }}</a>
-                <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-                <a href="{{ route('tiket.index') }}" class="hover:text-primary transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
-                <span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
-                <span class="text-primary">{{ __('messages.breadcrumb_booking') }}</span>
-            </nav>
-            <h1 class="font-display text-headline-md text-on-background">{{ __('messages.secure_your_visit') }}</h1>
-            <p class="font-body text-body-md text-on-surface-variant">{{ __('messages.secure_your_visit_desc') }}</p>
-        </div>
-    </section>
+@php
+    $pricesJson = json_encode($tiketList->pluck('harga', 'id_tiket')->toArray());
+    $namesJson  = json_encode($tiketList->pluck('nama_tiket', 'id_tiket')->toArray());
+@endphp
 
-    {{-- Error & Success --}}
-    <div class="max-w-container-max mx-auto px-gutter -mt-8 relative z-10">
-        @if(session('error'))
-        <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6 font-body text-body-md">{{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-        <div class="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl mb-6 font-body text-body-md">
-            <ul class="list-disc list-inside">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+<div x-data="ticketOrder({{ $pricesJson }}, {{ $namesJson }})">
+
+    {{-- ── PAGE HEADER ──────────────────────────────── --}}
+    <div class="pt-32 pb-10 px-gutter bg-white border-b border-gray-100">
+        <div class="max-w-6xl mx-auto">
+            {{-- Breadcrumb --}}
+            <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6 font-sans">
+                <a href="{{ route('landing') }}" class="hover:text-gray-700 transition-colors">Beranda</a>
+                <span>/</span>
+                <a href="{{ route('tiket.index') }}" class="hover:text-gray-700 transition-colors">Tiket</a>
+                <span>/</span>
+                <span class="text-gray-700">Pemesanan</span>
+            </nav>
+            <h1 class="font-serif text-4xl md:text-5xl text-gray-900">Pesan Tiket</h1>
+            <p class="font-sans text-sm text-gray-500 mt-2">Bangkiang Jaran · Desa Bakbakan, Gianyar, Bali</p>
         </div>
-        @endif
     </div>
 
-    {{-- Form --}}
-    <section class="max-w-container-max mx-auto px-gutter pb-xl">
-        <form method="POST" action="{{ route('wisatawan.pemesanan.store') }}">
+    {{-- ── ALERTS ───────────────────────────────────── --}}
+    @if(session('error') || (isset($errors) && $errors->any()))
+    <div class="max-w-6xl mx-auto px-gutter mt-6">
+        <div class="border border-red-200 bg-red-50 text-red-700 px-5 py-4 rounded-xl font-sans text-sm">
+            @if(session('error')){{ session('error') }}@endif
+            @if(isset($errors) && $errors->any())
+            <ul class="list-disc list-inside space-y-1">
+                @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+            </ul>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    {{-- ── FORM ─────────────────────────────────────── --}}
+    <section class="py-12 px-gutter bg-white">
+        <form method="POST" action="{{ route('wisatawan.pemesanan.store') }}"
+              class="max-w-6xl mx-auto">
             @csrf
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
-                {{-- Left: Main Form (8 cols) --}}
-                <div class="lg:col-span-8 flex flex-col gap-lg">
-                    {{-- Selected Ticket Banner --}}
-                    @if(isset($selectedTiket))
-                    <div class="bg-primary-container/10 border border-primary-container/20 rounded-2xl p-md flex items-center gap-md">
-                        <span class="material-symbols-outlined text-primary text-2xl">confirmation_number</span>
-                        <div>
-                            <p class="font-body text-label-md text-primary">{{ __('messages.selected_ticket') }}</p>
-                            <p class="font-display text-headline-sm text-on-background">{{ $selectedTiket->nama_tiket }}</p>
-                            <p class="font-body text-body-md text-primary">Rp{{ number_format($selectedTiket->harga, 0, ',', '.') }} {{ __('messages.per_person') }}</p>
-                        </div>
-                    </div>
-                    @endif
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
 
-                    {{-- Ticket Selection --}}
-                    <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
-                        <h2 class="font-display text-headline-sm text-on-background mb-md">{{ __('messages.select_ticket') }}</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
-                            @if(isset($selectedTiket))
-                            @php
-                                $tiketList = $tiketList ?? collect([$selectedTiket]);
-                            @endphp
-                            @endif
-                            @if(isset($tiketList))
+                {{-- ─ LEFT COLUMN ──────────────────── --}}
+                <div class="lg:col-span-7 space-y-5">
+
+                    {{-- Date picker --}}
+                    <div class="border border-gray-200 rounded-2xl p-6 bg-white" data-aos="fade-up">
+                        <label class="block font-sans text-xs tracking-[0.12em] uppercase text-gray-400 mb-3">
+                            Tanggal Kunjungan
+                        </label>
+                        <input type="date"
+                               name="tgl_kunjungan"
+                               value="{{ $tanggal ?? date('Y-m-d') }}"
+                               class="w-full bg-transparent border-0 p-0 font-serif text-2xl text-gray-900 focus:ring-0 outline-none cursor-pointer">
+                    </div>
+
+                    {{-- Ticket list --}}
+                    <div class="border border-gray-200 rounded-2xl overflow-hidden bg-white" data-aos="fade-up" data-aos-delay="40">
+                        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                            <div>
+                                <h3 class="font-serif text-xl text-gray-900">Pilih Tiket</h3>
+                                <p class="font-sans text-xs text-gray-400 mt-0.5">Tentukan jumlah tiket yang diinginkan</p>
+                            </div>
+                            <span class="font-sans text-xs text-gray-400">Maks. 10 per jenis</span>
+                        </div>
+
+                        <div class="divide-y divide-gray-100">
                             @foreach($tiketList as $t)
-                            <label class="relative flex flex-col p-md rounded-xl border border-outline-variant cursor-pointer hover:bg-surface-container-low transition-colors group">
-                                <input type="radio" name="id_tiket" value="{{ $t->id_tiket }}" data-harga="{{ $t->harga }}"
-                                       @change="harga = {{ $t->harga }}"
-                                       {{ isset($selectedTiket) && $selectedTiket->id_tiket == $t->id_tiket ? 'checked' : ($loop->first ? 'checked' : '') }}
-                                       class="peer sr-only">
-                                <div class="absolute inset-0 rounded-xl border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 pointer-events-none"></div>
-                                <div class="flex justify-between items-center mb-sm z-10">
-                                    <span class="font-body text-label-md text-on-surface">{{ $t->nama_tiket }}</span>
-                                    <span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100 transition-opacity">check_circle</span>
-                                </div>
-                                <p class="font-body text-body-md text-on-surface-variant mb-sm flex-grow z-10">{{ __('messages.ticket_description') }}</p>
-                                <span class="font-display text-headline-sm text-primary z-10">Rp{{ number_format($t->harga, 0, ',', '.') }}</span>
-                            </label>
-                            @endforeach
-                            @endif
-                        </div>
-                    </div>
-
-                    {{-- Date & Quantity --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                        <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
-                            <label for="tgl_kunjungan" class="font-body text-label-md text-on-surface-variant mb-2 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-sm">calendar_month</span>
-                                {{ __('messages.visit_date') }}
-                            </label>
-                            <input type="date" name="tgl_kunjungan" id="tgl_kunjungan" value="{{ $tanggal ?? date('Y-m-d') }}"
-                                   class="w-full bg-background border border-outline-variant text-on-background rounded-xl px-4 py-3 font-body text-body-md focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none">
-                        </div>
-                        <div class="bg-surface-container-lowest rounded-2xl card-shadow p-lg">
-                            <label class="font-body text-label-md text-on-surface-variant mb-2 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary text-sm">group</span>
-                                {{ __('messages.ticket_quantity') }}
-                            </label>
-                            <div class="flex items-center justify-between py-sm border-b border-outline-variant last:border-0">
+                            <div class="flex items-center justify-between px-6 py-5 hover:bg-gray-50 transition-colors">
                                 <div>
-                                        <p class="font-body text-label-md text-on-surface">{{ __('messages.adults') }}</p>
-                                    <p class="font-body text-caption text-on-surface-variant">{{ __('messages.age_12_plus') }}</p>
+                                    <p class="font-sans text-sm font-medium text-gray-900">{{ $t->nama_tiket }}</p>
+                                    <p class="font-sans text-xs text-gray-400 mt-0.5">Rp{{ number_format($t->harga, 0, ',', '.') }} / orang</p>
                                 </div>
-                                <div class="flex items-center gap-md">
-                                    <button type="button" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors"
-                                            @click="jumlah = Math.max(1, jumlah - 1)">
-                                        <span class="material-symbols-outlined">remove</span>
+
+                                <div class="flex items-center gap-3">
+                                    <button type="button"
+                                            class="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-gray-900 hover:text-gray-900 transition-colors"
+                                            @click="decrement({{ $t->id_tiket }})">
+                                        <span class="material-symbols-outlined text-base">remove</span>
                                     </button>
-                                    <span class="font-body text-body-lg w-8 text-center" x-text="jumlah">1</span>
-                                    <button type="button" class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface hover:bg-surface-container transition-colors"
-                                            @click="jumlah = Math.min(10, jumlah + 1)">
-                                        <span class="material-symbols-outlined">add</span>
+                                    <span class="font-sans text-sm font-medium w-6 text-center tabular-nums text-gray-900"
+                                          x-text="qty({{ $t->id_tiket }})">0</span>
+                                    <button type="button"
+                                            class="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-gray-900 hover:text-gray-900 transition-colors"
+                                            @click="increment({{ $t->id_tiket }})">
+                                        <span class="material-symbols-outlined text-base">add</span>
                                     </button>
+                                    <input type="hidden" name="tickets[{{ $t->id_tiket }}]" :value="qty({{ $t->id_tiket }})">
                                 </div>
                             </div>
-                            <input type="hidden" name="jumlah" x-model="jumlah">
+                            @endforeach
                         </div>
+                    </div>
+
+                    {{-- Info notes --}}
+                    <div class="flex flex-wrap gap-x-6 gap-y-2" data-aos="fade-up" data-aos-delay="60">
+                        <span class="font-sans text-xs text-gray-400 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">check</span>
+                            Harga sudah termasuk pajak
+                        </span>
+                        <span class="font-sans text-xs text-gray-400 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
+                            Tiket berlaku sesuai tanggal
+                        </span>
+                        <a href="mailto:info@bangkiangjaran.com" class="font-sans text-xs text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">mail</span>
+                            Pertanyaan? Hubungi pengelola
+                        </a>
                     </div>
                 </div>
 
-                {{-- Right: Summary Sidebar (4 cols) --}}
-                <div class="lg:col-span-4 relative">
-                    <div class="sticky top-24 bg-surface-container-lowest rounded-2xl card-shadow overflow-hidden flex flex-col">
-                        {{-- Image Header --}}
-                        <div class="h-48 w-full overflow-hidden">
-                            <img class="w-full h-full object-cover"
-                                 src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80"
-                                 alt="Bangkiang Jaran Waterfall">
-                        </div>
-                        <div class="p-lg space-y-md">
-                            <h3 class="font-display text-headline-sm text-on-background">{{ __('messages.booking_summary') }}</h3>
-                            <div class="space-y-sm">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex flex-col">
-                                        <span class="font-body text-label-md text-on-surface" x-text="selectedTicketName || '{{ $selectedTiket->nama_tiket ?? __('messages.tickets') }}'">{{ $selectedTiket->nama_tiket ?? 'Tiket' }}</span>
-                                        <span class="font-body text-caption text-on-surface-variant" x-text="selectedDate || '{{ isset($tanggal) ? \Carbon\Carbon::parse($tanggal)->format('M d, Y') : date('M d, Y') }}'">{{ isset($tanggal) ? \Carbon\Carbon::parse($tanggal)->format('M d, Y') : date('M d, Y') }}</span>
+                {{-- ─ RIGHT COLUMN (sticky summary) ── --}}
+                <div class="lg:col-span-5" data-aos="fade-left" data-aos-delay="60">
+                    <div class="sticky top-24 space-y-4">
+
+                        {{-- Summary card --}}
+                        <div class="border border-gray-200 rounded-2xl overflow-hidden bg-white">
+
+                            {{-- Photo --}}
+                            <div class="relative h-44 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80"
+                                     class="w-full h-full object-cover" alt="Bangkiang Jaran">
+                                <div class="absolute inset-0 bg-black/30"></div>
+                                <div class="absolute bottom-4 left-5">
+                                    <p class="font-serif text-lg text-white">Bangkiang Jaran</p>
+                                    <p class="font-sans text-xs text-white/70 mt-0.5">Gianyar, Bali</p>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <h3 class="font-serif text-lg text-gray-900 mb-5">Ringkasan Pesanan</h3>
+
+                                {{-- Empty state --}}
+                                <div class="py-8 text-center" x-show="selectedTickets().length === 0">
+                                    <p class="font-sans text-sm text-gray-400">Belum ada tiket dipilih</p>
+                                    <p class="font-sans text-xs text-gray-300 mt-1">Pilih tiket di sebelah kiri</p>
+                                </div>
+
+                                {{-- Selected items --}}
+                                <div class="space-y-3 mb-5" x-show="selectedTickets().length > 0">
+                                    <template x-for="item in selectedTickets()" :key="item.id">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="font-sans text-sm text-gray-900" x-text="item.nama"></p>
+                                                <p class="font-sans text-xs text-gray-400 mt-0.5"
+                                                   x-text="item.qty + ' × Rp' + item.harga.toLocaleString('id-ID')"></p>
+                                            </div>
+                                            <span class="font-sans text-sm text-gray-900 tabular-nums"
+                                                  x-text="'Rp' + (item.qty * item.harga).toLocaleString('id-ID')"></span>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                {{-- Totals --}}
+                                <div class="border-t border-gray-100 pt-4 space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="font-sans text-xs text-gray-400">Subtotal</span>
+                                        <span class="font-sans text-xs text-gray-700 tabular-nums"
+                                              x-text="'Rp' + subtotal().toLocaleString('id-ID')">Rp0</span>
                                     </div>
-                                    <span class="font-body text-body-md text-on-surface" x-text="'Rp' + harga.toLocaleString('id-ID')">Rp{{ number_format($selectedTiket->harga ?? 0, 0, ',', '.') }}</span>
+                                    <div class="flex justify-between">
+                                        <span class="font-sans text-xs text-gray-400">Pajak (10%)</span>
+                                        <span class="font-sans text-xs text-gray-700 tabular-nums"
+                                              x-text="'Rp' + pajak().toLocaleString('id-ID')">Rp0</span>
+                                    </div>
+                                    <div class="flex justify-between items-baseline pt-2 border-t border-gray-100">
+                                        <span class="font-sans text-sm font-medium text-gray-900">Total</span>
+                                        <span class="font-serif text-2xl text-gray-900 tabular-nums"
+                                              x-text="'Rp' + total().toLocaleString('id-ID')">Rp0</span>
+                                    </div>
                                 </div>
+
+                                {{-- CTA --}}
+                                <button type="submit"
+                                        class="mt-5 w-full py-3.5 rounded-xl font-sans text-sm font-medium transition-colors"
+                                        :class="selectedTickets().length > 0
+                                            ? 'bg-gray-900 text-white hover:bg-gray-700 cursor-pointer'
+                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
+                                        :disabled="selectedTickets().length === 0">
+                                    <span x-show="selectedTickets().length > 0">Lanjut ke Pembayaran</span>
+                                    <span x-show="selectedTickets().length === 0">Pilih tiket terlebih dahulu</span>
+                                </button>
+
+                                <p class="font-sans text-xs text-center text-gray-400 mt-3">
+                                    Anda belum akan dikenakan biaya sekarang
+                                </p>
                             </div>
-                            <div class="border-t border-outline-variant pt-md space-y-sm">
-                                <div class="flex justify-between items-center">
-                                    <span class="font-body text-body-md text-on-surface-variant">{{ __('messages.subtotal') }}</span>
-                                    <span class="font-body text-body-md text-on-surface" x-text="'Rp' + (harga * jumlah).toLocaleString('id-ID')">Rp{{ number_format(($selectedTiket->harga ?? 0) * 1, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="font-body text-body-md text-on-surface-variant">{{ __('messages.taxes_fees') }}</span>
-                                    <span class="font-body text-body-md text-on-surface">Rp{{ number_format(round(($selectedTiket->harga ?? 0) * 0.1), 0, ',', '.') }}</span>
-                                </div>
-                                <div class="flex justify-between items-center pt-md">
-                                    <span class="font-display text-headline-sm text-on-background">{{ __('messages.total') }}</span>
-                                    <span class="font-display text-headline-sm text-primary" x-text="'Rp' + ((harga * jumlah) + Math.round((harga * jumlah) * 0.1)).toLocaleString('id-ID')">
-                                        Rp{{ number_format(round(($selectedTiket->harga ?? 0) * 1 * 1.1), 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            </div>
-                            <button type="submit"
-                                    class="w-full bg-primary-container text-white font-body text-label-md px-6 py-4 rounded-xl hover:-translate-y-0.5 transition-all duration-300 shadow-sm flex items-center justify-center gap-2">
-                                {{ __('messages.proceed_to_payment') }}
-                            </button>
-                            <p class="font-body text-caption text-center text-on-surface-variant">{{ __('messages.no_charge_yet') }}</p>
                         </div>
+
+                        {{-- Help note --}}
+                        <div class="px-5 py-4 rounded-xl border border-gray-200 bg-white">
+                            <p class="font-sans text-sm font-medium text-gray-900">Butuh bantuan?</p>
+                            <p class="font-sans text-xs text-gray-400 mt-0.5">
+                                Hubungi kami di
+                                <a href="mailto:info@bangkiangjaran.com" class="text-gray-700 hover:underline">
+                                    info@bangkiangjaran.com
+                                </a>
+                            </p>
+                        </div>
+
                     </div>
                 </div>
+
             </div>
         </form>
     </section>
+
 </div>
+
+@push('scripts')
+<script>
+function ticketOrder(prices, names) {
+    const tickets = {};
+    Object.keys(prices).forEach(id => { tickets[id] = 0; });
+    return {
+        tickets,
+        prices,
+        names,
+        qty(id)       { return this.tickets[id] || 0; },
+        increment(id) { if (this.tickets[id] < 10) this.tickets[id]++; },
+        decrement(id) { if (this.tickets[id] > 0)  this.tickets[id]--; },
+        selectedTickets() {
+            return Object.entries(this.tickets)
+                .filter(([, qty]) => qty > 0)
+                .map(([id, qty]) => ({
+                    id:    parseInt(id),
+                    nama:  this.names[id] || 'Tiket',
+                    qty,
+                    harga: this.prices[id] || 0,
+                }));
+        },
+        subtotal() { return this.selectedTickets().reduce((s, t) => s + t.qty * t.harga, 0); },
+        pajak()    { return Math.round(this.subtotal() * 0.1); },
+        total()    { return this.subtotal() + this.pajak(); },
+    };
+}
+</script>
+@endpush
 @endsection

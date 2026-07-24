@@ -12,7 +12,7 @@ class TiketController extends Controller
     public function index()
     {
         $tiket = Tiket::withCount(['pemesanan as total_terjual' => function ($q) {
-            $q->whereIn('status', ['diproses', 'selesai']);
+            $q->where('status', 'selesai');
         }])->orderBy('created_at', 'desc')->paginate(20);
 
         return view('pengelola.tiket.index', compact('tiket'));
@@ -28,13 +28,16 @@ class TiketController extends Controller
         $request->validate([
             'nama_tiket' => ['required', 'string', 'max:100'],
             'harga'      => ['required', 'numeric', 'min:0'],
+            'kategori'   => ['required', 'in:perorangan,kendaraan,paket'],
         ], [
             'nama_tiket.required' => 'Nama tiket wajib diisi.',
             'harga.required'      => 'Harga tiket wajib diisi.',
             'harga.numeric'       => 'Harga harus angka.',
+            'kategori.required'   => 'Kategori tiket wajib dipilih.',
+            'kategori.in'         => 'Kategori tidak valid.',
         ]);
 
-        Tiket::create($request->only(['nama_tiket', 'harga', 'status']));
+        Tiket::create($request->only(['nama_tiket', 'harga', 'kategori', 'status']));
 
         return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil ditambahkan.');
     }
@@ -52,9 +55,10 @@ class TiketController extends Controller
         $request->validate([
             'nama_tiket' => ['required', 'string', 'max:100'],
             'harga'      => ['required', 'numeric', 'min:0'],
+            'kategori'   => ['required', 'in:perorangan,kendaraan,paket'],
         ]);
 
-        $tiket->update($request->only(['nama_tiket', 'harga', 'status']));
+        $tiket->update($request->only(['nama_tiket', 'harga', 'kategori', 'status']));
 
         return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil diperbarui.');
     }

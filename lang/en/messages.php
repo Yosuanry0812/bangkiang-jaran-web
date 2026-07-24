@@ -326,4 +326,22 @@ return [
     'lainnya' => 'Others',
     'upload_image_only' => 'Please upload an image file.',
     'standard_ticket' => 'Standard',
+
+    // Profile
+    'my_account' => 'My Account',
+    'manage_account' => 'Manage your account information',
+    'profile_updated' => 'Profile updated successfully',
+    'full_name' => 'Full Name',
+    'username' => 'Username',
+    'email' => 'Email',
+    'phone' => 'Phone Number',
+    'phone_placeholder' => '+62 812 3456 7890',
+    'save_changes' => 'Save Changes',
+    'cancel' => 'Cancel',
+    'member_since' => 'Member since',
+    'login_method' => 'Login Method',
+    'email_password' => 'Email & Password',
+    'account' => 'Account',
+    'tourist' => 'Tourist',
+    'manager' => 'Manager',
 ];

@@ -40,7 +40,13 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $t->pemesanan->kode_booking ?? '-' }}</td>
                 <td>{{ $t->pemesanan->user->name ?? '-' }}</td>
-                <td>{{ $t->pemesanan->tiket->nama_tiket ?? '-' }}</td>
+                <td>
+                    @php
+                        $dt = $t->pemesanan->detailPemesanan;
+                        $tSum = $dt ? $dt->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->nama_tiket)->implode(', ') : '';
+                    @endphp
+                    {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
+                </td>
                 <td>{{ $t->created_at ? \Carbon\Carbon::parse($t->created_at)->format('d/m/Y') : '-' }}</td>
                 <td>{{ $t->metode ?? '-' }}</td>
                 <td>Rp {{ number_format($t->total, 0, ',', '.') }}</td>

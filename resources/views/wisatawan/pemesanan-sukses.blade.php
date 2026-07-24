@@ -20,9 +20,12 @@
 
         {{-- Summary --}}
         <div class="grid grid-cols-2 gap-sm mb-lg text-left">
-            <div class="bg-background rounded-xl p-md">
+            <div class="bg-background rounded-xl p-md col-span-2 sm:col-span-1">
                 <p class="font-body text-caption text-on-surface-variant">{{ __('messages.ticket_label') }}</p>
-                <p class="font-body text-label-md text-on-background">{{ $pemesanan->tiket->nama_tiket ?? '-' }}</p>
+                @php
+                    $tSum = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', ');
+                @endphp
+                <p class="font-body text-label-md text-on-background">{{ $tSum ?: ($pemesanan->tiket->nama_tiket ?? '-') }}</p>
             </div>
             <div class="bg-background rounded-xl p-md">
                 <p class="font-body text-caption text-on-surface-variant">{{ __('messages.date_label') }}</p>
@@ -30,7 +33,7 @@
             </div>
             <div class="bg-background rounded-xl p-md">
                 <p class="font-body text-caption text-on-surface-variant">{{ __('messages.quantity_label') }}</p>
-                <p class="font-body text-label-md text-on-background">{{ __('messages.ticket_count', ['count' => $pemesanan->jumlah]) }}</p>
+                <p class="font-body text-label-md text-on-background">{{ $pemesanan->detailPemesanan->count() }} tiket</p>
             </div>
             <div class="bg-background rounded-xl p-md">
                 <p class="font-body text-caption text-on-surface-variant">{{ __('messages.total_label') }}</p>

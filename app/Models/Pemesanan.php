@@ -19,8 +19,13 @@ class Pemesanan extends Model
         'tgl_kunjungan',
         'jumlah',
         'total_harga',
+        'detail',
         'status',
         'kode_booking',
+    ];
+
+    protected $casts = [
+        'detail' => 'array',
     ];
 
     public function user()
@@ -36,5 +41,10 @@ class Pemesanan extends Model
     public function pembayaran()
     {
         return $this->hasOne(Pembayaran::class, 'id_pemesanan');
+    }
+
+    public function detailPemesanan()
+    {
+        return $this->hasMany(DetailPemesanan::class, 'id_pemesanan', 'id_pemesanan');
     }
 }

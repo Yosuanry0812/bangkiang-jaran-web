@@ -9,21 +9,31 @@
 </div>
 <div style="padding: 30px;">
 <h2 style="color: #065f46; margin-top: 0;">Halo, {{ $pemesanan->user->name }}!</h2>
-<p style="color: #4b5563;">Pemesanan tiket Anda berhasil dibuat. Berikut detail pemesanan:</p>
+<p style="color: #4b5563;">Pemesanan tiket Anda berhasil dibuat. Berikut kode tiket masing-masing pengunjung:</p>
 
-<table style="width: 100%; margin: 20px 0; background: #f0fdf4; border-radius: 12px; padding: 20px;">
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Kode Booking:</strong></td><td style="padding: 8px 0; color: #0d9488; font-size: 18px; font-weight: bold;">{{ $pemesanan->kode_booking }}</td></tr>
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Tiket:</strong></td><td style="padding: 8px 0; color: #374151;">{{ $pemesanan->tiket->nama_tiket }}</td></tr>
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Tanggal Kunjungan:</strong></td><td style="padding: 8px 0; color: #374151;">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d F Y') }}</td></tr>
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Jumlah Tiket:</strong></td><td style="padding: 8px 0; color: #374151;">{{ $pemesanan->jumlah }} tiket</td></tr>
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Total Harga:</strong></td><td style="padding: 8px 0; color: #374151;">Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}</td></tr>
-<tr><td style="padding: 8px 0; color: #374151;"><strong>Status:</strong></td><td style="padding: 8px 0;"><span style="background: #f59e0b; color: #ffffff; padding: 4px 12px; border-radius: 20px; font-size: 12px;">Menunggu Pembayaran</span></td></tr>
+@php $allItems = $pemesanan->detailPemesanan()->get(); @endphp
+
+<div style="background: #f0fdf4; border-radius: 12px; padding: 16px; margin: 16px 0;">
+<table style="width: 100%; border-collapse: collapse;">
+<tr><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">No</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Jenis Tiket</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Nama / Plat</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Kode Tiket</th></tr>
+@foreach($allItems as $idx => $item)
+<tr><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $idx + 1 }}</td><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $item->nama_tiket }}</td><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '-' }}</td><td style="padding: 6px 4px; font-family: monospace; font-weight: bold; color: #0d9488; font-size: 14px; letter-spacing: 1px;">{{ $item->kode_tiket }}</td></tr>
+@endforeach
+</table>
+</div>
+
+<table style="width: 100%; margin: 16px 0; background: #f9fafb; border-radius: 12px; padding: 16px;">
+<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Kode Booking:</strong></td><td style="padding: 6px 0; color: #0d9488; font-size: 16px; font-weight: bold;">{{ $pemesanan->kode_booking }}</td></tr>
+<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Tanggal Kunjungan:</strong></td><td style="padding: 6px 0; color: #374151; font-size: 13px;">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d F Y') }}</td></tr>
+<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Jumlah Tiket:</strong></td><td style="padding: 6px 0; color: #374151; font-size: 13px;">{{ $allItems->count() }} tiket</td></tr>
+<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Total Harga:</strong></td><td style="padding: 6px 0; color: #374151; font-size: 13px;">Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}</td></tr>
+<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Status:</strong></td><td style="padding: 6px 0;"><span style="background: #f59e0b; color: #ffffff; padding: 4px 12px; border-radius: 20px; font-size: 11px;">Menunggu Pembayaran</span></td></tr>
 </table>
 
-<p style="color: #4b5563;">Silakan lakukan pembayaran ke rekening yang tertera di halaman pemesanan dan upload bukti transfer untuk verifikasi.</p>
+<p style="color: #4b5563;">Silakan lakukan pembayaran dan upload bukti transfer untuk verifikasi. Setelah valid, tiket aktif dan bisa digunakan.</p>
 
 <div style="text-align: center; margin: 30px 0;">
-<a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" style="display: inline-block; background: #0d9488; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Lihat Detail Pemesanan</a>
+<a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" style="display: inline-block; background: #0d9488; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Lihat E-Ticket</a>
 </div>
 </div>
 <div style="background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">

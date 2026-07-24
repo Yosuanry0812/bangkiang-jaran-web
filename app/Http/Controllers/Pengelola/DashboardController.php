@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pemesanan;
 use App\Models\Pembayaran;
 use App\Models\User;
+use App\Models\DetailPemesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,7 @@ class DashboardController extends Controller
         $today = now()->toDateString();
 
         $pengunjungHariIni = Pemesanan::where('tgl_kunjungan', $today)
-            ->whereIn('status', ['diproses', 'selesai'])
+            ->where('status', 'selesai')
             ->sum('jumlah');
 
         $pendapatanBulanIni = Pembayaran::where('status', 'valid')
@@ -24,7 +25,9 @@ class DashboardController extends Controller
             ->whereYear('tgl_bayar', now()->year)
             ->sum('total');
 
-        $pemesananPending = Pemesanan::where('status', 'diproses')->count();
+        $pemesananPending = Pemesanan::whereHas('pembayaran', function ($q) {
+            $q->where('status', 'pending');
+        })->count();
 
         $totalWisatawan = User::where('role', 'wisatawan')->count();
 
@@ -33,7 +36,7 @@ class DashboardController extends Controller
                 'id_tiket',
                 DB::raw('SUM(jumlah) as total')
             )
-            ->whereIn('status', ['diproses', 'selesai'])
+            ->where('status', 'selesai')
             ->groupBy('id_tiket')
             ->with('tiket:id_tiket,nama_tiket')
             ->get();
@@ -41,7 +44,11 @@ class DashboardController extends Controller
         $grafikLabels = $grafik->pluck('tiket.nama_tiket')->toArray();
         $grafikData = $grafik->pluck('total')->map(fn($v) => (int)$v)->toArray();
 
-        $pemesananTerbaru = Pemesanan::with(['user', 'tiket'])
+        $scanHariIni = DetailPemesanan::where('status_tiket', 'digunakan')
+            ->whereDate('updated_at', $today)
+            ->count();
+
+        $pemesananTerbaru = Pemesanan::with(['user', 'tiket', 'detailPemesanan'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -53,7 +60,8 @@ class DashboardController extends Controller
             'totalWisatawan',
             'grafikLabels',
             'grafikData',
-            'pemesananTerbaru'
+            'pemesananTerbaru',
+            'scanHariIni'
         ));
     }
 }

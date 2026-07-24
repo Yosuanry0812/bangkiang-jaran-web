@@ -16,8 +16,10 @@ class VerifikasiController extends Controller
 {
     public function index()
     {
-        $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran'])
-            ->orderByRaw("FIELD(status, 'diproses', 'pending', 'selesai', 'dibatalkan')")
+        // Tampilkan semua pemesanan yg sudah punya pembayaran (pending verifikasi atau ditolak)
+        $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
+            ->has('pembayaran')
+            ->orderByRaw("FIELD(status, 'pending', 'selesai', 'dibatalkan')")
             ->orderBy('updated_at', 'desc')
             ->paginate(20);
 
@@ -26,7 +28,7 @@ class VerifikasiController extends Controller
 
     public function show($id)
     {
-        $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran'])->findOrFail($id);
+        $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])->findOrFail($id);
         return view('pengelola.verifikasi.show', compact('pemesanan'));
     }
 

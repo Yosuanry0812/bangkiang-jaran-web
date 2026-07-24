@@ -12,6 +12,7 @@ use App\Http\Controllers\Pengelola\TiketController as PengelolaTiketController;
 use App\Http\Controllers\Pengelola\VerifikasiController;
 use App\Http\Controllers\Pengelola\LaporanController;
 use App\Http\Controllers\Pengelola\UserController;
+use App\Http\Controllers\Pengelola\ScanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,12 +27,21 @@ Route::get('/informasi', function () {
 })->name('informasi');
 Route::get('/tiket', [WisatawanTiketController::class, 'index'])->name('tiket.index');
 Route::get('/tiket/{id}', [WisatawanTiketController::class, 'detail'])->name('tiket.detail');
+Route::get('/tiket/verifikasi/{kode}', [WisatawanTiketController::class, 'verifikasi'])->name('tiket.verifikasi');
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 
 // ========== AUTHENTICATED WISATAWAN ROUTES ==========
-Route::middleware(['auth', 'verified', 'role:wisatawan'])->prefix('wisatawan')->name('wisatawan.')->group(function () {
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+
+Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisatawan.')->group(function () {
     // Pemesanan
     Route::get('/pemesanan', [PemesananController::class, 'create'])->name('pemesanan.create');
     Route::post('/pemesanan', [PemesananController::class, 'store'])->middleware('throttle:10,1')->name('pemesanan.store');
+    Route::get('/pemesanan/data-diri', [PemesananController::class, 'dataDiri'])->name('pemesanan.data-diri');
+    Route::post('/pemesanan/data-diri', [PemesananController::class, 'storeDataDiri'])->name('pemesanan.store-data-diri');
     Route::get('/pemesanan/sukses/{id}', [PemesananController::class, 'sukses'])->name('pemesanan.sukses');
     Route::get('/pemesanan/riwayat', [PemesananController::class, 'riwayat'])->name('pemesanan.riwayat');
     Route::get('/pemesanan/{id}', [PemesananController::class, 'detailPemesanan'])->name('pemesanan.detail');
@@ -42,7 +52,7 @@ Route::middleware(['auth', 'verified', 'role:wisatawan'])->prefix('wisatawan')->
 });
 
 // ========== PENGGELOLA (ADMIN) ROUTES ==========
-Route::middleware(['auth', 'verified', 'role:pengelola'])->prefix('pengelola')->name('pengelola.')->group(function () {
+Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengelola.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -73,12 +83,18 @@ Route::middleware(['auth', 'verified', 'role:pengelola'])->prefix('pengelola')->
 
     // Manajemen User
     Route::get('/user', [UserController::class, 'index'])->name('user.index');
+
+    // Scan Tiket
+    Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');
+    Route::post('/scan/cari', [ScanController::class, 'cari'])->name('scan.cari');
+    Route::post('/scan/gunakan', [ScanController::class, 'gunakan'])->name('scan.gunakan');
 });
 
 // ========== PROFILE ROUTES ==========
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/set-password', [App\Http\Controllers\ProfileController::class, 'setPassword'])->name('profile.set-password');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

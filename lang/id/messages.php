@@ -326,4 +326,22 @@ return [
     'lainnya' => 'Lainnya',
     'upload_image_only' => 'Harap unggah file gambar.',
     'standard_ticket' => 'Standar',
+
+    // Profile
+    'my_account' => 'Akun Saya',
+    'manage_account' => 'Kelola informasi akun Anda',
+    'profile_updated' => 'Profil berhasil diperbarui',
+    'full_name' => 'Nama Lengkap',
+    'username' => 'Username',
+    'email' => 'Email',
+    'phone' => 'Nomor Telepon',
+    'phone_placeholder' => '+62 812 3456 7890',
+    'save_changes' => 'Simpan Perubahan',
+    'cancel' => 'Batal',
+    'member_since' => 'Bergabung sejak',
+    'login_method' => 'Metode Login',
+    'email_password' => 'Email & Password',
+    'account' => 'Akun',
+    'tourist' => 'Wisatawan',
+    'manager' => 'Pengelola',
 ];

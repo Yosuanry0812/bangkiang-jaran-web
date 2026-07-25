@@ -13,13 +13,13 @@
         <div class="max-w-6xl mx-auto">
             {{-- Breadcrumb --}}
             <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6 font-sans">
-                <a href="{{ route('landing') }}" class="hover:text-gray-700 transition-colors">Beranda</a>
+                <a href="{{ route('landing') }}" class="hover:text-gray-700 transition-colors">{{ __('messages.breadcrumb_home') }}</a>
                 <span>/</span>
-                <a href="{{ route('tiket.index') }}" class="hover:text-gray-700 transition-colors">Tiket</a>
+                <a href="{{ route('tiket.index') }}" class="hover:text-gray-700 transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
                 <span>/</span>
-                <span class="text-gray-700">Pemesanan</span>
+                <span class="text-gray-700">{{ __('messages.breadcrumb_booking') }}</span>
             </nav>
-            <h1 class="font-serif text-4xl md:text-5xl text-gray-900">Pesan Tiket</h1>
+            <h1 class="font-serif text-4xl md:text-5xl text-gray-900">{{ __('messages.book_ticket') }}</h1>
             <p class="font-sans text-sm text-gray-500 mt-2">Bangkiang Jaran · Desa Bakbakan, Gianyar, Bali</p>
         </div>
     </div>
@@ -51,7 +51,7 @@
                     {{-- Date picker --}}
                     <div class="border border-gray-200 rounded-2xl p-6 bg-white" data-aos="fade-up">
                         <label class="block font-sans text-xs tracking-[0.12em] uppercase text-gray-400 mb-3">
-                            Tanggal Kunjungan
+                            {{ __('messages.visit_date') }}
                         </label>
                         <input type="date"
                                name="tgl_kunjungan"
@@ -63,10 +63,10 @@
                     <div class="border border-gray-200 rounded-2xl overflow-hidden bg-white" data-aos="fade-up" data-aos-delay="40">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                             <div>
-                                <h3 class="font-serif text-xl text-gray-900">Pilih Tiket</h3>
-                                <p class="font-sans text-xs text-gray-400 mt-0.5">Tentukan jumlah tiket yang diinginkan</p>
+                                <h3 class="font-serif text-xl text-gray-900">{{ __('messages.select_ticket') }}</h3>
+                                <p class="font-sans text-xs text-gray-400 mt-0.5">{{ __('messages.select_ticket_desc') }}</p>
                             </div>
-                            <span class="font-sans text-xs text-gray-400">Maks. 10 per jenis</span>
+                            <span class="font-sans text-xs text-gray-400">{{ __('messages.max_per_type') }}</span>
                         </div>
 
                         <div class="divide-y divide-gray-100">
@@ -74,7 +74,7 @@
                             <div class="flex items-center justify-between px-6 py-5 hover:bg-gray-50 transition-colors">
                                 <div>
                                     <p class="font-sans text-sm font-medium text-gray-900">{{ $t->nama_tiket }}</p>
-                                    <p class="font-sans text-xs text-gray-400 mt-0.5">Rp{{ number_format($t->harga, 0, ',', '.') }} / orang</p>
+                                    <p class="font-sans text-xs text-gray-400 mt-0.5">Rp{{ number_format($t->harga, 0, ',', '.') }} {{ __('messages.per_person') }}</p>
                                 </div>
 
                                 <div class="flex items-center gap-3">
@@ -101,15 +101,15 @@
                     <div class="flex flex-wrap gap-x-6 gap-y-2" data-aos="fade-up" data-aos-delay="60">
                         <span class="font-sans text-xs text-gray-400 flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-sm">check</span>
-                            Harga sudah termasuk pajak
+                            {{ __('messages.price_includes_tax') }}
                         </span>
                         <span class="font-sans text-xs text-gray-400 flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-sm">schedule</span>
-                            Tiket berlaku sesuai tanggal
+                            {{ __('messages.ticket_valid_date') }}
                         </span>
                         <a href="mailto:info@bangkiangjaran.com" class="font-sans text-xs text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1.5">
                             <span class="material-symbols-outlined text-sm">mail</span>
-                            Pertanyaan? Hubungi pengelola
+                            {{ __('messages.questions_contact') }}
                         </a>
                     </div>
                 </div>
@@ -133,12 +133,12 @@
                             </div>
 
                             <div class="p-6">
-                                <h3 class="font-serif text-lg text-gray-900 mb-5">Ringkasan Pesanan</h3>
+                                <h3 class="font-serif text-lg text-gray-900 mb-5">{{ __('messages.booking_summary') }}</h3>
 
                                 {{-- Empty state --}}
                                 <div class="py-8 text-center" x-show="selectedTickets().length === 0">
-                                    <p class="font-sans text-sm text-gray-400">Belum ada tiket dipilih</p>
-                                    <p class="font-sans text-xs text-gray-300 mt-1">Pilih tiket di sebelah kiri</p>
+                                    <p class="font-sans text-sm text-gray-400">{{ __('messages.no_tickets_selected') }}</p>
+                                    <p class="font-sans text-xs text-gray-300 mt-1">{{ __('messages.select_tickets_on_left') }}</p>
                                 </div>
 
                                 {{-- Selected items --}}
@@ -159,17 +159,17 @@
                                 {{-- Totals --}}
                                 <div class="border-t border-gray-100 pt-4 space-y-2">
                                     <div class="flex justify-between">
-                                        <span class="font-sans text-xs text-gray-400">Subtotal</span>
+                                        <span class="font-sans text-xs text-gray-400">{{ __('messages.subtotal') }}</span>
                                         <span class="font-sans text-xs text-gray-700 tabular-nums"
                                               x-text="'Rp' + subtotal().toLocaleString('id-ID')">Rp0</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="font-sans text-xs text-gray-400">Pajak (10%)</span>
+                                        <span class="font-sans text-xs text-gray-400">{{ __('messages.tax') }}</span>
                                         <span class="font-sans text-xs text-gray-700 tabular-nums"
                                               x-text="'Rp' + pajak().toLocaleString('id-ID')">Rp0</span>
                                     </div>
                                     <div class="flex justify-between items-baseline pt-2 border-t border-gray-100">
-                                        <span class="font-sans text-sm font-medium text-gray-900">Total</span>
+                                        <span class="font-sans text-sm font-medium text-gray-900">{{ __('messages.total') }}</span>
                                         <span class="font-serif text-2xl text-gray-900 tabular-nums"
                                               x-text="'Rp' + total().toLocaleString('id-ID')">Rp0</span>
                                     </div>
@@ -182,21 +182,21 @@
                                             ? 'bg-gray-900 text-white hover:bg-gray-700 cursor-pointer'
                                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'"
                                         :disabled="selectedTickets().length === 0">
-                                    <span x-show="selectedTickets().length > 0">Lanjut ke Pembayaran</span>
-                                    <span x-show="selectedTickets().length === 0">Pilih tiket terlebih dahulu</span>
+                                    <span x-show="selectedTickets().length > 0">{{ __('messages.proceed_to_payment') }}</span>
+                                    <span x-show="selectedTickets().length === 0">{{ __('messages.select_tickets_first') }}</span>
                                 </button>
 
                                 <p class="font-sans text-xs text-center text-gray-400 mt-3">
-                                    Anda belum akan dikenakan biaya sekarang
+                                    {{ __('messages.no_charge_yet') }}
                                 </p>
                             </div>
                         </div>
 
                         {{-- Help note --}}
                         <div class="px-5 py-4 rounded-xl border border-gray-200 bg-white">
-                            <p class="font-sans text-sm font-medium text-gray-900">Butuh bantuan?</p>
+                            <p class="font-sans text-sm font-medium text-gray-900">{{ __('messages.need_help') }}</p>
                             <p class="font-sans text-xs text-gray-400 mt-0.5">
-                                Hubungi kami di
+                                {{ __('messages.contact_us_at') }}
                                 <a href="mailto:info@bangkiangjaran.com" class="text-gray-700 hover:underline">
                                     info@bangkiangjaran.com
                                 </a>

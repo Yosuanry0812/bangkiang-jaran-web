@@ -25,23 +25,23 @@
             {{-- Sidebar --}}
             <aside class="lg:col-span-3" data-aos="fade-right">
                 <div class="sticky top-28 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                    <h3 class="font-serif text-lg text-gray-900 mb-5">Ringkasan</h3>
+                    <h3 class="font-serif text-lg text-gray-900 mb-5">{{ __('messages.status_summary') }}</h3>
                     <ul class="space-y-1">
                         <li class="flex justify-between items-center py-3 border-b border-gray-100">
-                            <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Selesai
+                             <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> {{ __('messages.completed') }}
                             </span>
                             <span class="font-sans text-sm font-semibold text-gray-900">{{ $selesai }}</span>
                         </li>
                         <li class="flex justify-between items-center py-3 border-b border-gray-100">
-                            <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending
+                             <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> {{ __('messages.pending') }}
                             </span>
                             <span class="font-sans text-sm font-semibold text-gray-900">{{ $pending }}</span>
                         </li>
                         <li class="flex justify-between items-center py-3">
-                            <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> Dibatalkan
+                             <span class="font-sans text-sm text-gray-600 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> {{ __('messages.cancelled') }}
                             </span>
                             <span class="font-sans text-sm font-semibold text-gray-900">{{ $dibatalkan }}</span>
                         </li>
@@ -63,17 +63,17 @@
                                 @if($item->status == 'pending')
                                 <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full font-sans text-xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                                    {{ $item->pembayaran ? 'Menunggu Verifikasi' : 'Pending' }}
+                                    {{ $item->pembayaran ? __('messages.waiting_verification') : __('messages.pending') }}
                                 </span>
                                 @elseif($item->status == 'selesai')
                                 <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full font-sans text-xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    Selesai
+                                    {{ __('messages.completed') }}
                                 </span>
                                 @elseif($item->status == 'dibatalkan')
                                 <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-500 border border-gray-200 px-2.5 py-0.5 rounded-full font-sans text-xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                    Dibatalkan
+                                    {{ __('messages.cancelled') }}
                                 </span>
                                 @else
                                 <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-0.5 rounded-full font-sans text-xs">
@@ -89,7 +89,7 @@
                                 <span class="material-symbols-outlined text-xs">calendar_today</span>
                                 {{ \Carbon\Carbon::parse($item->tgl_kunjungan)->format('d M Y') }}
                                 <span class="text-gray-300 mx-1">·</span>
-                                <span>{{ $item->detailPemesanan->count() }} tiket</span>
+                                <span>{{ __('messages.ticket_count', ['count' => $item->detailPemesanan->count()]) }}</span>
                             </p>
                         </div>
                         <div class="text-left md:text-right w-full md:w-auto flex justify-between md:flex-col items-center md:items-end">
@@ -97,7 +97,7 @@
                                 Rp{{ number_format($item->total_harga, 0, ',', '.') }}
                             </span>
                             <span class="font-sans text-xs text-gray-400 flex items-center gap-1 mt-1">
-                                Detail <span class="material-symbols-outlined text-sm">expand_more</span>
+                                {{ __('messages.detail') }} <span class="material-symbols-outlined text-sm">expand_more</span>
                             </span>
                         </div>
                     </div>
@@ -107,17 +107,17 @@
                         <div class="flex items-start gap-2">
                             <span class="material-symbols-outlined text-gray-400 text-sm mt-0.5">info</span>
                             <div>
-                                <p class="font-sans text-sm font-medium text-gray-900">Alasan Penolakan</p>
-                                <p class="font-sans text-xs text-gray-500 mt-0.5">Pemesanan ini telah dibatalkan.</p>
+                                <p class="font-sans text-sm font-medium text-gray-900">{{ __('messages.reason_rejection') }}</p>
+                                <p class="font-sans text-xs text-gray-500 mt-0.5">{{ __('messages.booking_cancelled') }}</p>
                             </div>
                         </div>
                         @else
                         <div class="grid grid-cols-1 gap-4">
                             <div>
-                                <p class="font-sans text-xs text-gray-400 mb-2">Daftar Tiket</p>
+                                <p class="font-sans text-xs text-gray-400 mb-2">{{ __('messages.ticket_list') }}</p>
                                 <div class="space-y-1.5">
                                     @foreach($item->detailPemesanan as $dt)
-                                    <div class="flex items-center justify-between bg-white rounded-lg border border-gray-100 px-3.5 py-2.5">
+                                    <div class="flex items-center justify-between bg-white rounded-lg border border-gray-150 px-3.5 py-2.5">
                                         <div class="flex items-center gap-2.5 min-w-0 flex-1">
                                             @if($dt->plat_kendaraan)
                                                 <span class="material-symbols-outlined text-gray-400 text-sm flex-shrink-0">directions_car</span>
@@ -137,12 +137,12 @@
                             <div class="flex gap-3">
                                 <a href="{{ route('wisatawan.pemesanan.detail', $item->id_pemesanan) }}"
                                    class="flex-1 text-center py-2.5 rounded-xl border border-gray-200 text-gray-700 font-sans text-sm hover:border-gray-400 hover:text-gray-900 transition-colors">
-                                   Lihat E-Ticket
+                                   {{ __('messages.view_eticket_btn') }}
                                 </a>
                                 @if(!$item->pembayaran || $item->pembayaran->status == 'ditolak')
                                 <a href="{{ route('wisatawan.pembayaran.create', $item->id_pemesanan) }}"
                                    class="flex-1 text-center py-2.5 rounded-xl bg-gray-900 text-white font-sans text-sm hover:bg-gray-700 transition-colors">
-                                   Bayar
+                                   {{ __('messages.pay_btn') }}
                                 </a>
                                 @endif
                             </div>
@@ -162,7 +162,7 @@
             <a href="{{ route('tiket.index') }}"
                class="inline-flex items-center gap-2 bg-gray-900 text-white font-sans text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-700 transition-colors">
                 <span class="material-symbols-outlined text-sm">confirmation_number</span>
-                Pesan Tiket Sekarang
+                {{ __('messages.book_now_from_history') }}
             </a>
         </div>
         @endif

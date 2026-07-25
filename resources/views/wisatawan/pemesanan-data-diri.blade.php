@@ -99,7 +99,7 @@
                                                 Nama Lengkap
                                                 <span class="text-red-400">*</span>
                                                 @if($row['kategori'] === 'paket')
-                                                    <span class="text-stone font-normal">(Anggota {{ $loop->parent->iteration }})</span>
+                                                    <span class="text-stone font-normal">(Anggota {{ $loop->iteration }})</span>
                                                 @endif
                                             </label>
                                             <input type="text"

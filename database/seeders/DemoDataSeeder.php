@@ -41,7 +41,7 @@ class DemoDataSeeder extends Seeder
             // 1. Belum bayar
             ['kode_booking' => $codes[0],  'id_tiket' => 1, 'jumlah' => 2, 'total_harga' => 50000,  'tgl_kunjungan' => now()->addDays(3)->toDateString(), 'status' => 'pending',   'created' => now()->subDays(5)],
             // 2. Selesai + valid
-            ['kode_booking' => $codes[1],  'id_tiket' => 3, 'jumlah' => 1, 'total_harga' => 75000,  'tgl_kunjungan' => now()->addDays(7)->toDateString(), 'status' => 'selesai',   'created' => now()->subDays(4)],
+            ['kode_booking' => $codes[1],  'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 20000,  'tgl_kunjungan' => now()->addDays(7)->toDateString(), 'status' => 'selesai',   'created' => now()->subDays(4)],
             // 3. Diproses + pending payment (VERIFIKASI)
             ['kode_booking' => $codes[2],  'id_tiket' => 1, 'jumlah' => 3, 'total_harga' => 75000,  'tgl_kunjungan' => $today,                              'status' => 'diproses',  'created' => now()->subHours(12)],
             // 4. Diproses + pending payment (VERIFIKASI)
@@ -51,7 +51,7 @@ class DemoDataSeeder extends Seeder
             // 6. Selesai + valid
             ['kode_booking' => $codes[5],  'id_tiket' => 1, 'jumlah' => 4, 'total_harga' => 100000, 'tgl_kunjungan' => now()->subDays(2)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(3)],
             // 7. Selesai + valid
-            ['kode_booking' => $codes[6],  'id_tiket' => 3, 'jumlah' => 1, 'total_harga' => 75000,  'tgl_kunjungan' => now()->subDays(3)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(4)],
+            ['kode_booking' => $codes[6],  'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 20000,  'tgl_kunjungan' => now()->subDays(3)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(4)],
             // 8. Dibatalkan + payment ditolak
             ['kode_booking' => $codes[7],  'id_tiket' => 2, 'jumlah' => 3, 'total_harga' => 45000,  'tgl_kunjungan' => now()->addDays(5)->toDateString(),     'status' => 'dibatalkan','created' => now()->subDays(2)],
             // 9. Selesai + valid
@@ -59,7 +59,7 @@ class DemoDataSeeder extends Seeder
             // 10. Belum bayar
             ['kode_booking' => $codes[9],  'id_tiket' => 1, 'jumlah' => 2, 'total_harga' => 50000,  'tgl_kunjungan' => now()->addDays(10)->toDateString(),    'status' => 'pending',   'created' => now()->subHours(6)],
             // 11. Diproses + pending payment (VERIFIKASI)
-            ['kode_booking' => $codes[10], 'id_tiket' => 3, 'jumlah' => 2, 'total_harga' => 150000, 'tgl_kunjungan' => now()->addDays(2)->toDateString(),     'status' => 'diproses',  'created' => now()->subHours(4)],
+            ['kode_booking' => $codes[10], 'id_tiket' => 1, 'jumlah' => 2, 'total_harga' => 40000, 'tgl_kunjungan' => now()->addDays(2)->toDateString(),     'status' => 'diproses',  'created' => now()->subHours(4)],
             // 12. Dibatalkan (sebelum bayar)
             ['kode_booking' => $codes[11], 'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 25000,  'tgl_kunjungan' => now()->subDays(5)->toDateString(),     'status' => 'dibatalkan','created' => now()->subDays(6)],
         ];
@@ -84,15 +84,15 @@ class DemoDataSeeder extends Seeder
 
             // ===== PEMBAYARAN =====
             $pembayaran = [
-                ['kb' => $codes[1],  'total' => 75000,  'metode' => 'Transfer BRI',         'status' => 'valid',   'tgl_bayar' => now()->subDays(4)->toDateString(),  'created' => now()->subDays(4)],
+                ['kb' => $codes[1],  'total' => 20000,  'metode' => 'Transfer BRI',         'status' => 'valid',   'tgl_bayar' => now()->subDays(4)->toDateString(),  'created' => now()->subDays(4)],
                 ['kb' => $codes[2],  'total' => 75000,  'metode' => 'Transfer BCA',         'status' => 'pending', 'tgl_bayar' => now()->subHours(12)->toDateString(),'created' => now()->subHours(12), 'bukti' => 'bukti/bayar1.jpg'],
                 ['kb' => $codes[3],  'total' => 30000,  'metode' => 'Dana',                 'status' => 'pending', 'tgl_bayar' => now()->subHours(10)->toDateString(),'created' => now()->subHours(10), 'bukti' => 'bukti/bayar2.jpg'],
                 ['kb' => $codes[4],  'total' => 5000,   'metode' => 'Transfer BRI',         'status' => 'valid',   'tgl_bayar' => now()->subDays(3)->toDateString(),  'created' => now()->subDays(3)],
                 ['kb' => $codes[5],  'total' => 100000, 'metode' => 'GoPay',                'status' => 'valid',   'tgl_bayar' => now()->subDays(3)->toDateString(),  'created' => now()->subDays(3)],
-                ['kb' => $codes[6],  'total' => 75000,  'metode' => 'Transfer Mandiri',     'status' => 'valid',   'tgl_bayar' => now()->subDays(4)->toDateString(),  'created' => now()->subDays(4)],
+                ['kb' => $codes[6],  'total' => 20000,  'metode' => 'Transfer Mandiri',     'status' => 'valid',   'tgl_bayar' => now()->subDays(4)->toDateString(),  'created' => now()->subDays(4)],
                 ['kb' => $codes[7],  'total' => 45000,  'metode' => 'Transfer BRI',         'status' => 'ditolak', 'tgl_bayar' => now()->subDays(2)->toDateString(),  'created' => now()->subDays(2)],
                 ['kb' => $codes[8],  'total' => 10000,  'metode' => 'QRIS OVO',             'status' => 'valid',   'tgl_bayar' => now()->subDays(5)->toDateString(),  'created' => now()->subDays(5)],
-                ['kb' => $codes[10], 'total' => 150000, 'metode' => 'Transfer BNI',         'status' => 'pending', 'tgl_bayar' => now()->subHours(4)->toDateString(), 'created' => now()->subHours(4), 'bukti' => 'bukti/bayar3.jpg'],
+                ['kb' => $codes[10], 'total' => 40000, 'metode' => 'Transfer BNI',         'status' => 'pending', 'tgl_bayar' => now()->subHours(4)->toDateString(), 'created' => now()->subHours(4), 'bukti' => 'bukti/bayar3.jpg'],
             ];
 
             foreach ($pembayaran as $b) {

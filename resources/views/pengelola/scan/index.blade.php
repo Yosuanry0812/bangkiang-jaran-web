@@ -10,18 +10,12 @@
         </div>
     </div>
 
-    {{-- Alerts --}}
+    {{-- Alerts — ditampilkan via SweetAlert2 popup di JS --}}
     @if(session('success'))
-    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-5 py-4 rounded-xl font-sans text-sm flex items-start gap-3">
-        <span class="material-symbols-outlined text-emerald-500 mt-0.5 text-base">check_circle</span>
-        <span>{{ session('success') }}</span>
-    </div>
+    <meta name="alert-success" content="{{ session('success') }}">
     @endif
     @if(session('error'))
-    <div class="bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl font-sans text-sm flex items-start gap-3">
-        <span class="material-symbols-outlined text-red-500 mt-0.5 text-base">error</span>
-        <span>{{ session('error') }}</span>
-    </div>
+    <meta name="alert-error" content="{{ session('error') }}">
     @endif
 
     {{-- Search form --}}
@@ -119,12 +113,22 @@
                         </div>
                     </div>
                     @if(!$sudahDigunakan && !$belumLunas && !$pemesananDibatalkan)
-                    <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" onsubmit="return confirm('Konfirmasi tiket ini? Pengunjung akan dipersilakan masuk.')">
+                    <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="Konfirmasi tiket ini? Pengunjung akan dipersilakan masuk.">
                         @csrf
                         <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">
                         <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all">
                             <span class="material-symbols-outlined text-base">check</span>
                             Konfirmasi Masuk
+                        </button>
+                    </form>
+                    @endif
+                    @if($sudahDigunakan && !$detail->check_out_at && !$belumLunas && !$pemesananDibatalkan)
+                    <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="Konfirmasi check-out pengunjung ini?">
+                        @csrf
+                        <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">
+                        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all">
+                            <span class="material-symbols-outlined text-base">logout</span>
+                            Konfirmasi Keluar
                         </button>
                     </form>
                     @endif
@@ -242,10 +246,139 @@
         <p class="font-sans text-sm text-gray-400 max-w-xs mx-auto">Scan QR code pada tiket pengunjung atau masukkan kode tiket manual untuk verifikasi.</p>
     </div>
     @endif
+
+    {{-- ══════════════════════════════════════
+         MANUAL CHECK-IN / CHECK-OUT TABLE
+    ═══════════════════════════════════════ --}}
+    @php
+        $todayCount = isset($ticketsHariIni) ? $ticketsHariIni->count() : 0;
+    @endphp
+
+    @if($todayCount > 0)
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div>
+                <p class="font-sans text-sm font-semibold text-gray-800">Manual Check-in / Check-out Hari Ini</p>
+                <p class="font-sans text-xs text-gray-400 mt-0.5">{{ $todayCount }} tiket tersedia</p>
+            </div>
+            <span class="inline-flex items-center gap-1 font-sans text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
+                {{ now()->format('d/m/Y') }}
+            </span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-100 bg-gray-50">
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Kode Tiket</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Pengunjung</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400 hidden sm:table-cell">Tiket</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Status</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Masuk</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Keluar</th>
+                        <th class="text-center px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    @foreach($ticketsHariIni as $t)
+                    @php
+                        $canCheckIn  = $t->status_tiket === 'aktif';
+                        $canCheckOut = $t->status_tiket === 'digunakan' && !$t->check_out_at;
+                        $isDone      = (bool) $t->check_out_at;
+                    @endphp
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3">
+                            <span class="font-mono text-xs font-bold text-gray-700 tracking-wider">{{ $t->kode_tiket }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="font-sans text-xs font-medium text-gray-600">{{ $t->nama_pengunjung ?? $t->plat_kendaraan ?? $t->pemesanan->user->name ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 py-3 hidden sm:table-cell">
+                            <span class="font-sans text-xs text-gray-400">{{ $t->nama_tiket }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            @if($isDone)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0"></span>
+                                Selesai
+                            </span>
+                            @elseif($canCheckIn)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                                Aktif
+                            </span>
+                            @elseif($canCheckOut)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"></span>
+                                Masuk
+                            </span>
+                            @else
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></span>
+                                {{ ucfirst($t->status_tiket) }}
+                            </span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="font-sans text-xs {{ $t->check_in_at ? 'text-gray-700 font-medium' : 'text-gray-300' }}">
+                                {{ $t->check_in_at ? \Carbon\Carbon::parse($t->check_in_at)->format('H:i') : '-' }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="font-sans text-xs {{ $t->check_out_at ? 'text-gray-700 font-medium' : 'text-gray-300' }}">
+                                {{ $t->check_out_at ? \Carbon\Carbon::parse($t->check_out_at)->format('H:i') : '-' }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            @if($canCheckIn)
+                            <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="Check-in tiket {{ $t->kode_tiket }}?">
+                                @csrf
+                                <input type="hidden" name="kode" value="{{ $t->kode_tiket }}">
+                                <button type="submit"
+                                    class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all active:scale-[.97]">
+                                    <span class="material-symbols-outlined" style="font-size:14px">login</span>
+                                    Check In
+                                </button>
+                            </form>
+                            @elseif($canCheckOut)
+                            <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="Check-out tiket {{ $t->kode_tiket }}?">
+                                @csrf
+                                <input type="hidden" name="kode" value="{{ $t->kode_tiket }}">
+                                <button type="submit"
+                                    class="inline-flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all active:scale-[.97]">
+                                    <span class="material-symbols-outlined" style="font-size:14px">logout</span>
+                                    Check Out
+                                </button>
+                            </form>
+                            @elseif($isDone)
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 text-gray-400">
+                                <span class="material-symbols-outlined" style="font-size:16px">check</span>
+                            </span>
+                            @else
+                            <span class="font-sans text-[10px] text-gray-300">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @elseif(isset($ticketsHariIni))
+    {{-- Empty state — hari ini tidak ada tiket --}}
+    <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+        <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-300" style="font-size:24px">confirmation_number</span>
+        </div>
+        <p class="font-sans text-sm font-medium text-gray-500 mb-1">Tidak ada tiket untuk hari ini</p>
+        <p class="font-sans text-xs text-gray-400">Tiket dengan kunjungan hari ini akan tampil di sini</p>
+    </div>
+    @endif
+
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
     let html5QrCode = null;
@@ -258,6 +391,59 @@
         @if(isset($detail))
         if (input) input.select();
         @endif
+
+        // ── Flash alert popup ──
+        var success = document.querySelector('meta[name="alert-success"]');
+        var error   = document.querySelector('meta[name="alert-error"]');
+        if (success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: success.getAttribute('content'),
+                confirmButtonColor: '#059669',
+                confirmButtonText: 'OK',
+                timer: 4000,
+                timerProgressBar: true,
+            });
+        }
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: error.getAttribute('content'),
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Tutup',
+                timer: 5000,
+                timerProgressBar: true,
+            });
+        }
+    });
+
+    // ── SweetAlert2 confirm popup ──
+    document.querySelectorAll('form.confirm-form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var msg = this.getAttribute('data-confirm') || 'Konfirmasi?';
+            var btn = this.querySelector('button[type="submit"]');
+            var isCheckin = msg.toLowerCase().includes('masuk') || msg.toLowerCase().includes('check-in');
+            Swal.fire({
+                title: isCheckin ? 'Check In Tiket' : 'Check Out Tiket',
+                text: msg,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: isCheckin ? '#059669' : '#f97316',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: isCheckin ? 'Ya, Check In' : 'Ya, Check Out',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">hourglass_top</span> Memproses...';
+                    form.submit();
+                }
+            });
+        });
     });
 
     // Auto-submit on Enter

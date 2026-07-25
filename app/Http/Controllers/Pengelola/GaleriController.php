@@ -10,9 +10,15 @@ use Illuminate\Support\Facades\Storage;
 
 class GaleriController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $galeri = Galeri::orderBy('created_at', 'desc')->paginate(20);
+        $query = Galeri::orderBy('created_at', 'desc');
+
+        if ($request->tipe && in_array($request->tipe, ['wisata', 'restoran'])) {
+            $query->where('tipe', $request->tipe);
+        }
+
+        $galeri = $query->paginate(20);
         return view('pengelola.galeri.index', compact('galeri'));
     }
 
@@ -26,6 +32,7 @@ class GaleriController extends Controller
         $rules = [
             'file'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
             'keterangan' => ['nullable', 'string', 'max:255'],
+            'tipe'       => ['required', 'in:wisata,restoran'],
         ];
 
         $messages = [
@@ -33,6 +40,7 @@ class GaleriController extends Controller
             'file.image'    => 'File harus berupa gambar.',
             'file.mimes'    => 'Format foto: jpg, jpeg, png.',
             'file.max'      => 'Ukuran maksimal 5MB.',
+            'tipe.required' => 'Pilih tipe galeri.',
         ];
 
         $request->validate($rules, $messages);
@@ -51,6 +59,7 @@ class GaleriController extends Controller
         Galeri::create([
             'file'       => $pathDisplay,
             'keterangan' => $request->keterangan,
+            'tipe'       => $request->tipe,
         ]);
 
         return redirect()->route('pengelola.galeri.index')->with('success', 'Foto berhasil ditambahkan.');

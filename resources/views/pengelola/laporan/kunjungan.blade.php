@@ -19,19 +19,47 @@
         </a>
     </div>
 
-    <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-            <span class="material-symbols-outlined text-2xl">groups</span>
+    @php
+        $totalCheckIn = 0;
+        $totalCheckOut = 0;
+        foreach ($data ?? [] as $k) {
+            $totalCheckIn += $k->detailPemesanan->whereNotNull('check_in_at')->count();
+            $totalCheckOut += $k->detailPemesanan->whereNotNull('check_out_at')->count();
+        }
+    @endphp
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <span class="material-symbols-outlined text-2xl">groups</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">{{ __('messages.total_visitors_label') }}</p>
+                <p class="text-2xl font-bold text-emerald-900">{{ $total ?? 0 }}</p>
+            </div>
         </div>
-        <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">{{ __('messages.total_visitors_label') }}</p>
-            <p class="text-2xl font-bold text-emerald-900">{{ $total ?? 0 }}</p>
+        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-5 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+                <span class="material-symbols-outlined text-2xl">login</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-sky-600">Jumlah Masuk</p>
+                <p class="text-2xl font-bold text-sky-900">{{ $totalCheckIn }}</p>
+            </div>
+        </div>
+        <div class="bg-orange-50 border border-orange-200 rounded-2xl p-5 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                <span class="material-symbols-outlined text-2xl">logout</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-orange-600">Jumlah Keluar</p>
+                <p class="text-2xl font-bold text-orange-900">{{ $totalCheckOut }}</p>
+            </div>
         </div>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+                    <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-300-200 bg-stone-50 text-left">
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
@@ -40,11 +68,17 @@
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_date') }}</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.quantity_label') }}</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_total') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">Check In</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">Check Out</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_status') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($data ?? [] as $k)
+                    @php
+                        $checkIns = $k->detailPemesanan->whereNotNull('check_in_at');
+                        $checkOuts = $k->detailPemesanan->whereNotNull('check_out_at');
+                    @endphp
                     <tr class="border-b border-gray-300-100 hover:bg-stone-50 transition-colors">
                         <td class="py-3.5 px-4 font-mono text-gray-500-700">{{ $k->kode_booking }}</td>
                         <td class="py-3.5 px-4 text-gray-500-600">{{ $k->user->name ?? '-' }}</td>
@@ -57,6 +91,22 @@
                         <td class="py-3.5 px-4 text-gray-500-500 text-xs">{{ $k->tgl_kunjungan ? \Carbon\Carbon::parse($k->tgl_kunjungan)->format('d/m/Y') : '-' }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700">{{ $k->jumlah }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700 font-medium">Rp {{ number_format($k->total_harga, 0, ',', '.') }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-700 text-xs">
+                            @if($checkIns->count() > 0)
+                                <span class="text-emerald-600 font-medium">{{ $checkIns->count() }} org</span>
+                                <span class="block text-gray-400">{{ $checkIns->first()->check_in_at ? \Carbon\Carbon::parse($checkIns->first()->check_in_at)->format('H:i') : '-' }}</span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td class="py-3.5 px-4 text-gray-500-700 text-xs">
+                            @if($checkOuts->count() > 0)
+                                <span class="text-orange-600 font-medium">{{ $checkOuts->count() }} org</span>
+                                <span class="block text-gray-400">{{ $checkOuts->first()->check_out_at ? \Carbon\Carbon::parse($checkOuts->first()->check_out_at)->format('H:i') : '-' }}</span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
                         <td class="py-3.5 px-4">
                         @php
                             $sc = match($k->status) {
@@ -70,7 +120,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="7" class="py-10 text-center text-gray-500-400">{{ __('messages.no_data_visit') }}</td></tr>
+                    <tr><td colspan="9" class="py-10 text-center text-gray-500-400">{{ __('messages.no_data_visit') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

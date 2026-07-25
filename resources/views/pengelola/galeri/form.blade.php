@@ -32,6 +32,16 @@
                 </div>
 
                 <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Tipe Galeri <span class="text-red-400">*</span></label>
+                    <select name="tipe" required
+                        class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+                        <option value="wisata" {{ old('tipe') === 'wisata' ? 'selected' : '' }}>Wisata Bangkiang Jaran</option>
+                        <option value="restoran" {{ old('tipe') === 'restoran' ? 'selected' : '' }}>Restoran / Kuliner</option>
+                    </select>
+                    @error('tipe') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.description_label') }}</label>
                     <input type="text" name="keterangan" value="{{ old('keterangan') }}"
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">

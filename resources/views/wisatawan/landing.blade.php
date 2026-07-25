@@ -29,19 +29,19 @@
                 @auth
                 <a href="{{ route('wisatawan.pemesanan.create') }}"
                    class="inline-flex items-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-ivory transition-colors">
-                    Pesan Tiket
+                    {{ __('messages.book_ticket') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 @else
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-ivory transition-colors">
-                    Pesan Sekarang
+                    {{ __('messages.book_now_btn') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 @endauth
                 <a href="#about"
                    class="inline-flex items-center gap-2 font-sans text-sm text-white/70 border border-white/20 px-7 py-3.5 rounded-full hover:border-white/40 hover:text-white transition-colors">
-                    Pelajari Lebih
+                    {{ __('messages.learn_more') }}
                 </a>
             </div>
         </div>
@@ -49,18 +49,18 @@
         {{-- Quick info strip --}}
         <div class="flex flex-wrap gap-8 mt-16 pt-8 border-t border-white/10">
             <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">Jam Buka</p>
-                <p class="font-sans text-sm text-white/70">07:00 – 18:00 WITA</p>
+                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.operating_hours_label') }}</p>
+                <p class="font-sans text-sm text-white/70">{{ __('messages.operating_hours') }}</p>
             </div>
             <div class="w-px bg-white/10"></div>
             <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">Lokasi</p>
-                <p class="font-sans text-sm text-white/70">Desa Bakbakan, Gianyar</p>
+                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.location') }}</p>
+                <p class="font-sans text-sm text-white/70">{{ __('messages.address') }}</p>
             </div>
             <div class="w-px bg-white/10"></div>
             <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">Tiket Online</p>
-                <p class="font-sans text-sm text-white/70">Mulai Rp 10.000</p>
+                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.online_ticket') }}</p>
+                <p class="font-sans text-sm text-white/70">{{ __('messages.start_from', ['price' => '10.000']) }}</p>
             </div>
         </div>
     </div>
@@ -75,7 +75,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             {{-- Text --}}
             <div class="lg:col-span-5" data-aos="fade-right">
-                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-5">Tentang</p>
+                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-5">{{ __('messages.about') }}</p>
                 @foreach($kontenList->take(1) as $item)
                 <h2 class="font-serif text-[clamp(2rem,4vw,3.2rem)] text-forest leading-[1.1] mb-6">{{ $item->judul }}</h2>
                 <div class="space-y-4">
@@ -86,7 +86,7 @@
                 @endforeach
                 <a href="{{ route('tiket.index') }}"
                    class="inline-flex items-center gap-2 mt-8 font-sans text-sm font-semibold text-forest border-b border-forest/30 pb-0.5 hover:border-forest transition-colors">
-                    Lihat Tiket Masuk
+                    {{ __('messages.view_entry_tickets') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -113,7 +113,7 @@
                     <div class="col-span-5 row-span-1 rounded-2xl overflow-hidden bg-gold/10 flex items-center justify-center p-5">
                         <div class="text-center">
                             <p class="font-serif text-4xl text-forest mb-1">5K+</p>
-                            <p class="font-sans text-xs text-stone">Pengunjung / Bulan</p>
+                            <p class="font-sans text-xs text-stone">{{ __('messages.visitors_per_month') }}</p>
                         </div>
                     </div>
                 </div>
@@ -166,13 +166,13 @@
         {{-- ── Section header ── --}}
         <div class="max-w-7xl mx-auto px-gutter pt-20 pb-16 flex items-end justify-between">
             <div data-aos="fade-up">
-                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">Galeri</p>
+                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">{{ __('messages.gallery_tab') }}</p>
                 <h2 class="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] text-forest leading-tight">{{ __('messages.visual_journey') }}</h2>
                 <p class="font-sans text-sm text-stone mt-2 max-w-sm">{{ __('messages.visual_journey_desc') }}</p>
             </div>
             <p class="font-sans text-xs text-pebble hidden md:block" data-aos="fade-up">
                 <span class="material-symbols-outlined text-sm align-middle mr-1">mouse</span>
-                Scroll untuk melihat lebih banyak
+                {{ __('messages.scroll_for_more') }}
             </p>
         </div>
 
@@ -259,26 +259,26 @@
     <div class="max-w-7xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div data-aos="fade-right">
-                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-white/30 mb-5">Pemesanan Online</p>
-                <h2 class="font-serif text-[clamp(2rem,4vw,3.5rem)] text-white leading-[1.1] mb-5">Rencanakan Kunjungan Anda</h2>
-                <p class="font-sans text-[15px] text-white/50 leading-relaxed max-w-sm">Beli tiket online, hindari antrian. Konfirmasi langsung dikirim ke email Anda.</p>
+                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-white/30 mb-5">{{ __('messages.online_booking') }}</p>
+                <h2 class="font-serif text-[clamp(2rem,4vw,3.5rem)] text-white leading-[1.1] mb-5">{{ __('messages.plan_your_visit') }}</h2>
+                <p class="font-sans text-[15px] text-white/50 leading-relaxed max-w-sm">{{ __('messages.ticket_cta_desc') }}</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 lg:justify-end" data-aos="fade-left" data-aos-delay="80">
                 @auth
                 <a href="{{ route('wisatawan.pemesanan.create') }}"
                    class="inline-flex items-center justify-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-8 py-4 rounded-full hover:bg-ivory transition-colors">
-                    Pesan Tiket
+                    {{ __('messages.book_ticket') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 @else
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center justify-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-8 py-4 rounded-full hover:bg-ivory transition-colors">
-                    Masuk & Pesan
+                    {{ __('messages.login_and_book') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 <a href="{{ route('register') }}"
                    class="inline-flex items-center justify-center gap-2 border border-white/20 text-white font-sans text-sm px-8 py-4 rounded-full hover:border-white/40 transition-colors">
-                    Buat Akun Gratis
+                    {{ __('messages.create_free_account') }}
                 </a>
                 @endauth
             </div>
@@ -306,8 +306,8 @@
                     <div class="w-9 h-9 rounded-xl bg-forest/8 flex items-center justify-center mb-4">
                         <span class="material-symbols-outlined text-forest text-base">location_on</span>
                     </div>
-                    <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">Alamat</p>
-                    <p class="font-sans text-sm text-forest font-medium">Desa Bakbakan, Gianyar, Bali</p>
+                    <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">{{ __('messages.address_label') }}</p>
+                    <p class="font-sans text-sm text-forest font-medium">{{ __('messages.location_desc') }}</p>
                 </div>
                 <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                     <div class="w-9 h-9 rounded-xl bg-forest/8 flex items-center justify-center mb-4">

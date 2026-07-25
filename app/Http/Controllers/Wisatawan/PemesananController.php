@@ -57,23 +57,7 @@ class PemesananController extends Controller
             $subtotal = $tiket->harga * $jumlah;
             $items = [];
 
-            if ($tiket->kategori === 'paket') {
-                // Family package: 1 tiket = 4 individual entry codes
-                $jumlahInternal = 4;
-                for ($i = 0; $i < $jumlahInternal; $i++) {
-                    $kode = 'BJ-' . strtoupper(substr(uniqid(), -6)) . chr(rand(65, 90));
-                    $items[] = ['kode' => $kode];
-                    $detailRows[] = [
-                        'id_tiket'        => (int) $id_tiket,
-                        'kode_tiket'      => $kode,
-                        'nama_tiket'      => $tiket->nama_tiket,
-                        'kategori'        => $tiket->kategori,
-                        'harga'           => (int) round($tiket->harga / $jumlahInternal),
-                        'nama_pengunjung' => null,
-                        'plat_kendaraan'  => null,
-                    ];
-                }
-            } elseif ($tiket->kategori === 'kendaraan') {
+            if ($tiket->kategori === 'kendaraan') {
                 for ($i = 0; $i < $jumlah; $i++) {
                     $kode = 'BJ-' . strtoupper(substr(uniqid(), -6)) . chr(rand(65, 90));
                     $items[] = ['kode' => $kode];
@@ -165,9 +149,12 @@ class PemesananController extends Controller
                 $rules["plat_$i"] = ['required', 'string', 'max:20'];
                 $messages["plat_$i.required"] = 'Plat kendaraan untuk ' . $row['nama_tiket'] . ' wajib diisi.';
             } else {
-                // perorangan or paket
+                // perorangan
                 $rules["nama_$i"] = ['required', 'string', 'max:100'];
                 $messages["nama_$i.required"] = 'Nama pengunjung untuk ' . $row['nama_tiket'] . ' wajib diisi.';
+                $rules["gender_$i"] = ['required', 'in:L,P'];
+                $messages["gender_$i.required"] = 'Jenis kelamin untuk ' . $row['nama_tiket'] . ' wajib diisi.';
+                $messages["gender_$i.in"] = 'Jenis kelamin harus Laki-laki atau Perempuan.';
             }
         }
 
@@ -196,6 +183,7 @@ class PemesananController extends Controller
                     'kode_tiket'      => $row['kode_tiket'],
                     'nama_tiket'      => $row['nama_tiket'],
                     'nama_pengunjung' => $row['kategori'] === 'kendaraan' ? null : $request->input("nama_$i"),
+                    'jenis_kelamin'   => $row['kategori'] === 'kendaraan' ? null : $request->input("gender_$i"),
                     'plat_kendaraan'  => $row['kategori'] === 'kendaraan' ? $request->input("plat_$i") : null,
                     'harga'           => $row['harga'],
                     'status_tiket'    => 'aktif',

@@ -14,12 +14,31 @@
         </a>
     </div>
 
+    {{-- Filter tabs --}}
+    <div class="flex items-center gap-2 border-b border-gray-200 pb-3">
+        <a href="{{ route('pengelola.galeri.index') }}"
+           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ !request('tipe') ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
+            Semua
+        </a>
+        <a href="{{ route('pengelola.galeri.index', ['tipe' => 'wisata']) }}"
+           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ request('tipe') === 'wisata' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
+            Wisata Bangkiang Jaran
+        </a>
+        <a href="{{ route('pengelola.galeri.index', ['tipe' => 'restoran']) }}"
+           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ request('tipe') === 'restoran' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
+            Restoran / Kuliner
+        </a>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         @forelse ($galeri ?? [] as $g)
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden group">
             <div class="relative overflow-hidden">
                 <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
                      onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                @if($g->tipe === 'restoran')
+                <span class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Restoran</span>
+                @endif
             </div>
             <div class="p-4">
                 <p class="text-sm text-gray-500-600 truncate">{{ $g->keterangan }}</p>

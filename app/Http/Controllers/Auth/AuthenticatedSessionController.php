@@ -33,7 +33,7 @@ class AuthenticatedSessionController extends Controller
         ActivityLogger::log('Login sukses', 'Login sebagai ' . Auth::user()->email);
 
         if (Auth::user()->role === 'pengelola') {
-            return redirect()->intended(route('pengelola.dashboard'));
+            return redirect()->route('pengelola.dashboard');
         }
 
         return redirect()->intended(RouteServiceProvider::HOME);

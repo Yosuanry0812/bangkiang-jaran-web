@@ -108,6 +108,11 @@
 
             <p class="px-3 mb-2 font-sans text-[9px] font-semibold uppercase tracking-[.18em] text-white/20">Operasional</p>
 
+            <a href="{{ route('pengelola.pemesanan-offline.create') }}"
+               class="nav-link {{ Route::is('pengelola.pemesanan-offline*') ? 'active' : '' }}">
+                <span class="material-symbols-outlined">point_of_sale</span>
+                Pemesanan Offline
+            </a>
             <a href="{{ route('pengelola.scan.index') }}"
                class="nav-link {{ Route::is('pengelola.scan*') ? 'active' : '' }}">
                 <span class="material-symbols-outlined">qr_code_scanner</span>

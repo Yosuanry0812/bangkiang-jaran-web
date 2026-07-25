@@ -13,6 +13,7 @@ use App\Http\Controllers\Pengelola\VerifikasiController;
 use App\Http\Controllers\Pengelola\LaporanController;
 use App\Http\Controllers\Pengelola\UserController;
 use App\Http\Controllers\Pengelola\ScanController;
+use App\Http\Controllers\Pengelola\PemesananOfflineController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +89,15 @@ Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengel
     Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');
     Route::post('/scan/cari', [ScanController::class, 'cari'])->name('scan.cari');
     Route::post('/scan/gunakan', [ScanController::class, 'gunakan'])->name('scan.gunakan');
+    Route::post('/scan/checkout', [ScanController::class, 'checkout'])->name('scan.checkout');
+
+    // Pemesanan Offline (manual ticket entry)
+    Route::get('/pemesanan-offline', [PemesananOfflineController::class, 'create'])->name('pemesanan-offline.create');
+    Route::post('/pemesanan-offline', [PemesananOfflineController::class, 'store'])->name('pemesanan-offline.store');
+    Route::get('/pemesanan-offline/data-diri', [PemesananOfflineController::class, 'dataDiri'])->name('pemesanan-offline.data-diri');
+    Route::post('/pemesanan-offline/data-diri', [PemesananOfflineController::class, 'storeDataDiri'])->name('pemesanan-offline.store-data-diri');
+    Route::get('/pemesanan-offline/sukses/{id}', [PemesananOfflineController::class, 'sukses'])->name('pemesanan-offline.sukses');
+    Route::get('/pemesanan-offline/riwayat', [PemesananOfflineController::class, 'riwayat'])->name('pemesanan-offline.riwayat');
 });
 
 // ========== PROFILE ROUTES ==========

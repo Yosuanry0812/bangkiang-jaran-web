@@ -28,7 +28,7 @@ class TiketController extends Controller
         $request->validate([
             'nama_tiket' => ['required', 'string', 'max:100'],
             'harga'      => ['required', 'numeric', 'min:0'],
-            'kategori'   => ['required', 'in:perorangan,kendaraan,paket'],
+            'kategori'   => ['required', 'in:perorangan,kendaraan'],
         ], [
             'nama_tiket.required' => 'Nama tiket wajib diisi.',
             'harga.required'      => 'Harga tiket wajib diisi.',
@@ -55,7 +55,7 @@ class TiketController extends Controller
         $request->validate([
             'nama_tiket' => ['required', 'string', 'max:100'],
             'harga'      => ['required', 'numeric', 'min:0'],
-            'kategori'   => ['required', 'in:perorangan,kendaraan,paket'],
+            'kategori'   => ['required', 'in:perorangan,kendaraan'],
         ]);
 
         $tiket->update($request->only(['nama_tiket', 'harga', 'kategori', 'status']));

@@ -16,7 +16,7 @@
     </div>
     <div class="relative z-10 w-full max-w-6xl mx-auto px-gutter py-32 lg:py-44">
         <div class="max-w-xl" data-aos="fade-up" data-aos-duration="900">
-            <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-white/50 mb-8">Pemesanan Online</p>
+            <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-white/50 mb-8">{{ __('messages.online_booking') }}</p>
             <h1 class="font-serif text-[clamp(3rem,7vw,5.5rem)] leading-[1.0] text-white mb-7">
                 {{ __('messages.plan_your_journey') }}
             </h1>
@@ -27,33 +27,33 @@
                 @auth
                 <a href="{{ route('wisatawan.pemesanan.create') }}"
                    class="inline-flex items-center gap-2 bg-white text-gray-900 font-sans text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
-                    Pesan Tiket <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    {{ __('messages.book_ticket') }} <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 @else
                 <a href="{{ route('login') }}"
                    class="inline-flex items-center gap-2 bg-white text-gray-900 font-sans text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
-                    Masuk untuk Memesan <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    {{ __('messages.login_to_book') }} <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
                 @endauth
                 <a href="#tiket-list"
                    class="inline-flex items-center gap-2 border border-white/25 text-white/80 font-sans text-sm px-6 py-3 rounded-full hover:border-white/50 hover:text-white transition-colors">
-                    Lihat Harga
+                    {{ __('messages.view_price') }}
                 </a>
             </div>
             <div class="flex flex-wrap gap-6 mt-14 pt-10 border-t border-white/10">
                 <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">Jam Buka</p>
-                    <p class="font-sans text-sm text-white/80">07:00 – 18:00 WITA</p>
+                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.operating_hours_label') }}</p>
+                    <p class="font-sans text-sm text-white/80">{{ __('messages.operating_hours') }}</p>
                 </div>
                 <div class="w-px bg-white/10"></div>
                 <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">Lokasi</p>
-                    <p class="font-sans text-sm text-white/80">Desa Bakbakan, Gianyar</p>
+                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.location') }}</p>
+                    <p class="font-sans text-sm text-white/80">{{ __('messages.address') }}</p>
                 </div>
                 <div class="w-px bg-white/10"></div>
                 <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">Pengunjung</p>
-                    <p class="font-sans text-sm text-white/80">5.000+ per bulan</p>
+                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.visitors') }}</p>
+                    <p class="font-sans text-sm text-white/80">{{ __('messages.visitors_value') }}</p>
                 </div>
             </div>
         </div>
@@ -66,11 +66,11 @@
 <section id="tiket-list" class="py-24 md:py-32 px-gutter bg-white">
     <div class="max-w-6xl mx-auto">
         <div class="mb-16" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">Harga Tiket</p>
+            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.ticket_price') }}</p>
             <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                <h2 class="font-serif text-5xl md:text-6xl text-gray-900 leading-[1.05]">Pilih Tiket Anda</h2>
+                <h2 class="font-serif text-5xl md:text-6xl text-gray-900 leading-[1.05]">{{ __('messages.select_your_ticket') }}</h2>
                 <p class="font-sans text-sm text-gray-400 max-w-xs leading-relaxed md:text-right">
-                    Semua harga sudah termasuk akses penuh ke area wisata.
+                    {{ __('messages.ticket_price_desc') }}
                 </p>
             </div>
             <div class="mt-8 h-px bg-gray-100"></div>
@@ -84,11 +84,11 @@
                 <div class="flex items-center justify-between mb-8">
                     <span class="font-sans text-xs text-gray-300 tabular-nums">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                     <span class="inline-flex items-center gap-1.5 font-sans text-xs text-gray-400">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Tersedia
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> {{ __('messages.available') }}
                     </span>
                 </div>
                 <h3 class="font-serif text-2xl text-gray-900 mb-1 leading-snug">{{ $t->nama_tiket }}</h3>
-                <p class="font-sans text-sm text-gray-400 mb-8">Per orang · 1 hari kunjungan</p>
+                <p class="font-sans text-sm text-gray-400 mb-8">{{ __('messages.per_person_day') }}</p>
                 <div class="mt-auto">
                     <div class="flex items-baseline gap-1.5 mb-7">
                         <span class="font-sans text-sm text-gray-400">Rp</span>
@@ -98,31 +98,31 @@
                     <ul class="space-y-2.5 mb-8">
                         <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
                             <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            Akses masuk area wisata
+                            {{ __('messages.facility_access_entry') }}
                         </li>
                         <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
                             <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            Berlaku 1 hari kunjungan
+                            {{ __('messages.facility_valid_date_one_day') }}
                         </li>
                         <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
                             <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            Konfirmasi via email
+                            {{ __('messages.email_confirmation') }}
                         </li>
                     </ul>
                     <div class="flex gap-2.5">
                         <a href="{{ route('tiket.detail', $t->id_tiket) }}"
                            class="flex-1 text-center font-sans text-sm py-3 rounded-xl border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-900 transition-all duration-200">
-                            Detail
+                            {{ __('messages.detail') }}
                         </a>
                         @auth
                         <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $t->id_tiket]) }}"
                            class="flex-1 text-center font-sans text-sm font-medium py-3 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-all duration-200">
-                            Pesan
+                            {{ __('messages.book') }}
                         </a>
                         @else
                         <a href="{{ route('login') }}"
                            class="flex-1 text-center font-sans text-sm font-medium py-3 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-all duration-200">
-                            Pesan
+                            {{ __('messages.book') }}
                         </a>
                         @endauth
                     </div>
@@ -134,8 +134,8 @@
         @else
         <div class="text-center py-24" data-aos="fade-up">
             <span class="material-symbols-outlined text-5xl text-gray-200 block mb-4">confirmation_number</span>
-            <p class="font-serif text-xl text-gray-400 mb-2">Belum ada tiket tersedia</p>
-            <p class="font-sans text-sm text-gray-400">Silakan pilih tanggal lain atau hubungi pengelola</p>
+            <p class="font-serif text-xl text-gray-400 mb-2">{{ __('messages.no_tickets') }}</p>
+            <p class="font-sans text-sm text-gray-400">{{ __('messages.no_tickets_desc') }}</p>
         </div>
         @endif
     </div>
@@ -147,24 +147,24 @@
 <section class="py-24 md:py-32 px-gutter bg-white border-t border-gray-100">
     <div class="max-w-6xl mx-auto">
         <div class="mb-16" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">Keuntungan</p>
-            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">Mengapa Pesan Online?</h2>
+            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.advantages') }}</p>
+            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">{{ __('messages.why_book_online') }}</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             <div class="py-10 md:py-0 md:pr-12" data-aos="fade-up" data-aos-delay="0">
                 <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">01</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">Proses Cepat & Mudah</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">Pesan tiket hanya dalam beberapa langkah. Tidak perlu antri di loket, tidak perlu datang lebih awal.</p>
+                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.fast_easy_process') }}</h3>
+                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.fast_easy_desc') }}</p>
             </div>
             <div class="py-10 md:py-0 md:px-12" data-aos="fade-up" data-aos-delay="80">
                 <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">02</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">Aman & Terpercaya</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">Konfirmasi langsung ke email. Data dan transaksi Anda terlindungi sepenuhnya.</p>
+                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.secure_reliable') }}</h3>
+                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.secure_reliable_desc') }}</p>
             </div>
             <div class="py-10 md:py-0 md:pl-12" data-aos="fade-up" data-aos-delay="160">
                 <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">03</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">Dukungan Kapan Saja</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">Tim kami siap membantu melalui email. Respons cepat, solusi jelas.</p>
+                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.anytime_support') }}</h3>
+                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.anytime_support_desc') }}</p>
             </div>
         </div>
     </div>
@@ -177,28 +177,28 @@
     <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             <div data-aos="fade-right">
-                <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-5">Cara Pesan</p>
-                <h2 class="font-serif text-4xl md:text-5xl text-gray-900 leading-[1.1] mb-14">3 Langkah<br>Mudah Pesan</h2>
+                <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-5">{{ __('messages.how_to_book') }}</p>
+                <h2 class="font-serif text-4xl md:text-5xl text-gray-900 leading-[1.1] mb-14">{{ __('messages.three_steps_title') }}</h2>
                 <div class="divide-y divide-gray-200">
                     <div class="flex gap-7 py-9">
                         <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">1</span>
                         <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">Pilih Tiket & Tanggal</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">Pilih jenis tiket, masukkan jumlah pengunjung dan tanggal kunjungan yang diinginkan.</p>
+                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_one_title') }}</h4>
+                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_one_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex gap-7 py-9">
                         <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">2</span>
                         <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">Lakukan Pembayaran</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">Transfer ke rekening yang tersedia, kemudian upload bukti bayar. Verifikasi berlangsung cepat.</p>
+                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_two_title') }}</h4>
+                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_two_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex gap-7 py-9">
                         <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">3</span>
                         <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">Terima E-Tiket</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">E-tiket dikirim ke email setelah pembayaran dikonfirmasi. Tunjukkan ke petugas saat tiba.</p>
+                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_three_title') }}</h4>
+                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_three_desc') }}</p>
                         </div>
                     </div>
                 </div>
@@ -209,8 +209,8 @@
                          class="w-full h-full object-cover" alt="Bangkiang Jaran" loading="lazy">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                     <div class="absolute bottom-0 left-0 right-0 p-8">
-                        <p class="font-serif text-white text-xl leading-snug">Nikmati pengalaman<br>yang tak terlupakan.</p>
-                        <p class="font-sans text-sm text-white/60 mt-2">Bangkiang Jaran, Gianyar Bali</p>
+                        <p class="font-serif text-white text-xl leading-snug">{{ __('messages.experience_cta_title') }}</p>
+                        <p class="font-sans text-sm text-white/60 mt-2">{{ __('messages.location_desc_short') }}</p>
                     </div>
                 </div>
             </div>
@@ -225,14 +225,14 @@
     <div class="max-w-3xl mx-auto">
         <div class="mb-16" data-aos="fade-up">
             <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">FAQ</p>
-            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">Pertanyaan Umum</h2>
+            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">{{ __('messages.faq_title') }}</h2>
         </div>
         @php $faqs = [
-            ['q'=>'Apakah tiket dapat dibatalkan?','a'=>'Tiket yang sudah dipesan tidak dapat dibatalkan. Namun tiket dapat dialihkan ke tanggal lain maksimal H-1 kunjungan dengan menghubungi tim kami.'],
-            ['q'=>'Berapa lama konfirmasi tiket?','a'=>'Setelah melakukan pembayaran dan upload bukti transfer, konfirmasi tiket akan dikirim ke email Anda dalam waktu 1×24 jam di hari kerja.'],
-            ['q'=>'Apakah tiket berlaku untuk anak di bawah 3 tahun?','a'=>'Anak di bawah 3 tahun masuk GRATIS tanpa perlu membeli tiket. Cukup beli tiket untuk pengunjung dewasa yang mendampingi.'],
-            ['q'=>'Metode pembayaran apa yang diterima?','a'=>'Kami menerima transfer bank (BCA, BRI, BNI, Mandiri), serta berbagai dompet digital. Detail akan ditampilkan saat proses pemesanan.'],
-            ['q'=>'Bagaimana cara menunjukkan tiket di lokasi?','a'=>'Tunjukkan e-tiket di email atau screenshot kepada petugas di pintu masuk. Pastikan kode QR atau nomor tiket terlihat jelas.'],
+            ['q'=>__('messages.faq_q1'),'a'=>__('messages.faq_a1')],
+            ['q'=>__('messages.faq_q2'),'a'=>__('messages.faq_a2')],
+            ['q'=>__('messages.faq_q3'),'a'=>__('messages.faq_a3')],
+            ['q'=>__('messages.faq_q4'),'a'=>__('messages.faq_a4')],
+            ['q'=>__('messages.faq_q5'),'a'=>__('messages.faq_a5')],
         ]; @endphp
         <div class="divide-y divide-gray-200" data-aos="fade-up">
             @foreach($faqs as $i => $faq)

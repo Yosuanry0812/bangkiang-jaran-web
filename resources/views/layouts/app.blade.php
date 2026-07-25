@@ -129,15 +129,15 @@
 
             {{-- Desktop nav --}}
             <nav class="hidden md:flex items-center gap-8" aria-label="Menu desktop">
-                <a href="{{ route('landing') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">Beranda</a>
-                <a href="{{ route('tiket.index') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">Tiket</a>
+                <a href="{{ route('landing') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.home') }}</a>
+                <a href="{{ route('tiket.index') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.tickets') }}</a>
                 @auth
-                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">Riwayat</a>
+                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.history') }}</a>
                 <a href="{{ route('profile.edit') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ Auth::user()->username }}</a>
-                <a href="{{ route('logout.get') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">Keluar</a>
+                <a href="{{ route('logout.get') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">{{ __('messages.logout') }}</a>
                 @else
-                <a href="{{ route('login') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">Masuk</a>
-                <a href="{{ route('register') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">Daftar</a>
+                <a href="{{ route('login') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.login') }}</a>
+                <a href="{{ route('register') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">{{ __('messages.register') }}</a>
                 @endauth
                 <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-sm text-white/50 hover:text-white transition-colors">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
             </nav>
@@ -145,7 +145,7 @@
             {{-- Hamburger (mobile) --}}
             <button id="mobileMenuBtn"
                     class="md:hidden text-white w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
-                    aria-label="Buka menu" aria-expanded="false" aria-controls="mobileMenu">
+                    aria-label="{{ __('messages.open_menu') }}" aria-expanded="false" aria-controls="mobileMenu">
                 <span class="material-symbols-outlined text-2xl" id="menuIcon">menu</span>
             </button>
         </div>
@@ -157,21 +157,21 @@
              aria-label="Menu mobile">
             <div class="px-gutter py-5 space-y-1">
                 <a href="{{ route('landing') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">home</span> Beranda
+                    <span class="material-symbols-outlined text-base text-white/40">home</span> {{ __('messages.home') }}
                 </a>
                 <a href="{{ route('tiket.index') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">confirmation_number</span> Tiket
+                    <span class="material-symbols-outlined text-base text-white/40">confirmation_number</span> {{ __('messages.tickets') }}
                 </a>
                 @auth
                 <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">history</span> Riwayat
+                    <span class="material-symbols-outlined text-base text-white/40">history</span> {{ __('messages.history') }}
                 </a>
                 <a href="{{ route('profile.edit') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
                     <span class="material-symbols-outlined text-base text-white/40">person</span> {{ Auth::user()->username }}
                 </a>
                 <div class="pt-2 mt-2 border-t border-white/10 flex items-center gap-3">
                     <a href="{{ route('logout.get') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white border border-white/20 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        <span class="material-symbols-outlined text-base">logout</span> Keluar
+                        <span class="material-symbols-outlined text-base">logout</span> {{ __('messages.logout') }}
                     </a>
                     <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="nav-mobile-link font-sans text-sm text-white/50 border border-white/10 px-4 py-2.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
                         {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
@@ -180,10 +180,10 @@
                 @else
                 <div class="pt-2 mt-2 border-t border-white/10 flex items-center gap-3">
                     <a href="{{ route('login') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/80 hover:text-white border border-white/20 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        Masuk
+                        {{ __('messages.login') }}
                     </a>
                     <a href="{{ route('register') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white border border-white/30 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        Daftar
+                        {{ __('messages.register') }}
                     </a>
                     <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="nav-mobile-link font-sans text-sm text-white/50 border border-white/10 px-4 py-2.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
                         {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
@@ -230,24 +230,24 @@
                 </div>
 
                 <div>
-                    <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">Navigasi</h4>
+                    <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">{{ __('messages.nav_title') }}</h4>
                     <ul class="space-y-2.5">
-                        <li><a href="{{ route('landing') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">Beranda</a></li>
-                        <li><a href="#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">Lokasi</a></li>
-                        <li><a href="{{ route('tiket.index') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">Tiket</a></li>
+                        <li><a href="{{ route('landing') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.home') }}</a></li>
+                        <li><a href="#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.location') }}</a></li>
+                        <li><a href="{{ route('tiket.index') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.tickets') }}</a></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">Kontak</h4>
+                    <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">{{ __('messages.contact_title') }}</h4>
                     <ul class="space-y-2.5">
                         <li class="flex items-start gap-2">
                             <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">location_on</span>
-                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">Desa Bakbakan, Gianyar, Bali</span>
+                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">{{ __('messages.address') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">schedule</span>
-                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">07:00 – 18:00 WITA</span>
+                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">{{ __('messages.operating_hours') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">mail</span>
@@ -259,7 +259,7 @@
 
             <div class="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
                  style="border-top: 1px solid rgba(255,255,255,0.06);">
-                <p class="font-sans text-xs" style="color:rgba(247,243,238,0.3);">&copy; {{ date('Y') }} Bangkiang Jaran Waterfall. Hak cipta dilindungi.</p>
+                <p class="font-sans text-xs" style="color:rgba(247,243,238,0.3);">&copy; {{ date('Y') }} Bangkiang Jaran Waterfall. {{ __('messages.copyright_reserved') }}</p>
                 <p class="font-sans text-xs" style="color:rgba(247,243,238,0.2);">Gianyar, Bali, Indonesia</p>
             </div>
         </div>

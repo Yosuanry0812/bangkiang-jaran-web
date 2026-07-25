@@ -41,11 +41,9 @@ class DatabaseSeeder extends Seeder
 
         // ========== TIKET ==========
         $tikets = [
-            ['nama_tiket' => 'Tiket Masuk Dewasa',     'harga' => 25000, 'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Masuk Anak-Anak',  'harga' => 15000, 'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Paket Keluarga (4 Orang)', 'harga' => 75000, 'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Parkir Motor',     'harga' => 5000,  'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Parkir Mobil',     'harga' => 10000, 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Masuk Dewasa',               'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Masuk Anak-Anak',            'harga' => 15000, 'kategori' => 'perorangan', 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Masuk Domestik (WNA)',       'harga' => 30000, 'kategori' => 'perorangan', 'status' => 'aktif'],
         ];
         foreach ($tikets as $t) {
             DB::table('tiket')->updateOrInsert(
@@ -53,6 +51,10 @@ class DatabaseSeeder extends Seeder
                 array_merge($t, ['created_at' => now(), 'updated_at' => now()])
             );
         }
+
+        // Nonaktifkan tiket parkir (tidak dihapus karena ada relasi ke pemesanan lama)
+        DB::table('tiket')->whereIn('nama_tiket', ['Tiket Parkir Motor', 'Tiket Parkir Mobil'])
+            ->update(['status' => 'nonaktif', 'updated_at' => now()]);
 
         // ========== KONTEN ==========
         $kontens = [

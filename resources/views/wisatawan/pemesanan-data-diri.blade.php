@@ -55,8 +55,6 @@
                                         <div class="w-8 h-8 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
                                             @if($row['kategori'] === 'kendaraan')
                                                 <span class="material-symbols-outlined text-forest text-sm">directions_car</span>
-                                            @elseif($row['kategori'] === 'paket')
-                                                <span class="material-symbols-outlined text-forest text-sm">family_restroom</span>
                                             @else
                                                 <span class="material-symbols-outlined text-forest text-sm">person</span>
                                             @endif
@@ -66,8 +64,6 @@
                                             <p class="font-sans text-xs text-stone">
                                                 @if($row['kategori'] === 'kendaraan')
                                                     Masukkan plat nomor kendaraan
-                                                @elseif($row['kategori'] === 'paket')
-                                                    Masukkan nama setiap anggota keluarga
                                                 @else
                                                     Masukkan nama lengkap pengunjung
                                                 @endif
@@ -94,6 +90,7 @@
                                             @enderror
                                         </div>
                                     @else
+<<<<<<< HEAD
                                         <div>
                                             <label class="block font-sans text-xs text-stone mb-1.5">
                                                 Nama Lengkap
@@ -110,6 +107,38 @@
                                             @error('nama_' . $i)
                                                 <p class="font-sans text-xs text-red-500 mt-1">{{ $message }}</p>
                                             @enderror
+=======
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block font-sans text-xs text-stone mb-1.5">
+                                                    Nama Lengkap
+                                                    <span class="text-red-400">*</span>
+                                                </label>
+                                                <input type="text"
+                                                       name="nama_{{ $i }}"
+                                                       value="{{ old('nama_' . $i) }}"
+                                                       placeholder="Nama lengkap pengunjung"
+                                                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest transition-all bg-white">
+                                                @error('nama_' . $i)
+                                                    <p class="font-sans text-xs text-red-500 mt-1">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                            <div>
+                                                <label class="block font-sans text-xs text-stone mb-1.5">
+                                                    Jenis Kelamin
+                                                    <span class="text-red-400">*</span>
+                                                </label>
+                                                <select name="gender_{{ $i }}"
+                                                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/30 focus:border-forest transition-all bg-white">
+                                                    <option value="" disabled {{ old('gender_' . $i) ? '' : 'selected' }}>Pilih jenis kelamin</option>
+                                                    <option value="L" {{ old('gender_' . $i) === 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                                    <option value="P" {{ old('gender_' . $i) === 'P' ? 'selected' : '' }}>Perempuan</option>
+                                                </select>
+                                                @error('gender_' . $i)
+                                                    <p class="font-sans text-xs text-red-500 mt-1">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+>>>>>>> 8ee10519aaa7872d3c5666ecaff490a4ad1616e4
                                         </div>
                                     @endif
                                 </div>

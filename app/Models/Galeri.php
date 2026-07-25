@@ -16,5 +16,16 @@ class Galeri extends Model
     protected $fillable = [
         'file',
         'keterangan',
+        'tipe',
     ];
+
+    public function scopeWisata($query)
+    {
+        return $query->where('tipe', 'wisata');
+    }
+
+    public function scopeRestoran($query)
+    {
+        return $query->where('tipe', 'restoran');
+    }
 }

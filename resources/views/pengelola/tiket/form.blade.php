@@ -38,9 +38,8 @@
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
                         <option value="perorangan" {{ old('kategori', $tiket->kategori ?? '') == 'perorangan' ? 'selected' : '' }}>Perorangan</option>
                         <option value="kendaraan"  {{ old('kategori', $tiket->kategori ?? '') == 'kendaraan' ? 'selected' : '' }}>Kendaraan</option>
-                        <option value="paket"      {{ old('kategori', $tiket->kategori ?? '') == 'paket' ? 'selected' : '' }}>Paket Keluarga</option>
                     </select>
-                    <p class="text-xs text-stone mt-1">Perorangan = 1 tiket per orang, Kendaraan = 1 tiket per plat, Paket = 1 tiket untuk 4 orang</p>
+                    <p class="text-xs text-stone mt-1">Perorangan = 1 tiket per orang, Kendaraan = 1 tiket per plat.</p>
                     @error('kategori') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tiket', function (Blueprint $table) {
-            $table->enum('kategori', ['perorangan', 'kendaraan', 'paket'])
+            $table->enum('kategori', ['perorangan', 'kendaraan'])
                   ->default('perorangan')
                   ->after('harga');
         });
@@ -20,7 +20,6 @@ return new class extends Migration
         // Set default kategori for existing tickets
         DB::statement("UPDATE tiket SET kategori='perorangan' WHERE nama_tiket LIKE '%Dewasa%' OR nama_tiket LIKE '%Anak%'");
         DB::statement("UPDATE tiket SET kategori='kendaraan' WHERE nama_tiket LIKE '%Parkir%' OR nama_tiket LIKE '%Motor%' OR nama_tiket LIKE '%Mobil%'");
-        DB::statement("UPDATE tiket SET kategori='paket' WHERE nama_tiket LIKE '%Keluarga%' OR nama_tiket LIKE '%Paket%'");
     }
 
     /**

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($tiket->nama_tiket ?? 'Detail Tiket') . ' — Bangkiang Jaran')
+@section('title', ($tiket->nama_tiket ?? __('messages.breadcrumb_detail')) . ' — Bangkiang Jaran')
 
 @section('content')
 <div class="min-h-screen" style="background:#F8F7F5;">
@@ -9,11 +9,11 @@
     <div class="pt-28 pb-0 px-gutter">
         <div class="max-w-5xl mx-auto">
             <nav class="flex items-center gap-2 font-sans text-xs text-stone" aria-label="Breadcrumb">
-                <a href="{{ url('/') }}" class="hover:text-forest transition-colors">Beranda</a>
+                <a href="{{ url('/') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_home') }}</a>
                 <span class="text-gray-300">/</span>
-                <a href="{{ route('tiket.index') }}" class="hover:text-forest transition-colors">Tiket</a>
+                <a href="{{ route('tiket.index') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
                 <span class="text-gray-300">/</span>
-                <span class="text-forest">Detail Tiket</span>
+                <span class="text-forest">{{ __('messages.breadcrumb_detail') }}</span>
             </nav>
         </div>
     </div>
@@ -34,7 +34,7 @@
                             </div>
                             <p class="font-sans text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3">Bangkiang Jaran Waterfall</p>
                             <h1 class="font-serif text-3xl text-white mb-1">{{ $tiket->nama_tiket }}</h1>
-                            <p class="font-sans text-sm text-white/50">Tiket Masuk · 1 Hari Kunjungan</p>
+                            <p class="font-sans text-sm text-white/50">{{ __('messages.ticket_entry_one_day') }}</p>
                         </div>
 
                         {{-- Perforation --}}
@@ -49,12 +49,12 @@
                             {{-- Price & Status --}}
                             <div class="flex items-center justify-between mb-8">
                                 <div>
-                                    <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">Harga</p>
+                                    <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">{{ __('messages.th_price') }}</p>
                                     <div class="flex items-baseline gap-1">
                                         <span class="font-sans text-sm text-stone">Rp</span>
                                         <span class="font-serif text-4xl text-forest">{{ number_format($tiket->harga, 0, ',', '.') }}</span>
                                     </div>
-                                    <p class="font-sans text-xs text-pebble mt-0.5">per orang</p>
+                                    <p class="font-sans text-xs text-pebble mt-0.5">{{ __('messages.per_person_unit') }}</p>
                                 </div>
                                 @if($tiket->status == 'aktif')
                                 <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-sans text-xs font-medium px-3.5 py-1.5 rounded-full">
@@ -113,8 +113,8 @@
                 <div class="lg:col-span-5 lg:sticky lg:top-28" data-aos="fade-left" data-aos-delay="80">
                     <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-7 pt-7 pb-6 border-b border-gray-100">
-                            <h3 class="font-serif text-xl text-forest mb-0.5">Pesan Tiket Ini</h3>
-                            <p class="font-sans text-xs text-stone">Konfirmasi langsung via email</p>
+                            <h3 class="font-serif text-xl text-forest mb-0.5">{{ __('messages.book_this_ticket') }}</h3>
+                            <p class="font-sans text-xs text-stone">{{ __('messages.instant_confirmation_email') }}</p>
                         </div>
 
                         <div class="px-7 py-6">
@@ -124,12 +124,12 @@
                                 <span class="font-sans text-sm text-forest font-semibold">Rp{{ number_format($tiket->harga, 0, ',', '.') }}</span>
                             </div>
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-sans text-sm text-stone">Jam Buka</span>
-                                <span class="font-sans text-sm text-ink">07:00 – 18:00 WITA</span>
+                                <span class="font-sans text-sm text-stone">{{ __('messages.operating_hours_label') }}</span>
+                                <span class="font-sans text-sm text-ink">{{ __('messages.operating_hours') }}</span>
                             </div>
                             <div class="flex items-center justify-between py-3">
-                                <span class="font-sans text-sm text-stone">Lokasi</span>
-                                <span class="font-sans text-sm text-ink">Desa Bakbakan, Gianyar</span>
+                                <span class="font-sans text-sm text-stone">{{ __('messages.location') }}</span>
+                                <span class="font-sans text-sm text-ink">{{ __('messages.address') }}</span>
                             </div>
 
                             {{-- CTA --}}
@@ -145,25 +145,25 @@
                                 <a href="{{ route('login') }}"
                                    class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                                     <span class="material-symbols-outlined text-sm">login</span>
-                                    Masuk untuk Memesan
+                                    {{ __('messages.login_to_book') }}
                                 </a>
                                 @endauth
                                 @else
                                 <button disabled
                                         class="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-400 font-sans text-sm font-semibold py-3.5 rounded-xl cursor-not-allowed">
-                                    Tiket Tidak Tersedia
+                                    {{ __('messages.ticket_unavailable') }}
                                 </button>
                                 @endif
                                 <a href="{{ route('tiket.index') }}"
                                    class="flex items-center justify-center w-full border border-gray-200 text-stone font-sans text-sm py-3.5 rounded-xl hover:border-gray-400 hover:text-ink transition-colors">
-                                    Lihat Tiket Lainnya
+                                    {{ __('messages.view_other_tickets') }}
                                 </a>
                             </div>
 
                             {{-- Note --}}
                             <p class="font-sans text-xs text-center text-pebble mt-4">
                                 <span class="material-symbols-outlined text-xs align-middle mr-0.5">lock</span>
-                                Transaksi aman & terenkripsi
+                                {{ __('messages.secure_encrypted_transaction') }}
                             </p>
                         </div>
                     </div>
@@ -175,9 +175,9 @@
                                 <span class="material-symbols-outlined text-forest text-sm">support_agent</span>
                             </div>
                             <div>
-                                <p class="font-sans text-sm font-medium text-ink mb-0.5">Butuh bantuan?</p>
+                                <p class="font-sans text-sm font-medium text-ink mb-0.5">{{ __('messages.need_help') }}</p>
                                 <p class="font-sans text-xs text-stone leading-relaxed">
-                                    Hubungi kami di
+                                    {{ __('messages.contact_us_at') }}
                                     <a href="mailto:info@bangkiangjaran.com" class="text-forest hover:underline">info@bangkiangjaran.com</a>
                                 </p>
                             </div>

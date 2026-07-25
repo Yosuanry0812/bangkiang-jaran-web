@@ -15,9 +15,12 @@ class DetailPemesanan extends Model
         'kode_tiket',
         'nama_tiket',
         'nama_pengunjung',
+        'jenis_kelamin',
         'plat_kendaraan',
         'harga',
         'status_tiket',
+        'check_in_at',
+        'check_out_at',
     ];
 
     public function pemesanan()

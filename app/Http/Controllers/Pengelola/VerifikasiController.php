@@ -16,11 +16,10 @@ class VerifikasiController extends Controller
 {
     public function index()
     {
-        // Tampilkan semua pemesanan yg sudah punya pembayaran (pending verifikasi atau ditolak)
+        // Tampilkan semua pemesanan yg sudah punya pembayaran — urut dari yg terbaru
         $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
             ->has('pembayaran')
-            ->orderByRaw("FIELD(status, 'pending', 'selesai', 'dibatalkan')")
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('pengelola.verifikasi.index', compact('pemesanan'));

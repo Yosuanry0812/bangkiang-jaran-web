@@ -82,8 +82,6 @@
                     <div class="flex items-center gap-2">
                         @if($item->plat_kendaraan)
                             <span class="material-symbols-outlined text-forest text-sm">directions_car</span>
-                        @elseif($item->nama_tiket && strpos($item->nama_tiket, 'Keluarga') !== false)
-                            <span class="material-symbols-outlined text-forest text-sm">family_restroom</span>
                         @else
                             <span class="material-symbols-outlined text-forest text-sm">person</span>
                         @endif

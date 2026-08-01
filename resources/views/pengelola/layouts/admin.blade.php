@@ -58,8 +58,12 @@
     @stack('styles')
 </head>
 
-<body class="font-sans antialiased bg-slate-50 text-slate-800 min-h-screen">
-<div x-data="{ sidebarOpen: false }" class="flex min-h-screen">
+<body class="font-sans antialiased bg-slate-50 text-slate-800 min-h-screen overflow-x-clip">
+<div x-data="{ sidebarOpen: false }"
+     x-effect="document.body.style.overflow = sidebarOpen ? 'hidden' : ''"
+     @keydown.escape.window="sidebarOpen = false"
+     @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false"
+     class="flex min-h-screen">
 
     {{-- ── SIDEBAR ── --}}
     <aside id="sidebar"
@@ -79,7 +83,7 @@
         </div>
 
         {{-- Nav --}}
-        <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-0.5">
+        <nav class="flex-1 overflow-y-auto overscroll-contain py-5 px-3 space-y-0.5">
 
             <p class="px-3 mb-2 font-sans text-[9px] font-semibold uppercase tracking-[.18em] text-white/20">Utama</p>
 

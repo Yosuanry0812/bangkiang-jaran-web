@@ -249,6 +249,7 @@ return [
     'th_ticket' => 'Tiket',
     'th_date' => 'Tanggal',
     'th_total' => 'Total',
+    'th_type' => 'Tipe',
     'th_payment_status' => 'Pembayaran',
     'detail' => 'Detail',
     'no_verification_data' => 'Belum ada pemesanan',
@@ -357,6 +358,9 @@ return [
     'easy_access_detail' => 'Akses mudah melalui jalan aspal',
     'no_data_visit' => 'Tidak ada data kunjungan',
     'no_data_transaction' => 'Tidak ada data transaksi',
+    'report_type' => 'Jenis Laporan',
+    'online' => 'Online',
+    'offline' => 'Offline',
 
     // Others
     'lainnya' => 'Lainnya',

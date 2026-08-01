@@ -10,6 +10,11 @@
                 {{ __('messages.period') }} {{ $periode_awal ? \Carbon\Carbon::parse($periode_awal)->format('d/m/Y') : __('messages.all') }}
                 -
                 {{ $periode_akhir ? \Carbon\Carbon::parse($periode_akhir)->format('d/m/Y') : __('messages.all') }}
+                @if ($tipe)
+                    <span class="inline-block ml-2 px-2 py-0.5 rounded-full text-xs font-medium {{ $tipe === 'offline' ? 'bg-orange-100 text-orange-700' : 'bg-sky-100 text-sky-700' }}">
+                        {{ $tipe === 'offline' ? __('messages.offline') : __('messages.online') }}
+                    </span>
+                @endif
             </p>
         </div>
         <a href="{{ route('pengelola.laporan.kunjungan', array_merge(request()->all(), ['export' => 'pdf'])) }}"
@@ -17,6 +22,34 @@
             <span class="material-symbols-outlined text-base">picture_as_pdf</span>
             Export PDF
         </a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+        <form method="GET" action="{{ route('pengelola.laporan.kunjungan') }}" class="flex flex-wrap items-end gap-3">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
+                <input type="date" name="periode_awal" value="{{ request('periode_awal') }}"
+                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
+                <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
+                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
+                <select name="tipe"
+                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+                    <option value="" {{ !$tipe ? 'selected' : '' }}>{{ __('messages.all') }}</option>
+                    <option value="online" {{ $tipe === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
+                    <option value="offline" {{ $tipe === 'offline' ? 'selected' : '' }}>{{ __('messages.offline') }}</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined text-base">search</span>
+                {{ __('messages.filter') }}
+            </button>
+        </form>
     </div>
 
     @php
@@ -63,6 +96,7 @@
                 <thead>
                     <tr class="border-b border-gray-300-200 bg-stone-50 text-left">
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_booking_code') }}</th>
+                        <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_type') }}</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_user') }}</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_ticket') }}</th>
                         <th class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 py-3.5 px-4">{{ __('messages.th_date') }}</th>
@@ -81,6 +115,13 @@
                     @endphp
                     <tr class="border-b border-gray-300-100 hover:bg-stone-50 transition-colors">
                         <td class="py-3.5 px-4 font-mono text-gray-500-700">{{ $k->kode_booking }}</td>
+                        <td class="py-3.5 px-4">
+                            @if (str_starts_with($k->kode_booking, 'BJ-OFF-'))
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">{{ __('messages.offline') }}</span>
+                            @else
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-sky-100 text-sky-700">{{ __('messages.online') }}</span>
+                            @endif
+                        </td>
                         <td class="py-3.5 px-4 text-gray-500-600">{{ $k->user->name ?? '-' }}</td>
                         <td class="py-3.5 px-4 text-gray-500-600">
                             @php
@@ -120,7 +161,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="9" class="py-10 text-center text-gray-500-400">{{ __('messages.no_data_visit') }}</td></tr>
+                    <tr><td colspan="10" class="py-10 text-center text-gray-500-400">{{ __('messages.no_data_visit') }}</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -63,7 +63,6 @@
                 background-color 0.35s ease,
                 backdrop-filter 0.35s ease,
                 box-shadow 0.35s ease;
-            will-change: transform, background-color;
         }
         #main-nav.nav-hidden  { transform: translateY(-100%); }
         #main-nav.nav-solid   { background-color: rgba(15,28,20,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(255,255,255,0.04); }
@@ -72,12 +71,19 @@
 
         /* ─── Mobile menu ─── */
         #mobileMenu {
-            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), max-height 0.3s ease;
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: top;
-            overflow: hidden;
+            max-height: calc(100vh - 64px);
+            max-height: calc(100dvh - 64px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        #mobileMenu.menu-open  { opacity: 1; transform: scaleY(1); max-height: 400px; }
-        #mobileMenu.menu-close { opacity: 0; transform: scaleY(0.97); max-height: 0; pointer-events: none; }
+        #mobileMenu.menu-open  { opacity: 1; transform: scaleY(1); pointer-events: auto; }
+        #mobileMenu.menu-close { opacity: 0; transform: scaleY(0.97); pointer-events: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #main-nav, #mobileMenu { transition: none; }
+        }
 
         /* ─── Gray blur shapes ─── */
         .blur-jungle { background: radial-gradient(ellipse at center, rgba(74,124,89,0.10) 0%, transparent 70%); }
@@ -116,7 +122,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col" style="selection-background: #1B3A2D;">
+<body class="bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip" style="selection-background: #1B3A2D;">
 
     {{-- Navigation --}}
     <header class="fixed top-0 left-0 right-0 z-50 nav-clear" id="main-nav" aria-label="Navigasi utama">
@@ -287,7 +293,8 @@
 
         let lastY     = window.scrollY;
         let ticking   = false;
-        let hidden     = false;
+        let hidden    = false;
+        let menuOpen  = false;
 
         function setClass(cls) {
             nav.classList.remove('nav-clear', 'nav-tinted', 'nav-solid', 'nav-hidden');
@@ -297,6 +304,15 @@
         function update() {
             const curr = window.scrollY;
             const delta = curr - lastY;
+
+            if (menuOpen) {
+                // Menu terbuka — nav selalu tampil & solid, jangan hide
+                hidden = false;
+                setClass('nav-solid');
+                lastY = curr;
+                ticking = false;
+                return;
+            }
 
             if (curr <= TINTED) {
                 // Top zone — always visible, transparent
@@ -345,7 +361,6 @@
         const btn      = document.getElementById('mobileMenuBtn');
         const menu     = document.getElementById('mobileMenu');
         const menuIcon = document.getElementById('menuIcon');
-        let menuOpen   = false;
 
         function openMenu() {
             menuOpen = true;
@@ -358,6 +373,8 @@
                 nav.classList.remove('nav-clear');
                 nav.classList.add('nav-tinted');
             }
+            setClass('nav-solid');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeMenu() {
@@ -366,6 +383,7 @@
             menu.classList.add('menu-close');
             menuIcon.textContent = 'menu';
             btn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
             // Restore transparent bg if at top
             if (window.scrollY <= TINTED) {
                 nav.classList.remove('nav-tinted', 'nav-solid');

@@ -5,7 +5,7 @@
 {{-- ══════════════════════════════════════════════════════
      HERO
 ══════════════════════════════════════════════════════ --}}
-<section class="relative w-full min-h-screen flex items-end overflow-hidden">
+<section class="relative w-full min-h-screen min-h-svh flex items-end overflow-hidden">
     {{-- Background image --}}
     <div class="absolute inset-0 z-0">
         <img id="hero-img"
@@ -93,7 +93,7 @@
 
             {{-- Images --}}
             <div class="lg:col-span-7" data-aos="fade-left" data-aos-delay="100">
-                <div class="grid grid-cols-12 grid-rows-2 gap-3 h-[480px]">
+                <div class="grid grid-cols-12 grid-rows-2 gap-3 h-[320px] sm:h-[420px] md:h-[480px]">
                     <div class="col-span-7 row-span-2 rounded-2xl overflow-hidden">
                         <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
                              alt="Bangkiang Jaran"
@@ -260,7 +260,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             {{-- Images grid --}}
             <div class="lg:col-span-7" data-aos="fade-right">
-                <div class="grid grid-cols-4 grid-rows-2 gap-3 h-[420px] md:h-[500px]">
+                <div class="grid grid-cols-4 grid-rows-2 gap-3 h-[260px] sm:h-[420px] md:h-[500px]">
                     <div class="col-span-2 row-span-2 rounded-2xl overflow-hidden shadow-lg">
                         <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80"
                              alt="Resto interior"

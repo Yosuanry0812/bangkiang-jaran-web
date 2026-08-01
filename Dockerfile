@@ -11,8 +11,12 @@ RUN npm run build
 FROM php:8.3-apache
 WORKDIR /var/www/html
 
+# Debian bookworm libpng-dev only ships libpng16.pc; PHP gd configure needs libpng.pc
+# -> symlink required, otherwise docker-php-ext-configure gd fails
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libxml2-dev libicu-dev \
+    && ln -s /usr/lib/$(dpkg-architecture -q DEB_HOST_MULTIARCH)/pkgconfig/libpng16.pc \
+              /usr/lib/$(dpkg-architecture -q DEB_HOST_MULTIARCH)/pkgconfig/libpng.pc \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring zip gd exif intl opcache \
     && a2enmod rewrite \
@@ -27,7 +31,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
     && chown -R www-data:www-data storage bootstrap/cache \
     && mkdir -p public/storage
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 

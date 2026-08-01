@@ -11,12 +11,10 @@ RUN npm run build
 FROM php:8.3-apache
 WORKDIR /var/www/html
 
-# Debian bookworm libpng-dev only ships libpng16.pc; PHP gd configure needs libpng.pc
-# -> symlink required, otherwise docker-php-ext-configure gd fails
+# php:8.3-apache (trixie) purges build deps; reinstall the -dev packages needed
+# by docker-php-ext-install (gd, mbstring/oniguruma, zip, intl)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git unzip libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libxml2-dev libicu-dev \
-    && ln -s /usr/lib/$(dpkg-architecture -q DEB_HOST_MULTIARCH)/pkgconfig/libpng16.pc \
-              /usr/lib/$(dpkg-architecture -q DEB_HOST_MULTIARCH)/pkgconfig/libpng.pc \
+        git unzip libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libxml2-dev libicu-dev libonig-dev zlib1g-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring zip gd exif intl opcache \
     && a2enmod rewrite \

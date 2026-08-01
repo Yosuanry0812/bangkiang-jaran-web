@@ -249,6 +249,7 @@ return [
     'th_ticket' => 'Ticket',
     'th_date' => 'Date',
     'th_total' => 'Total',
+    'th_type' => 'Type',
     'th_payment_status' => 'Payment',
     'detail' => 'Detail',
     'no_verification_data' => 'No bookings yet',
@@ -357,6 +358,9 @@ return [
     'easy_access_detail' => 'Easy access via paved road',
     'no_data_visit' => 'No visit data',
     'no_data_transaction' => 'No transaction data',
+    'report_type' => 'Report Type',
+    'online' => 'Online',
+    'offline' => 'Offline',
 
     // Others
     'lainnya' => 'Others',

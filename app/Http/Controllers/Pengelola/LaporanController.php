@@ -20,13 +20,20 @@ class LaporanController extends Controller
         $request->validate([
             'periode_awal'  => ['required', 'date'],
             'periode_akhir' => ['required', 'date', 'after_or_equal:periode_awal'],
+            'tipe'          => ['nullable', 'in:online,offline'],
         ]);
 
         $periode_awal = $request->periode_awal;
         $periode_akhir = $request->periode_akhir;
+        $tipe = $request->tipe;
 
         $data = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
             ->whereBetween('tgl_kunjungan', [$periode_awal, $periode_akhir])
+            ->when($tipe, function ($q) use ($tipe) {
+                $tipe === 'offline'
+                    ? $q->where('kode_booking', 'like', 'BJ-OFF-%')
+                    : $q->where('kode_booking', 'not like', 'BJ-OFF-%');
+            })
             ->orderBy('tgl_kunjungan')
             ->get();
 
@@ -38,11 +45,12 @@ class LaporanController extends Controller
                 'total' => $total,
                 'periode_awal' => $request->periode_awal,
                 'periode_akhir' => $request->periode_akhir,
+                'tipe' => $tipe,
             ]);
             return $pdf->download('laporan-kunjungan-' . $request->periode_awal . '-sampai-' . $request->periode_akhir . '.pdf');
         }
 
-        return view('pengelola.laporan.kunjungan', compact('data', 'total', 'periode_awal', 'periode_akhir'));
+        return view('pengelola.laporan.kunjungan', compact('data', 'total', 'periode_awal', 'periode_akhir', 'tipe'));
     }
 
     public function transaksi(Request $request)
@@ -50,14 +58,21 @@ class LaporanController extends Controller
         $request->validate([
             'periode_awal'  => ['required', 'date'],
             'periode_akhir' => ['required', 'date', 'after_or_equal:periode_awal'],
+            'tipe'          => ['nullable', 'in:online,offline'],
         ]);
 
         $periode_awal = $request->periode_awal;
         $periode_akhir = $request->periode_akhir;
+        $tipe = $request->tipe;
 
         $data = Pembayaran::with('pemesanan.user', 'pemesanan.tiket', 'pemesanan.detailPemesanan')
             ->where('status', 'valid')
             ->whereBetween('tgl_bayar', [$periode_awal, $periode_akhir])
+            ->when($tipe, function ($q) use ($tipe) {
+                $tipe === 'offline'
+                    ? $q->whereHas('pemesanan', fn($p) => $p->where('kode_booking', 'like', 'BJ-OFF-%'))
+                    : $q->whereHas('pemesanan', fn($p) => $p->where('kode_booking', 'not like', 'BJ-OFF-%'));
+            })
             ->orderBy('tgl_bayar')
             ->get();
 
@@ -69,10 +84,11 @@ class LaporanController extends Controller
                 'total' => $total,
                 'periode_awal' => $request->periode_awal,
                 'periode_akhir' => $request->periode_akhir,
+                'tipe' => $tipe,
             ]);
             return $pdf->download('laporan-transaksi-' . $request->periode_awal . '-sampai-' . $request->periode_akhir . '.pdf');
         }
 
-        return view('pengelola.laporan.transaksi', compact('data', 'total', 'periode_awal', 'periode_akhir'));
+        return view('pengelola.laporan.transaksi', compact('data', 'total', 'periode_awal', 'periode_akhir', 'tipe'));
     }
 }

@@ -24,11 +24,20 @@
                 <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
+                <select name="tipe"
+                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+                    <option value="" {{ request('tipe') === null ? 'selected' : '' }}>{{ __('messages.all') }}</option>
+                    <option value="online" {{ request('tipe') === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
+                    <option value="offline" {{ request('tipe') === 'offline' ? 'selected' : '' }}>{{ __('messages.offline') }}</option>
+                </select>
+            </div>
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base">search</span>
                 {{ __('messages.filter') }}
             </button>
-            <a href="{{ route('pengelola.laporan.kunjungan', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'export' => 'pdf']) }}"
+            <a href="{{ route('pengelola.laporan.kunjungan', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'tipe' => request('tipe'), 'export' => 'pdf']) }}"
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base">picture_as_pdf</span>
                 {{ __('messages.export_pdf') }}
@@ -52,11 +61,20 @@
                 <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
+                <select name="tipe"
+                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
+                    <option value="" {{ request('tipe') === null ? 'selected' : '' }}>{{ __('messages.all') }}</option>
+                    <option value="online" {{ request('tipe') === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
+                    <option value="offline" {{ request('tipe') === 'offline' ? 'selected' : '' }}>{{ __('messages.offline') }}</option>
+                </select>
+            </div>
             <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base">search</span>
                 {{ __('messages.filter') }}
             </button>
-            <a href="{{ route('pengelola.laporan.transaksi', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'export' => 'pdf']) }}"
+            <a href="{{ route('pengelola.laporan.transaksi', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'tipe' => request('tipe'), 'export' => 'pdf']) }}"
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base">picture_as_pdf</span>
                 {{ __('messages.export_pdf') }}

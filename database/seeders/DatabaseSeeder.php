@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
                 'password'          => Hash::make('Password123'),
                 'role'              => 'pengelola',
                 'email_verified_at' => now(),
+                'last_login_at'     => now()->subHours(2),
+                'last_login_method' => 'manual',
+                'login_count'       => 3,
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]
@@ -34,7 +37,27 @@ class DatabaseSeeder extends Seeder
                 'password'          => Hash::make('Password123'),
                 'role'              => 'wisatawan',
                 'email_verified_at' => now(),
+                'last_login_at'     => now()->subDay(),
+                'last_login_method' => 'manual',
+                'login_count'       => 5,
                 'created_at'        => now(),
+                'updated_at'        => now(),
+            ]
+        );
+
+        DB::table('users')->updateOrInsert(
+            ['email' => 'yosuanry66@gmail.com'],
+            [
+                'name'              => 'Yosuanry Simbolon (2301020122_yosuanry)',
+                'username'          => 'yosuanry66',
+                'google_id'         => '114819912863405494772',
+                'role'              => 'wisatawan',
+                'email_verified_at' => now(),
+                'password'          => null,
+                'last_login_at'     => now()->subDays(3),
+                'last_login_method' => 'google',
+                'login_count'       => 2,
+                'created_at'        => now()->subDays(13),
                 'updated_at'        => now(),
             ]
         );
@@ -51,10 +74,6 @@ class DatabaseSeeder extends Seeder
                 array_merge($t, ['created_at' => now(), 'updated_at' => now()])
             );
         }
-
-        // Nonaktifkan tiket parkir (tidak dihapus karena ada relasi ke pemesanan lama)
-        DB::table('tiket')->whereIn('nama_tiket', ['Tiket Parkir Motor', 'Tiket Parkir Mobil'])
-            ->update(['status' => 'nonaktif', 'updated_at' => now()]);
 
         // ========== KONTEN ==========
         $kontens = [

@@ -2,17 +2,49 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    public function create()
+    public function create(): View
     {
-        return redirect()->route('auth.google');
+        return view('auth.register');
     }
 
-    public function store()
+    public function store(Request $request): RedirectResponse
     {
-        return redirect()->route('auth.google');
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_.-]+$/', 'unique:' . User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => 'wisatawan',
+            'email_verified_at' => now(),
+            'last_login_at' => now(),
+            'last_login_method' => 'manual',
+            'login_count' => 1,
+        ]);
+
+        ActivityLogger::log('Registrasi', 'Akun baru: ' . $user->email);
+
+        Auth::login($user);
+
+        return redirect()->route('redirect.after.login');
     }
 }

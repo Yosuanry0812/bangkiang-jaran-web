@@ -105,6 +105,7 @@ Akses: http://localhost:8000
 ## Struktur Direktori
 
 ```
+# Backend (Laravel)
 app/
   Http/
     Controllers/
@@ -119,18 +120,34 @@ app/
   Mail/               # Mailable classes (Welcome, Pemesanan, Pembayaran)
   Models/             # User, Tiket, Pemesanan, Pembayaran, Galeri, Konten, Laporan
 database/
-  migrations/         # 7 migration files
+  migrations/         # Migration files
   seeders/
     DatabaseSeeder.php # Demo data seeder
+routes/
+  web.php             # Semua route definitions
+  auth.php            # Auth routes
+
+# Frontend (Blade + Tailwind + Alpine)
 resources/views/
   auth/               # Login, register, forgot password
   emails/             # Email templates (HTML)
   layouts/            # app.blade.php, guest.blade.php
   wisatawan/          # Landing, informasi, tiket, pemesanan, pembayaran, riwayat
   pengelola/          # Dashboard, konten, galeri, tiket, verifikasi, laporan, user
-routes/
-  web.php             # Semua route definitions
-  auth.php            # Auth routes
+resources/css|js/     # Aset frontend (Tailwind, Alpine, Vite)
+public/               # Dokumen root web (index.php, images, videos, build)
+
+# Dokumentasi & Script
+docs/
+  DESIGN.md           # Desain sistem
+  CLASS_DIAGRAM.md    # Diagram kelas (PlantUML)
+  BLACKBOX_TESTING.md # Checklist pengujian (61 skenario)
+  diagrams/           # Diagram arsitektur (PNG)
+scripts/
+  backup-db.bat       # Backup database MySQL
+docker/
+  Dockerfile          # Build image (docker build -f docker/Dockerfile .)
+  entrypoint.sh       # Entry script container
 ```
 
 ## Yang Perlu Kamu Kerjakan Manual
@@ -195,7 +212,7 @@ Untuk production, buat cron job yang menjalankan backup setiap hari:
 
 ## Black Box Testing
 
-Lihat file `BLACKBOX_TESTING.md` untuk checklist pengujian lengkap (61 skenario).
+Lihat file `docs/BLACKBOX_TESTING.md` untuk checklist pengujian lengkap (61 skenario).
 
 ## Lisensi
 

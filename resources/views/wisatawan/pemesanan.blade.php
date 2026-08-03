@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
 @section('content')
 @php
@@ -9,7 +10,7 @@
 <div x-data="ticketOrder({{ $pricesJson }}, {{ $namesJson }})">
 
     {{-- ── PAGE HEADER ──────────────────────────────── --}}
-    <div class="pt-32 pb-10 px-gutter bg-white border-b border-gray-100">
+    <div class="pt-24 sm:pt-32 pb-10 px-gutter bg-white border-b border-gray-100">
         <div class="max-w-6xl mx-auto">
             {{-- Breadcrumb --}}
             <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6 font-sans">
@@ -71,13 +72,13 @@
 
                         <div class="divide-y divide-gray-100">
                             @foreach($tiketList as $t)
-                            <div class="flex items-center justify-between px-6 py-5 hover:bg-gray-50 transition-colors">
-                                <div>
+                            <div class="flex items-center justify-between px-6 py-5 hover:bg-gray-50 transition-colors gap-3">
+                                <div class="flex-1 min-w-0">
                                     <p class="font-sans text-sm font-medium text-gray-900">{{ $t->nama_tiket }}</p>
                                     <p class="font-sans text-xs text-gray-400 mt-0.5">Rp{{ number_format($t->harga, 0, ',', '.') }} {{ __('messages.per_person') }}</p>
                                 </div>
 
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3 flex-shrink-0">
                                     <button type="button"
                                             class="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:border-gray-900 hover:text-gray-900 transition-colors"
                                             @click="decrement({{ $t->id_tiket }})">

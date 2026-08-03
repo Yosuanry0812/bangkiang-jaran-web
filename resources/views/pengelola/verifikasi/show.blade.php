@@ -67,7 +67,8 @@
                     <tr class="border-b border-gray-200 text-left">
                         <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">No</th>
                         <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Jenis</th>
-                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Nama / Plat</th>
+                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Nama Pengunjung</th>
+                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Jenis Kelamin</th>
                         <th class="py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Kode Tiket</th>
                     </tr>
                 </thead>
@@ -76,7 +77,10 @@
                     <tr class="border-b border-gray-100">
                         <td class="py-2.5 pr-4 text-gray-500">{{ $idx + 1 }}</td>
                         <td class="py-2.5 pr-4 text-gray-700">{{ $item->nama_tiket }}</td>
-                        <td class="py-2.5 pr-4 text-gray-700">{{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '-' }}</td>
+                        <td class="py-2.5 pr-4 text-gray-700">{{ $item->nama_pengunjung ?? '-' }}</td>
+                        <td class="py-2.5 pr-4 text-gray-700">
+                            {{ $item->jenis_kelamin == 'L' ? 'Laki-laki' : ($item->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}
+                        </td>
                         <td class="py-2.5 font-mono font-bold text-gray-800 tracking-wider">{{ $item->kode_tiket }}</td>
                     </tr>
                     @endforeach

@@ -15,10 +15,22 @@ class Tiket extends Model
 
     protected $fillable = [
         'nama_tiket',
+        'nama_tiket_en',
         'harga',
         'kategori',
         'status',
     ];
+
+    /**
+     * Nama tiket lokal sesuai locale situs (EN fallback ke Indonesia).
+     */
+    public function getNamaTiketAttribute()
+    {
+        if (app()->getLocale() === 'en' && !empty($this->attributes['nama_tiket_en'])) {
+            return $this->attributes['nama_tiket_en'];
+        }
+        return $this->attributes['nama_tiket'] ?? null;
+    }
 
     public function pemesanan()
     {

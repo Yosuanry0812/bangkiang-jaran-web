@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
 @section('title', ($tiket->nama_tiket ?? __('messages.breadcrumb_detail')) . ' — Bangkiang Jaran')
 
@@ -6,9 +7,9 @@
 <div class="min-h-screen" style="background:#F8F7F5;">
 
     {{-- ── Breadcrumb ──────────────────────────────────────── --}}
-    <div class="pt-28 pb-0 px-gutter">
+    <div class="pt-20 sm:pt-28 pb-0 px-gutter">
         <div class="max-w-5xl mx-auto">
-            <nav class="flex items-center gap-2 font-sans text-xs text-stone" aria-label="Breadcrumb">
+            <nav class="flex flex-wrap items-center gap-2 font-sans text-xs text-stone" aria-label="Breadcrumb">
                 <a href="{{ url('/') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_home') }}</a>
                 <span class="text-gray-300">/</span>
                 <a href="{{ route('tiket.index') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
@@ -28,7 +29,7 @@
                     {{-- Ticket UI --}}
                     <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
                         {{-- Header band --}}
-                        <div class="bg-forest px-8 py-8 relative overflow-hidden">
+                        <div class="bg-forest px-6 sm:px-8 py-8 relative overflow-hidden">
                             <div class="absolute right-0 top-0 bottom-0 w-40 opacity-5">
                                 <span class="material-symbols-outlined text-white" style="font-size:200px; line-height:1; transform:rotate(-15deg); display:block; margin-top:-30px; margin-right:-30px;">confirmation_number</span>
                             </div>
@@ -45,9 +46,9 @@
                         </div>
 
                         {{-- Body --}}
-                        <div class="px-8 py-7 bg-white">
+                        <div class="px-6 sm:px-8 py-7 bg-white">
                             {{-- Price & Status --}}
-                            <div class="flex items-center justify-between mb-8">
+                            <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
                                 <div>
                                     <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">{{ __('messages.th_price') }}</p>
                                     <div class="flex items-baseline gap-1">
@@ -119,17 +120,17 @@
 
                         <div class="px-7 py-6">
                             {{-- Summary row --}}
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-sans text-sm text-stone">{{ $tiket->nama_tiket }}</span>
-                                <span class="font-sans text-sm text-forest font-semibold">Rp{{ number_format($tiket->harga, 0, ',', '.') }}</span>
+                            <div class="flex items-start justify-between gap-3 py-3 border-b border-gray-100">
+                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ $tiket->nama_tiket }}</span>
+                                <span class="font-sans text-sm text-forest font-semibold text-right">Rp{{ number_format($tiket->harga, 0, ',', '.') }}</span>
                             </div>
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-sans text-sm text-stone">{{ __('messages.operating_hours_label') }}</span>
-                                <span class="font-sans text-sm text-ink">{{ __('messages.operating_hours') }}</span>
+                            <div class="flex items-start justify-between gap-3 py-3 border-b border-gray-100">
+                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ __('messages.operating_hours_label') }}</span>
+                                <span class="font-sans text-sm text-ink text-right">{{ __('messages.operating_hours') }}</span>
                             </div>
-                            <div class="flex items-center justify-between py-3">
-                                <span class="font-sans text-sm text-stone">{{ __('messages.location') }}</span>
-                                <span class="font-sans text-sm text-ink">{{ __('messages.address') }}</span>
+                            <div class="flex items-start justify-between gap-3 py-3">
+                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ __('messages.location') }}</span>
+                                <span class="font-sans text-sm text-ink text-right">{{ __('messages.address') }}</span>
                             </div>
 
                             {{-- CTA --}}

@@ -1,89 +1,145 @@
 @extends('layouts.app')
+@section('nav-mode', 'hero')
 
 @section('content')
 
 {{-- ══════════════════════════════════════════════════════
-     HERO
+     HERO — Video / Image Background (Cinematic)
 ══════════════════════════════════════════════════════ --}}
-<section class="relative w-full min-h-screen min-h-svh flex items-end overflow-hidden">
-    {{-- Background image --}}
+<section id="hero-section" class="relative w-full min-h-screen min-h-svh flex flex-col justify-end overflow-hidden">
+
+    {{-- ── Background media layer ─────────────────────── --}}
     <div class="absolute inset-0 z-0">
+        {{-- Video background (autoplay, muted, loop) --}}
+        {{-- Place your video at: public/videos/hero-bangkiang.mp4  --}}
+        {{-- Falls back to image if video is unavailable --}}
+        <video id="hero-video"
+               class="absolute inset-0 w-full h-full object-cover"
+               autoplay muted loop playsinline
+               poster="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
+               oncanplay="onVideoReady()"
+               onerror="onVideoError()">
+            <source src="{{ asset('videos/hero-bangkiang.mp4') }}" type="video/mp4">
+        </video>
+
+        {{-- Fallback image (shown until video loads or if no video) --}}
         <img id="hero-img"
              src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
              alt="Bangkiang Jaran Waterfall"
              fetchpriority="high"
-             onload="revealHero()"
-             onerror="revealHero()"
-             class="w-full h-full object-cover">
-        <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(10,20,14,0.85) 0%, rgba(10,20,14,0.35) 55%, transparent 100%);"></div>
+             onload="onImgLoaded()"
+             class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+             style="opacity:1;">
+
+        {{-- Cinematic gradient overlays --}}
+        {{-- Top vignette for navbar readability --}}
+        <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, transparent 30%);"></div>
+        {{-- Bottom gradient for content readability --}}
+        <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(5,15,10,0.92) 0%, rgba(5,15,10,0.55) 40%, rgba(5,15,10,0.10) 70%, transparent 100%);"></div>
+        {{-- Subtle side vignette --}}
+        <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.30) 100%);"></div>
     </div>
 
-    {{-- Hero content --}}
+    {{-- ── Video mute toggle ───────────────────────────── --}}
+    <button id="video-sound-btn"
+            onclick="toggleVideoSound()"
+            title="Toggle sound"
+            class="absolute top-24 right-6 z-20 hidden w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 items-center justify-center text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200">
+        <span id="sound-icon" class="material-symbols-outlined text-[18px]">volume_off</span>
+    </button>
+
+    {{-- ── Decorative side label (desktop) ─────────────── --}}
+    <div class="absolute left-6 bottom-1/2 translate-y-1/2 z-10 hidden lg:flex flex-col items-center gap-3">
+        <div class="w-px h-16 bg-white/20"></div>
+        <p class="font-sans text-[10px] tracking-[0.3em] uppercase text-white/30 [writing-mode:vertical-lr] rotate-180">Gianyar · Bali · Indonesia</p>
+        <div class="w-px h-16 bg-white/20"></div>
+    </div>
+
+    {{-- ── Hero content ────────────────────────────────── --}}
     <div id="hero-content"
-         class="relative z-10 w-full max-w-7xl mx-auto px-gutter pb-20 md:pb-28 opacity-0 translate-y-6 transition-all duration-1000 ease-out">
-        <div class="max-w-2xl">
-            <p class="font-sans text-[11px] tracking-[0.2em] uppercase text-white/40 mb-6">Bangkiang Jaran Waterfall · Gianyar, Bali</p>
-            <h1 id="typing-heading" class="font-serif text-[clamp(2.8rem,6vw,5rem)] leading-[1.05] text-white mb-5 min-h-[1.1em]"></h1>
-            <p id="typing-sub" class="font-sans text-[15px] text-white/55 mb-10 leading-relaxed max-w-md min-h-[2em]"></p>
-            <div class="flex flex-wrap items-center gap-3">
-                @auth
-                <a href="{{ route('wisatawan.pemesanan.create') }}"
-                   class="inline-flex items-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-ivory transition-colors">
-                    {{ __('messages.book_ticket') }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                @else
-                <a href="{{ route('login') }}"
-                   class="inline-flex items-center gap-2 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-ivory transition-colors">
-                    {{ __('messages.book_now_btn') }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                @endauth
-                <a href="#about"
-                   class="inline-flex items-center gap-2 font-sans text-sm text-white/70 border border-white/20 px-7 py-3.5 rounded-full hover:border-white/40 hover:text-white transition-colors">
-                    {{ __('messages.learn_more') }}
-                </a>
-            </div>
+         class="relative z-10 w-full max-w-7xl mx-auto px-gutter pb-16 md:pb-24 opacity-0 translate-y-8 transition-all duration-1000 ease-out">
+
+        {{-- Badge --}}
+        <div class="inline-flex items-center gap-2 mb-7">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p class="font-sans text-[11px] tracking-[0.22em] uppercase text-white/50">Bangkiang Jaran Waterfall &nbsp;·&nbsp; Gianyar, Bali</p>
+        </div>
+
+        {{-- Main heading --}}
+        <h1 id="typing-heading"
+            class="font-serif text-[clamp(2.6rem,5.5vw,5.2rem)] leading-[1.03] text-white mb-5 min-h-[1.1em] max-w-3xl"
+            style="text-shadow: 0 2px 40px rgba(0,0,0,0.3);"></h1>
+
+        {{-- Sub text --}}
+        <p id="typing-sub"
+           class="font-sans text-[15px] md:text-[16px] text-white/55 mb-10 leading-relaxed max-w-lg min-h-[2em]"></p>
+
+        {{-- CTA Buttons --}}
+        <div class="flex flex-wrap items-center gap-3 mb-10 md:mb-20">
+            @auth
+            <a href="{{ route('wisatawan.pemesanan.create') }}"
+               class="group inline-flex items-center gap-2.5 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-emerald-50 transition-all duration-300 shadow-lg shadow-black/20">
+                {{ __('messages.book_ticket') }}
+                <span class="material-symbols-outlined text-sm transition-transform duration-300 group-hover:translate-x-0.5">arrow_forward</span>
+            </a>
+            @else
+            <a href="{{ route('login') }}"
+               class="group inline-flex items-center gap-2.5 bg-white text-forest font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-emerald-50 transition-all duration-300 shadow-lg shadow-black/20">
+                {{ __('messages.book_now_btn') }}
+                <span class="material-symbols-outlined text-sm transition-transform duration-300 group-hover:translate-x-0.5">arrow_forward</span>
+            </a>
+            @endauth
+
+            <a href="#about"
+               class="group inline-flex items-center gap-2.5 font-sans text-sm text-white/75 bg-white/10 backdrop-blur-sm border border-white/20 px-7 py-3.5 rounded-full hover:bg-white/15 hover:border-white/35 hover:text-white transition-all duration-300">
+                <span class="material-symbols-outlined text-sm">play_circle</span>
+                {{ __('messages.learn_more') }}
+            </a>
         </div>
 
         {{-- Quick info strip --}}
-        <div class="flex flex-wrap gap-8 mt-16 pt-8 border-t border-white/10">
-            <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.operating_hours_label') }}</p>
-                <p class="font-sans text-sm text-white/70">{{ __('messages.operating_hours') }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 w-full sm:w-fit divide-y sm:divide-y-0 sm:divide-x divide-white/10 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden">
+            <div class="px-5 sm:px-6 py-4">
+                <p class="font-sans text-[9px] tracking-[0.2em] uppercase text-white/35 mb-1.5">{{ __('messages.operating_hours_label') }}</p>
+                <p class="font-sans text-sm font-medium text-white/80">{{ __('messages.operating_hours') }}</p>
             </div>
-            <div class="w-px bg-white/10"></div>
-            <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.location') }}</p>
-                <p class="font-sans text-sm text-white/70">{{ __('messages.address') }}</p>
+            <div class="px-5 sm:px-6 py-4">
+                <p class="font-sans text-[9px] tracking-[0.2em] uppercase text-white/35 mb-1.5">{{ __('messages.location') }}</p>
+                <p class="font-sans text-sm font-medium text-white/80">{{ __('messages.address') }}</p>
             </div>
-            <div class="w-px bg-white/10"></div>
-            <div>
-                <p class="font-sans text-[10px] tracking-widest uppercase text-white/30 mb-1">{{ __('messages.online_ticket') }}</p>
-                <p class="font-sans text-sm text-white/70">{{ __('messages.start_from', ['price' => '15.000']) }}</p>
+            <div class="px-5 sm:px-6 py-4">
+                <p class="font-sans text-[9px] tracking-[0.2em] uppercase text-white/35 mb-1.5">{{ __('messages.online_ticket') }}</p>
+                <p class="font-sans text-sm font-medium text-white/80">{{ __('messages.start_from', ['price' => '15.000']) }}</p>
             </div>
         </div>
     </div>
+
+    {{-- ── Scroll indicator ────────────────────────────── --}}
+    <div id="hero-scroll-hint"
+         class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 transition-opacity duration-500">
+        <div class="w-6 h-9 rounded-full border border-white/25 flex items-start justify-center pt-1.5">
+            <div id="scroll-dot" class="w-1 h-1.5 rounded-full bg-white/60"></div>
+        </div>
+        <p class="font-sans text-[9px] tracking-[0.25em] uppercase text-white/30">Scroll</p>
+    </div>
+
 </section>
 
 {{-- ══════════════════════════════════════════════════════
      ABOUT / SEJARAH
 ══════════════════════════════════════════════════════ --}}
-@if(isset($kontenList) && $kontenList->count() > 0)
 <section id="about" class="py-24 md:py-32 px-gutter" style="background:#F8F7F5;">
     <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {{-- Text --}}
             <div class="lg:col-span-5" data-aos="fade-right">
                 <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-5">{{ __('messages.about') }}</p>
-                @foreach($kontenList->take(1) as $item)
-                <h2 class="font-serif text-[clamp(2rem,4vw,3.2rem)] text-forest leading-[1.1] mb-6">{{ $item->judul }}</h2>
+                <h2 class="font-serif text-[clamp(2rem,4vw,3.2rem)] text-forest leading-[1.1] mb-6">{{ __('messages.about_judul') }}</h2>
                 <div class="space-y-4">
-                    @foreach(array_filter(array_map('trim', explode("\n", $item->isi))) as $p)
+                    @foreach(array_filter(array_map('trim', explode("\n", __('messages.about_isi')))) as $p)
                     <p class="font-sans text-[15px] text-stone leading-relaxed">{{ $p }}</p>
                     @endforeach
                 </div>
-                @endforeach
                 <a href="{{ route('tiket.index') }}"
                    class="inline-flex items-center gap-2 mt-8 font-sans text-sm font-semibold text-forest border-b border-forest/30 pb-0.5 hover:border-forest transition-colors">
                     {{ __('messages.view_entry_tickets') }}
@@ -121,7 +177,6 @@
         </div>
     </div>
 </section>
-@endif
 
 {{-- ══════════════════════════════════════════════════════
      HIGHLIGHTS / USP
@@ -215,10 +270,10 @@
                              style="background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 55%);"></div>
 
                         {{-- Card label --}}
-                        <div class="absolute bottom-0 left-0 right-0 p-7 md:p-10 flex items-end justify-between">
+                        <div class="absolute bottom-0 left-0 right-0 p-5 md:p-10 flex items-end justify-between">
                             <div>
                                 @if($media->keterangan)
-                                <p class="font-serif text-xl md:text-2xl text-white leading-snug mb-1">{{ $media->keterangan }}</p>
+                                <p class="font-serif text-lg md:text-2xl text-white leading-snug mb-1">{{ $media->keterangan }}</p>
                                 @endif
                                 <div class="flex items-center gap-2">
                                     <span class="w-6 h-px bg-white/40"></span>
@@ -226,7 +281,7 @@
                                 </div>
                             </div>
                             {{-- Index badge --}}
-                            <span class="font-serif text-5xl md:text-6xl text-white/15 tabular-nums leading-none select-none">
+                            <span class="font-serif text-4xl md:text-6xl text-white/15 tabular-nums leading-none select-none">
                                 {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </span>
                         </div>
@@ -286,14 +341,12 @@
 
             {{-- Text --}}
             <div class="lg:col-span-5" data-aos="fade-left" data-aos-delay="80">
-                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-4">Restoran & Kuliner</p>
+                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-4">{{ __('messages.resto_label') }}</p>
                 <h2 class="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] text-forest leading-[1.1] mb-5">
-                    Nikmati Hidangan<br>di <span class="text-leaf">Kepulauan Rasa</span>
+                    {{ __('messages.resto_heading_1') }}<br>{{ __('messages.resto_heading_2') }} <span class="text-leaf">{{ __('messages.resto_name') }}</span>
                 </h2>
                 <p class="font-sans text-[15px] text-stone leading-relaxed mb-6">
-                    Setelah puas menikmati air terjun, mampirlah ke restoran kami yang menyajikan
-                    beragam masakan khas Nusantara dan minuman segar. Suasana tropis yang asri
-                    menemani setiap santapan Anda.
+                    {{ __('messages.resto_desc') }}
                 </p>
                 <div class="space-y-3 mb-8">
                     <div class="flex items-center gap-3">
@@ -301,8 +354,8 @@
                             <span class="material-symbols-outlined text-forest text-sm">restaurant</span>
                         </div>
                         <div>
-                            <p class="font-sans text-sm font-semibold text-ink">Masakan Khas Nusantara</p>
-                            <p class="font-sans text-xs text-stone">Aneka lauk & sambal tradisional</p>
+                            <p class="font-sans text-sm font-semibold text-ink">{{ __('messages.resto_feat_1') }}</p>
+                            <p class="font-sans text-xs text-stone">{{ __('messages.resto_feat_1_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -310,8 +363,8 @@
                             <span class="material-symbols-outlined text-forest text-sm">local_cafe</span>
                         </div>
                         <div>
-                            <p class="font-sans text-sm font-semibold text-ink">Minuman Tropis Segar</p>
-                            <p class="font-sans text-xs text-stone">Kelapa muda, es campur, jus buah</p>
+                            <p class="font-sans text-sm font-semibold text-ink">{{ __('messages.resto_feat_2') }}</p>
+                            <p class="font-sans text-xs text-stone">{{ __('messages.resto_feat_2_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
@@ -319,14 +372,14 @@
                             <span class="material-symbols-outlined text-forest text-sm">deck</span>
                         </div>
                         <div>
-                            <p class="font-sans text-sm font-semibold text-ink">Gazebo & Area Santai</p>
-                            <p class="font-sans text-xs text-stone">Duduk santai dengan pemandangan hijau</p>
+                            <p class="font-sans text-sm font-semibold text-ink">{{ __('messages.resto_feat_3') }}</p>
+                            <p class="font-sans text-xs text-stone">{{ __('messages.resto_feat_3_desc') }}</p>
                         </div>
                     </div>
                 </div>
                 <a href="#lokasi"
                    class="inline-flex items-center gap-2 bg-forest text-white font-sans text-sm font-semibold px-7 py-3.5 rounded-full hover:bg-leaf transition-colors shadow-md">
-                    Jelajahi Sekarang
+                    {{ __('messages.resto_cta') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -346,13 +399,13 @@
         {{-- ── Section header ── --}}
         <div class="max-w-7xl mx-auto px-gutter pt-20 pb-16 flex items-end justify-between">
             <div data-aos="fade-up">
-                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">Galeri Restoran</p>
-                <h2 class="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] text-forest leading-tight">Kuliner di Kepulauan Rasa</h2>
-                <p class="font-sans text-sm text-stone mt-2 max-w-sm">Suasana dan hidangan terbaik di restoran kami.</p>
+                <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">{{ __('messages.resto_gallery_label') }}</p>
+                <h2 class="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] text-forest leading-tight">{{ __('messages.resto_gallery_heading') }}</h2>
+                <p class="font-sans text-sm text-stone mt-2 max-w-sm">{{ __('messages.resto_gallery_desc') }}</p>
             </div>
             <p class="font-sans text-xs text-pebble hidden md:block" data-aos="fade-up">
                 <span class="material-symbols-outlined text-sm align-middle mr-1">mouse</span>
-                Scroll untuk lihat lainnya
+                {{ __('messages.resto_gallery_scroll') }}
             </p>
         </div>
 
@@ -390,17 +443,17 @@
                         <div class="absolute inset-0"
                              style="background: linear-gradient(to top, rgba(0,0,0,0.60) 0%, transparent 55%);"></div>
 
-                        <div class="absolute bottom-0 left-0 right-0 p-7 md:p-10 flex items-end justify-between">
+                        <div class="absolute bottom-0 left-0 right-0 p-5 md:p-10 flex items-end justify-between">
                             <div>
                                 @if($media->keterangan)
-                                <p class="font-serif text-xl md:text-2xl text-white leading-snug mb-1">{{ $media->keterangan }}</p>
+                                <p class="font-serif text-lg md:text-2xl text-white leading-snug mb-1">{{ $media->keterangan }}</p>
                                 @endif
                                 <div class="flex items-center gap-2">
                                     <span class="w-6 h-px bg-white/40"></span>
-                                    <span class="font-sans text-xs text-white/50 uppercase tracking-widest">Restoran Bangkiang Jaran</span>
+                                    <span class="font-sans text-xs text-white/50 uppercase tracking-widest">{{ __('messages.resto_card_label') }}</span>
                                 </div>
                             </div>
-                            <span class="font-serif text-5xl md:text-6xl text-white/15 tabular-nums leading-none select-none">
+                            <span class="font-serif text-4xl md:text-6xl text-white/15 tabular-nums leading-none select-none">
                                 {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                             </span>
                         </div>
@@ -432,7 +485,7 @@
 <section id="lokasi" class="py-24 md:py-32 px-gutter bg-white">
     <div class="max-w-7xl mx-auto">
         <div class="mb-12" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">Lokasi</p>
+            <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-stone mb-3">{{ __('messages.location') }}</p>
             <h2 class="font-serif text-[clamp(1.8rem,3.5vw,2.8rem)] text-forest">{{ __('messages.location_title') }}</h2>
         </div>
 
@@ -477,6 +530,29 @@
 
 @push('styles')
 <style>
+/* ── Hero video / image transition ── */
+#hero-img {
+    transition: opacity 0.8s ease;
+}
+#hero-video {
+    transition: opacity 0.5s ease;
+}
+
+/* ── Scroll dot bounce ── */
+#scroll-dot {
+    transition: transform 0.025s linear;
+}
+
+/* ── Hero content entrance ── */
+#hero-content {
+    transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Video sound toggle ── */
+#video-sound-btn {
+    transition: background 0.2s, color 0.2s, opacity 0.3s;
+}
+
 /* ── Stacked cards — NO CSS transition, lerp handles smoothing ── */
 .stack-card {
     will-change: transform, opacity;
@@ -500,14 +576,65 @@
 #stack-hint.hide { opacity: 0 !important; pointer-events: none; }
 #resto-stack-hint { animation: bounce-soft 1.8s ease-in-out infinite; }
 #resto-stack-hint.hide { opacity: 0 !important; pointer-events: none; }
+
+/* ── Mobile: shrink stacked cards so they fit small viewports ── */
+@media (max-width: 767px) {
+    #stack-wrapper,
+    #resto-stack-wrapper {
+        min-height: min(460px, 62vh);
+    }
+}
+@media (max-width: 400px) {
+    #stack-wrapper,
+    #resto-stack-wrapper {
+        min-height: 320px;
+    }
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
-/* ───────── hero reveal: media dulu, konten setelah ───────── */
+/* ═══════════════════════════════════════════════════════
+   HERO — Video / Image logic + reveal
+════════════════════════════════════════════════════════ */
 let heroRevealed = false;
+let videoReady   = false;
 
+/* Called when image finishes loading (fallback layer) */
+function onImgLoaded() {
+    revealHero();
+}
+
+/* Called when video has enough data to play */
+function onVideoReady() {
+    videoReady = true;
+    // Fade out the fallback image so video shows through
+    const img = document.getElementById('hero-img');
+    if (img) { img.style.opacity = '0'; }
+    // Show sound toggle button
+    const btn = document.getElementById('video-sound-btn');
+    if (btn) btn.classList.replace('hidden', 'flex');
+    revealHero();
+}
+
+/* Called if browser can't load the video src */
+function onVideoError() {
+    // Hide video element, keep image visible
+    const vid = document.getElementById('hero-video');
+    if (vid) vid.style.display = 'none';
+}
+
+/* Toggle sound on video */
+function toggleVideoSound() {
+    const vid  = document.getElementById('hero-video');
+    const icon = document.getElementById('sound-icon');
+    if (!vid || !icon) return;
+    vid.muted = !vid.muted;
+    icon.textContent = vid.muted ? 'volume_off' : 'volume_up';
+}
+
+/* Reveal hero content */
 function revealHero() {
     if (heroRevealed) return;
     heroRevealed = true;
@@ -515,12 +642,37 @@ function revealHero() {
     const content = document.getElementById('hero-content');
     if (!content) return;
 
-    // Fade-in + slide up konten
-    content.classList.remove('opacity-0', 'translate-y-6');
+    content.classList.remove('opacity-0', 'translate-y-8');
 
-    // Typing animation mulai setelah reveal selesai
-    setTimeout(startTyping, 500);
+    // Start typing after reveal
+    setTimeout(startTyping, 600);
 }
+
+/* ───────── scroll dot in mouse indicator ───────── */
+(function () {
+    const dot = document.getElementById('scroll-dot');
+    const hint = document.getElementById('hero-scroll-hint');
+    if (!dot || !hint) return;
+
+    // Animate scroll dot
+    let dotDir = 1, dotPos = 0;
+    setInterval(function () {
+        dotPos += dotDir * 1.5;
+        if (dotPos >= 12) { dotPos = 12; dotDir = -1; }
+        if (dotPos <= 0)  { dotPos = 0;  dotDir = 1; }
+        dot.style.transform = `translateY(${dotPos}px)`;
+    }, 25);
+
+    // Hide on scroll
+    let hidden = false;
+    window.addEventListener('scroll', function () {
+        if (!hidden && window.scrollY > 80) {
+            hidden = true;
+            hint.style.opacity = '0';
+            hint.style.pointerEvents = 'none';
+        }
+    }, { passive: true });
+})();
 
 /* ───────── typing animation ───────── */
 function startTyping() {
@@ -547,10 +699,12 @@ function startTyping() {
     type();
 }
 
-/* ───────── fallback kalo image udah cached ───────── */
+/* ───────── fallback kalo image/video udah cached ───────── */
 (function () {
     const img = document.getElementById('hero-img');
+    const vid = document.getElementById('hero-video');
     if (img && img.complete) revealHero();
+    if (vid && vid.readyState >= 3) onVideoReady();
 })();
 
 /* ═══════════════════════════════════════════════════════

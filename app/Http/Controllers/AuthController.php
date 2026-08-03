@@ -30,30 +30,49 @@ class AuthController extends Controller
                 ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
         }
 
-        $username = explode('@', $googleUser->getEmail())[0];
+        $user = User::where('email', $googleUser->getEmail())->first();
 
-        // handle username conflict — tambah angka kalo udah dipake
-        $base = $username;
+        if ($user) {
+            // User sudah ada (manual atau Google) — jangan sentuh password, catat login
+            $user->update([
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+                'last_login_at' => now(),
+                'last_login_method' => 'google',
+            ]);
+            $user->increment('login_count');
+        } else {
+            $username = $this->uniqueUsername($googleUser->getEmail());
+
+            $user = User::create([
+                'name' => $googleUser->getName(),
+                'username' => $username,
+                'email' => $googleUser->getEmail(),
+                'google_id' => $googleUser->getId(),
+                'role' => 'wisatawan',
+                'email_verified_at' => now(),
+                'last_login_at' => now(),
+                'last_login_method' => 'google',
+                'login_count' => 1,
+                // password null = wajib set password untuk akun website ini
+            ]);
+        }
+
+        Auth::login($user);
+
+        return redirect()->route('redirect.after.login');
+    }
+
+    private function uniqueUsername(string $email): string
+    {
+        $base = explode('@', $email)[0];
+        $username = $base;
         $suffix = 1;
         while (User::where('username', $username)->exists()) {
             $username = $base . $suffix;
             $suffix++;
         }
 
-        $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
-                'name' => $googleUser->getName(),
-                'google_id' => $googleUser->getId(),
-                'password' => bcrypt(uniqid()),
-                'username' => $username,
-                'role' => 'wisatawan',
-                'email_verified_at' => now(),
-            ]
-        );
-
-        Auth::login($user);
-
-        return redirect()->route('redirect.after.login');
+        return $username;
     }
 }

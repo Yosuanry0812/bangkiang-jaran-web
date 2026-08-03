@@ -40,17 +40,17 @@
                     {{ __('messages.view_price') }}
                 </a>
             </div>
-            <div class="flex flex-wrap gap-6 mt-14 pt-10 border-t border-white/10">
+            <div class="flex flex-wrap gap-x-6 gap-y-8 mt-14 pt-10 border-t border-white/10">
                 <div>
                     <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.operating_hours_label') }}</p>
                     <p class="font-sans text-sm text-white/80">{{ __('messages.operating_hours') }}</p>
                 </div>
-                <div class="w-px bg-white/10"></div>
+                <div class="w-px bg-white/10 hidden md:block"></div>
                 <div>
                     <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.location') }}</p>
                     <p class="font-sans text-sm text-white/80">{{ __('messages.address') }}</p>
                 </div>
-                <div class="w-px bg-white/10"></div>
+                <div class="w-px bg-white/10 hidden md:block"></div>
                 <div>
                     <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.visitors') }}</p>
                     <p class="font-sans text-sm text-white/80">{{ __('messages.visitors_value') }}</p>
@@ -68,7 +68,7 @@
         <div class="mb-16" data-aos="fade-up">
             <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.ticket_price') }}</p>
             <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                <h2 class="font-serif text-5xl md:text-6xl text-gray-900 leading-[1.05]">{{ __('messages.select_your_ticket') }}</h2>
+                <h2 class="font-serif text-4xl md:text-6xl text-gray-900 leading-[1.05]">{{ __('messages.select_your_ticket') }}</h2>
                 <p class="font-sans text-sm text-gray-400 max-w-xs leading-relaxed md:text-right">
                     {{ __('messages.ticket_price_desc') }}
                 </p>
@@ -148,7 +148,7 @@
     <div class="max-w-6xl mx-auto">
         <div class="mb-16" data-aos="fade-up">
             <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.advantages') }}</p>
-            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">{{ __('messages.why_book_online') }}</h2>
+            <h2 class="font-serif text-3xl md:text-5xl text-gray-900">{{ __('messages.why_book_online') }}</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             <div class="py-10 md:py-0 md:pr-12" data-aos="fade-up" data-aos-delay="0">
@@ -178,24 +178,24 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             <div data-aos="fade-right">
                 <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-5">{{ __('messages.how_to_book') }}</p>
-                <h2 class="font-serif text-4xl md:text-5xl text-gray-900 leading-[1.1] mb-14">{{ __('messages.three_steps_title') }}</h2>
+                <h2 class="font-serif text-3xl md:text-5xl text-gray-900 leading-[1.1] mb-14">{{ __('messages.three_steps_title') }}</h2>
                 <div class="divide-y divide-gray-200">
-                    <div class="flex gap-7 py-9">
+                    <div class="flex gap-5 sm:gap-7 py-9">
                         <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">1</span>
                         <div class="pt-1">
                             <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_one_title') }}</h4>
                             <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_one_desc') }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-7 py-9">
-                        <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">2</span>
+                    <div class="flex gap-5 sm:gap-7 py-9">
+                        <span class="font-serif text-[2.5rem] sm:text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">2</span>
                         <div class="pt-1">
                             <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_two_title') }}</h4>
                             <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_two_desc') }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-7 py-9">
-                        <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">3</span>
+                    <div class="flex gap-5 sm:gap-7 py-9">
+                        <span class="font-serif text-[2.5rem] sm:text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">3</span>
                         <div class="pt-1">
                             <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_three_title') }}</h4>
                             <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_three_desc') }}</p>
@@ -225,7 +225,7 @@
     <div class="max-w-3xl mx-auto">
         <div class="mb-16" data-aos="fade-up">
             <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">FAQ</p>
-            <h2 class="font-serif text-4xl md:text-5xl text-gray-900">{{ __('messages.faq_title') }}</h2>
+            <h2 class="font-serif text-3xl md:text-5xl text-gray-900">{{ __('messages.faq_title') }}</h2>
         </div>
         @php $faqs = [
             ['q'=>__('messages.faq_q1'),'a'=>__('messages.faq_a1')],

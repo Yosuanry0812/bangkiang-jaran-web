@@ -30,6 +30,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        Auth::user()->increment('login_count');
+        Auth::user()->update([
+            'last_login_at'     => now(),
+            'last_login_method' => 'manual',
+        ]);
+
         ActivityLogger::log('Login sukses', 'Login sebagai ' . Auth::user()->email);
 
         if (Auth::user()->role === 'pengelola') {

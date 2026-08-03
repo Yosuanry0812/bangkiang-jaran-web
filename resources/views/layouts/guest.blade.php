@@ -37,29 +37,40 @@
         .card-shadow { box-shadow: 0px 4px 20px rgba(0, 50, 40, 0.04); }
     </style>
 </head>
-<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
-    {{-- Nav --}}
-    <nav class="bg-surface/80 backdrop-blur-md shadow-sm">
-        <div class="flex justify-between items-center px-gutter py-md max-w-container-max mx-auto w-full">
-            <a href="{{ route('landing') }}" class="font-display text-headline-sm font-bold text-primary">Bangkiang Jaran</a>
-            <div class="flex items-center gap-md">
+<body class="font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100" style="background: #f0f2ef;">
+
+    {{-- ── Subtle background texture ── --}}
+    <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,100,70,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,80,60,0.05) 0%, transparent 55%);"></div>
+
+    {{-- ── Minimal top nav ── --}}
+    <nav class="relative z-10 py-5 px-8">
+        <div class="flex justify-between items-center max-w-6xl mx-auto">
+            <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
+                <div class="w-7 h-7 rounded-lg bg-emerald-800 flex items-center justify-center shadow-sm group-hover:bg-emerald-700 transition-colors">
+                    <span class="material-symbols-outlined text-white text-[13px]" style="font-variation-settings:'FILL' 1;">water</span>
+                </div>
+                <span class="font-display text-[15px] font-semibold text-emerald-900 tracking-wide">Bangkiang Jaran</span>
+            </a>
+            <div class="flex items-center gap-1">
                 <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
-                   class="font-body text-label-md text-primary hover:bg-primary/5 transition-colors px-4 py-2 rounded-xl flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">language</span>
+                   class="flex items-center gap-1.5 font-body text-[13px] font-medium text-gray-500 hover:text-emerald-800 hover:bg-white/70 transition-all px-3 py-2 rounded-xl">
+                    <span class="material-symbols-outlined text-[14px]">language</span>
                     {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
                 </a>
-                <a href="{{ route('login') }}" class="font-body text-label-md text-primary hover:bg-primary/5 transition-colors px-4 py-2 rounded-xl">{{ __('messages.login') }}</a>
-                <a href="{{ route('register') }}" class="font-body text-label-md bg-primary-container text-white px-6 py-2 rounded-xl shadow-sm hover:-translate-y-0.5 transition-transform">{{ __('messages.register') }}</a>
+                <a href="{{ route('login') }}" class="font-body text-[13px] font-medium text-gray-600 hover:text-emerald-800 hover:bg-white/70 transition-all px-4 py-2 rounded-xl">{{ __('messages.login') }}</a>
+                <a href="{{ route('register') }}" class="font-body text-[13px] font-semibold bg-emerald-800 text-white px-5 py-2 rounded-xl hover:bg-emerald-700 shadow-sm hover:shadow-md transition-all">{{ __('messages.register') }}</a>
             </div>
         </div>
     </nav>
 
     {{-- Content --}}
-    <main class="flex-grow flex items-center justify-center py-xl px-gutter relative overflow-hidden">
+    <main class="relative z-10 flex-grow flex items-center justify-center py-8 px-6">
         <div class="w-full flex flex-col items-center">
             @yield('content')
             {{ $slot ?? '' }}
         </div>
     </main>
+
+    @stack('scripts')
 </body>
 </html>

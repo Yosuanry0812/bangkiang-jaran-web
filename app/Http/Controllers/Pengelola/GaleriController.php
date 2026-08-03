@@ -30,9 +30,10 @@ class GaleriController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'file'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-            'tipe'       => ['required', 'in:wisata,restoran'],
+            'file'           => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'keterangan'     => ['nullable', 'string', 'max:255'],
+            'keterangan_en'  => ['nullable', 'string', 'max:255'],
+            'tipe'           => ['required', 'in:wisata,restoran'],
         ];
 
         $messages = [
@@ -57,9 +58,10 @@ class GaleriController extends Controller
         $pathDisplay = str_replace('public/', '', $path);
 
         Galeri::create([
-            'file'       => $pathDisplay,
-            'keterangan' => $request->keterangan,
-            'tipe'       => $request->tipe,
+            'file'           => $pathDisplay,
+            'keterangan'     => $request->keterangan,
+            'keterangan_en'  => $request->keterangan_en,
+            'tipe'           => $request->tipe,
         ]);
 
         return redirect()->route('pengelola.galeri.index')->with('success', 'Foto berhasil ditambahkan.');

@@ -48,6 +48,14 @@
                     @error('keterangan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Keterangan (English)</label>
+                    <input type="text" name="keterangan_en" value="{{ old('keterangan_en') }}"
+                        class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
+                    <p class="text-xs text-stone mt-1">Terjemahan bahasa Inggris (opsional — kalau kosong, situs bahasa Inggris memakai keterangan Indonesia).</p>
+                    @error('keterangan_en') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 <div class="flex gap-3 pt-2">
                     <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
                         <span class="material-symbols-outlined text-base">upload</span>

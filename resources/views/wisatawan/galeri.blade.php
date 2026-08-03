@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
 @section('content')
 <div class="bg-background min-h-screen">

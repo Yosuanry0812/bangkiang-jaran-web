@@ -26,9 +26,10 @@ class TiketController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_tiket' => ['required', 'string', 'max:100'],
-            'harga'      => ['required', 'numeric', 'min:0'],
-            'kategori'   => ['required', 'in:perorangan,kendaraan'],
+            'nama_tiket'    => ['required', 'string', 'max:100'],
+            'nama_tiket_en' => ['nullable', 'string', 'max:100'],
+            'harga'         => ['required', 'numeric', 'min:0'],
+            'kategori'      => ['required', 'in:perorangan,kendaraan'],
         ], [
             'nama_tiket.required' => 'Nama tiket wajib diisi.',
             'harga.required'      => 'Harga tiket wajib diisi.',
@@ -37,7 +38,7 @@ class TiketController extends Controller
             'kategori.in'         => 'Kategori tidak valid.',
         ]);
 
-        Tiket::create($request->only(['nama_tiket', 'harga', 'kategori', 'status']));
+        Tiket::create($request->only(['nama_tiket', 'nama_tiket_en', 'harga', 'kategori', 'status']));
 
         return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil ditambahkan.');
     }
@@ -53,12 +54,13 @@ class TiketController extends Controller
         $tiket = Tiket::findOrFail($id);
 
         $request->validate([
-            'nama_tiket' => ['required', 'string', 'max:100'],
-            'harga'      => ['required', 'numeric', 'min:0'],
-            'kategori'   => ['required', 'in:perorangan,kendaraan'],
+            'nama_tiket'    => ['required', 'string', 'max:100'],
+            'nama_tiket_en' => ['nullable', 'string', 'max:100'],
+            'harga'         => ['required', 'numeric', 'min:0'],
+            'kategori'      => ['required', 'in:perorangan,kendaraan'],
         ]);
 
-        $tiket->update($request->only(['nama_tiket', 'harga', 'kategori', 'status']));
+        $tiket->update($request->only(['nama_tiket', 'nama_tiket_en', 'harga', 'kategori', 'status']));
 
         return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil diperbarui.');
     }

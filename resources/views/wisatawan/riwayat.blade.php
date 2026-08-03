@@ -1,9 +1,10 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
 @section('title', 'Riwayat Pemesanan — Bangkiang Jaran')
 
 @section('content')
-<section class="py-24 md:py-32 px-gutter min-h-screen" style="background:#F8F7F5;">
+<section class="pt-20 md:pt-32 pb-24 px-gutter min-h-screen" style="background:#F8F7F5;">
     <div class="max-w-6xl mx-auto">
 
         <header class="mb-12 max-w-xl" data-aos="fade-up">

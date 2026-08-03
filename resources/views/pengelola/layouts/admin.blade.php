@@ -102,11 +102,6 @@
                 <span class="material-symbols-outlined">photo_library</span>
                 Galeri
             </a>
-            <a href="{{ route('pengelola.konten.index') }}"
-               class="nav-link {{ Route::is('pengelola.konten*') ? 'active' : '' }}">
-                <span class="material-symbols-outlined">article</span>
-                Konten
-            </a>
 
             <div class="my-4" style="height:1px; background: rgba(255,255,255,.06)"></div>
 
@@ -195,6 +190,73 @@
                     {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
                 </a>
 
+                {{-- Notifikasi (polling 20s) --}}
+                <div class="relative" x-data="notifikasi()" x-init="init()">
+                    <button @click="open = !open"
+                            class="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                            :title="count + ' notifikasi'">
+                        <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
+                        <span x-show="count > 0" x-cloak
+                              class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center"
+                              x-text="count"></span>
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" x-cloak
+                         class="absolute right-0 mt-1.5 w-80 max-h-[70vh] bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-y-auto">
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white">
+                            <p class="text-xs font-semibold text-slate-700">Notifikasi</p>
+                            <a href="{{ route('pengelola.verifikasi.index') }}" class="text-[11px] font-medium text-emerald-600 hover:text-emerald-800 transition-colors">Lihat Semua</a>
+                        </div>
+
+                        <template x-if="verifikasi.length">
+                            <div>
+                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">Menunggu Verifikasi</p>
+                                <template x-for="v in verifikasi" :key="'v-' + v.id_pemesanan">
+                                    <a :href="'/pengelola/verifikasi/' + v.id_pemesanan"
+                                       class="flex items-start gap-2.5 px-4 py-2.5 hover:bg-slate-50 transition-colors border-b border-slate-50">
+                                        <span class="w-1.5 h-1.5 mt-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-xs font-medium text-slate-700 truncate" x-text="v.nama_user"></p>
+                                            <p class="text-[11px] text-slate-400 truncate"><span x-text="v.kode_booking"></span> &middot; <span x-text="v.metode"></span></p>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <p class="text-[11px] font-semibold text-slate-700" x-text="rp(v.total)"></p>
+                                            <p class="text-[10px] text-slate-400" x-text="v.waktu"></p>
+                                        </div>
+                                    </a>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template x-if="pesananBaru.length">
+                            <div>
+                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pesanan Baru</p>
+                                <template x-for="p in pesananBaru" :key="'p-' + p.id_pemesanan">
+                                    <a href="{{ route('pengelola.verifikasi.index') }}"
+                                       class="flex items-start gap-2.5 px-4 py-2.5 hover:bg-slate-50 transition-colors border-b border-slate-50">
+                                        <span class="w-1.5 h-1.5 mt-1.5 rounded-full bg-sky-400 flex-shrink-0"></span>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-xs font-medium text-slate-700 truncate" x-text="p.nama_user"></p>
+                                            <p class="text-[11px] text-slate-400 truncate" x-text="p.kode_booking"></p>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <p class="text-[11px] font-semibold text-slate-700" x-text="rp(p.total)"></p>
+                                            <p class="text-[10px] text-slate-400" x-text="p.waktu"></p>
+                                        </div>
+                                    </a>
+                                </template>
+                            </div>
+                        </template>
+
+                        <template x-if="count === 0">
+                            <div class="px-4 py-8 text-center">
+                                <span class="material-symbols-outlined text-slate-200 mb-2" style="font-size:28px">notifications_none</span>
+                                <p class="text-xs text-slate-400">Tidak ada notifikasi baru.</p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
                 {{-- Profile dropdown --}}
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open"
@@ -234,6 +296,43 @@
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+function notifikasi() {
+    return {
+        open: false,
+        count: 0,
+        verifikasi: [],
+        pesananBaru: [],
+        prevCount: null,
+        timer: null,
+        init() {
+            this.load();
+            this.timer = setInterval(() => this.load(), 20000);
+        },
+        async load() {
+            try {
+                const r = await fetch('{{ route('pengelola.notifikasi') }}', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!r.ok) return;
+                const d = await r.json();
+                // Popup otomatis hanya saat ADA data BARU (bukan saat pertama buka halaman)
+                if (this.prevCount !== null && d.count > this.prevCount) {
+                    this.open = true;
+                }
+                this.count = d.count;
+                this.verifikasi = d.verifikasi;
+                this.pesananBaru = d.pesanan_baru;
+                this.prevCount = d.count;
+            } catch (e) { /* halaman belum dibuka / koneksi putus — coba lagi interval berikutnya */ }
+        },
+        rp(n) {
+            return 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+        },
+    };
+}
+</script>
 @stack('scripts')
 </body>
 </html>

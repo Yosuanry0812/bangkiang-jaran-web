@@ -1,6 +1,7 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
-@section('title', 'Pembayaran — Bangkiang Jaran')
+@section('title', __('messages.step_payment') . ' — Bangkiang Jaran')
 
 @section('content')
 @php
@@ -16,35 +17,35 @@ $metodeBayar = [
 @endphp
 
 {{-- ── Fixed top progress bar ───────────────────────── --}}
-<div class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-    <div class="max-w-5xl mx-auto px-gutter py-3 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-            <span class="font-sans text-xs text-stone">Kode Booking:</span>
-            <span class="font-sans text-xs font-semibold text-forest bg-forest/8 px-3 py-1 rounded-full">
+<div class="fixed top-12 md:top-[68px] left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-gutter py-2.5 sm:py-3 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 flex-1 min-w-0">
+            <span class="font-sans text-xs text-stone hidden sm:inline flex-shrink-0">{{ __('messages.booking_code') }}:</span>
+            <span class="font-sans text-xs font-semibold text-forest bg-forest/8 px-3 py-1 rounded-full truncate max-w-full">
                 {{ $pemesanan->kode_booking ?? '-' }}
             </span>
         </div>
-        <div class="flex items-center gap-2 text-xs">
-            <div class="flex items-center gap-1.5" id="step-1-indicator">
-                <div class="w-7 h-7 rounded-full bg-forest text-white flex items-center justify-center text-xs font-bold" id="step-1-circle">1</div>
-                <span class="font-sans font-semibold text-forest hidden sm:inline">Metode</span>
+        <div class="flex items-center gap-1 sm:gap-2 text-xs flex-shrink-0">
+            <div class="flex items-center gap-1" id="step-1-indicator">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-forest text-white flex items-center justify-center text-xs font-bold" id="step-1-circle">1</div>
+                <span class="font-sans font-semibold text-forest hidden sm:inline">{{ __('messages.step_method') }}</span>
             </div>
-            <div class="w-8 h-px bg-gray-200"></div>
-            <div class="flex items-center gap-1.5" id="step-2-indicator">
-                <div class="w-7 h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold" id="step-2-circle">2</div>
-                <span class="font-sans text-gray-400 hidden sm:inline" id="step-2-label">Upload</span>
+            <div class="w-4 sm:w-8 h-px bg-gray-200"></div>
+            <div class="flex items-center gap-1" id="step-2-indicator">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold" id="step-2-circle">2</div>
+                <span class="font-sans text-gray-400 hidden sm:inline" id="step-2-label">{{ __('messages.step_upload') }}</span>
             </div>
-            <div class="w-8 h-px bg-gray-200"></div>
-            <div class="flex items-center gap-1.5">
-                <div class="w-7 h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold">3</div>
-                <span class="font-sans text-gray-400 hidden sm:inline">Selesai</span>
+            <div class="w-4 sm:w-8 h-px bg-gray-200"></div>
+            <div class="flex items-center gap-1">
+                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold">3</div>
+                <span class="font-sans text-gray-400 hidden sm:inline">{{ __('messages.step_done') }}</span>
             </div>
         </div>
     </div>
 </div>
 
 {{-- ── Page body ─────────────────────────────────────── --}}
-<div class="min-h-screen pt-20 pb-16 px-gutter" style="background:#F8F7F5;">
+<div class="min-h-screen pt-32 md:pt-36 pb-16 px-gutter" style="background:#F8F7F5;">
     <div class="max-w-5xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
@@ -55,13 +56,13 @@ $metodeBayar = [
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="panel-step-1">
                     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 bg-forest">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">1</div>
-                        <h2 class="font-serif text-lg text-white">Pilih Metode Pembayaran</h2>
+                        <h2 class="font-serif text-lg text-white">{{ __('messages.choose_payment_method') }}</h2>
                     </div>
                     <div class="p-6 space-y-6">
 
                         {{-- Bank Transfer --}}
                         <div>
-                            <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">Bank Transfer</p>
+                            <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.bank_transfer') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
                                 @if($m['tipe'] === 'bank')
@@ -80,7 +81,7 @@ $metodeBayar = [
                                     <div class="hidden px-4 pb-4 pt-0 bg-gray-50 border-t border-gray-100" id="detail-{{ $m['id'] }}">
                                         <div class="pt-4 flex items-center justify-between">
                                             <div>
-                                                <p class="font-sans text-xs text-stone mb-1">Nomor Rekening</p>
+                                                <p class="font-sans text-xs text-stone mb-1">{{ __('messages.account_number') }}</p>
                                                 <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['nomor'] }}</p>
                                                 <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['atas_nama'] }}</p>
                                             </div>
@@ -88,7 +89,7 @@ $metodeBayar = [
                                                     onclick="salin('{{ $m['nomor'] }}', 'salin-{{ $m['id'] }}')"
                                                     class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
                                                 <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
-                                                Salin
+                                                {{ __('messages.copy') }}
                                             </button>
                                         </div>
                                     </div>
@@ -100,7 +101,7 @@ $metodeBayar = [
 
                         {{-- E-Wallet --}}
                         <div>
-                            <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">E-Wallet</p>
+                            <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.e_wallet') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
                                 @if($m['tipe'] === 'ewallet')
@@ -119,7 +120,7 @@ $metodeBayar = [
                                     <div class="hidden px-4 pb-4 pt-0 bg-gray-50 border-t border-gray-100" id="detail-{{ $m['id'] }}">
                                         <div class="pt-4 flex items-center justify-between">
                                             <div>
-                                                <p class="font-sans text-xs text-stone mb-1">Nomor</p>
+                                                <p class="font-sans text-xs text-stone mb-1">{{ __('messages.number') }}</p>
                                                 <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['nomor'] }}</p>
                                                 <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['atas_nama'] }}</p>
                                             </div>
@@ -127,7 +128,7 @@ $metodeBayar = [
                                                     onclick="salin('{{ $m['nomor'] }}', 'salin-{{ $m['id'] }}')"
                                                     class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
                                                 <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
-                                                Salin
+                                                {{ __('messages.copy') }}
                                             </button>
                                         </div>
                                     </div>
@@ -160,7 +161,7 @@ $metodeBayar = [
                                             <div class="w-36 h-36 bg-white border border-gray-200 rounded-xl flex items-center justify-center shadow-sm">
                                                 <span class="material-symbols-outlined text-gray-200" style="font-size:80px;">qr_code</span>
                                             </div>
-                                            <p class="font-sans text-xs text-stone">Scan QR code dengan mobile banking atau e-wallet</p>
+                                            <p class="font-sans text-xs text-stone">{{ __('messages.qris_scan_desc') }}</p>
                                             <p class="font-sans text-xs text-pebble">a.n. {{ $m['atas_nama'] }}</p>
                                         </div>
                                     </div>
@@ -174,7 +175,7 @@ $metodeBayar = [
                         <button type="button" id="btn-lanjutkan" disabled
                                 class="w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl transition-all opacity-40 cursor-not-allowed">
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            Lanjutkan ke Upload Bukti
+                            {{ __('messages.continue_to_upload') }}
                         </button>
                     </div>
                 </div>
@@ -183,7 +184,7 @@ $metodeBayar = [
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2">
                     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100" id="step-2-header" style="background:#6B6B6B;">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
-                        <h2 class="font-serif text-lg text-white">Upload Bukti Pembayaran</h2>
+                        <h2 class="font-serif text-lg text-white">{{ __('messages.upload_payment') }}</h2>
                     </div>
                     <div class="p-6">
                         <form method="POST"
@@ -200,7 +201,7 @@ $metodeBayar = [
                                     <span class="material-symbols-outlined text-white text-sm icon-fill">check</span>
                                 </div>
                                 <div>
-                                    <p class="font-sans text-xs text-stone">Metode dipilih</p>
+                                    <p class="font-sans text-xs text-stone">{{ __('messages.method_selected') }}</p>
                                     <p class="font-sans text-sm font-semibold text-forest" id="badge-method-name"></p>
                                 </div>
                             </div>
@@ -217,8 +218,8 @@ $metodeBayar = [
                                     <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-forest/10 to-forest/5 flex items-center justify-center mb-4 transition-transform duration-300 hover:scale-105">
                                         <span class="material-symbols-outlined text-forest text-3xl">cloud_upload</span>
                                     </div>
-                                    <p class="font-sans text-sm font-semibold text-ink mb-1">Seret & lepas file di sini</p>
-                                    <p class="font-sans text-xs text-stone mb-4">atau <span class="text-forest font-medium">klik untuk browse</span> dari perangkat Anda</p>
+                                    <p class="font-sans text-sm font-semibold text-ink mb-1">{{ __('messages.drag_drop_file') }}</p>
+                                    <p class="font-sans text-xs text-stone mb-4">{!! __('messages.or_click_browse') !!}</p>
                                     <div class="flex flex-wrap items-center justify-center gap-2">
                                         <span class="font-sans text-xs text-pebble bg-white border border-gray-200 px-3 py-1.5 rounded-full">
                                             <span class="material-symbols-outlined text-xs align-middle mr-0.5">image</span>
@@ -230,7 +231,7 @@ $metodeBayar = [
                                         </span>
                                         <span class="font-sans text-xs text-pebble bg-white border border-gray-200 px-3 py-1.5 rounded-full">
                                             <span class="material-symbols-outlined text-xs align-middle mr-0.5">data_usage</span>
-                                            Maks. 5MB
+                                            {{ __('messages.max_size') }}
                                         </span>
                                     </div>
                                 </div>
@@ -238,8 +239,8 @@ $metodeBayar = [
                                 {{-- Loading state --}}
                                 <div class="hidden absolute inset-0 w-full h-full bg-white z-20 flex flex-col items-center justify-center p-6" id="upload-loading">
                                     <div class="w-16 h-16 rounded-full border-4 border-gray-100 border-t-forest animate-spin mb-4"></div>
-                                    <p class="font-sans text-sm font-medium text-ink">Memproses file...</p>
-                                    <p class="font-sans text-xs text-stone mt-1">Mohon tunggu sebentar</p>
+                                    <p class="font-sans text-sm font-medium text-ink">{{ __('messages.processing_file') }}</p>
+                                    <p class="font-sans text-xs text-stone mt-1">{{ __('messages.please_wait') }}</p>
                                 </div>
 
                                 {{-- Preview container --}}
@@ -255,12 +256,12 @@ $metodeBayar = [
                                             <button class="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-ink hover:bg-white border border-gray-200/60 px-3 py-2 rounded-xl text-xs font-medium transition-all shadow-sm hover:shadow-md"
                                                     id="change-file" type="button">
                                                 <span class="material-symbols-outlined text-sm">edit</span>
-                                                <span class="hidden sm:inline">Ganti</span>
+                                                <span class="hidden sm:inline">{{ __('messages.change') }}</span>
                                             </button>
                                             <button class="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm text-red-600 hover:bg-white border border-gray-200/60 px-3 py-2 rounded-xl text-xs font-medium transition-all shadow-sm hover:shadow-md"
                                                     id="remove-file" type="button">
                                                 <span class="material-symbols-outlined text-sm">delete</span>
-                                                <span class="hidden sm:inline">Hapus</span>
+                                                <span class="hidden sm:inline">{{ __('messages.delete') }}</span>
                                             </button>
                                         </div>
 
@@ -281,7 +282,7 @@ $metodeBayar = [
                                         <div class="w-20 h-20 rounded-2xl bg-red-100 flex items-center justify-center mb-4 shadow-inner">
                                             <span class="material-symbols-outlined text-red-500" style="font-size:48px;">picture_as_pdf</span>
                                         </div>
-                                        <p class="font-sans text-xs font-medium text-stone mb-3">Dokumen PDF</p>
+                                        <p class="font-sans text-xs font-medium text-stone mb-3">{{ __('messages.pdf_document') }}</p>
                                         <div class="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm w-full max-w-xs">
                                             <span class="material-symbols-outlined text-forest text-sm flex-shrink-0">check_circle</span>
                                             <div class="min-w-0 flex-1">
@@ -293,12 +294,12 @@ $metodeBayar = [
                                             <button class="flex items-center gap-1.5 text-stone bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors shadow-sm"
                                                     id="change-file-pdf" type="button">
                                                 <span class="material-symbols-outlined text-sm">edit</span>
-                                                Ganti
+                                                {{ __('messages.change') }}
                                             </button>
                                             <button class="flex items-center gap-1.5 text-red-600 bg-white border border-red-200 hover:bg-red-50 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors shadow-sm"
                                                     id="remove-file-pdf" type="button">
                                                 <span class="material-symbols-outlined text-sm">delete</span>
-                                                Hapus
+                                                {{ __('messages.delete') }}
                                             </button>
                                         </div>
                                     </div>
@@ -309,12 +310,12 @@ $metodeBayar = [
                                     <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
                                         <span class="material-symbols-outlined text-red-500 text-3xl">error</span>
                                     </div>
-                                    <p class="font-sans text-sm font-semibold text-red-700 mb-1" id="error-title">File tidak valid</p>
+                                    <p class="font-sans text-sm font-semibold text-red-700 mb-1" id="error-title">{{ __('messages.invalid_file') }}</p>
                                     <p class="font-sans text-xs text-red-600 mb-4 max-w-xs" id="error-message"></p>
                                     <button class="flex items-center gap-1.5 text-red-700 border border-red-300 hover:bg-red-100 px-4 py-2 rounded-xl text-xs font-medium transition-colors"
                                             id="retry-upload" type="button">
                                         <span class="material-symbols-outlined text-sm">refresh</span>
-                                        Coba Lagi
+                                        {{ __('messages.retry') }}
                                     </button>
                                 </div>
                             </div>
@@ -322,7 +323,7 @@ $metodeBayar = [
                             <button type="submit" id="submit-btn"
                                     class="w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                                 <span class="material-symbols-outlined text-sm">send</span>
-                                Kirim Bukti Pembayaran
+                                {{ __('messages.submit_payment_proof') }}
                             </button>
                         </form>
                     </div>
@@ -332,8 +333,8 @@ $metodeBayar = [
                 <div class="flex items-start gap-3 bg-amber-50 border border-amber-200/60 rounded-xl px-4 py-3.5">
                     <span class="material-symbols-outlined text-amber-500 text-base mt-0.5 flex-shrink-0">info</span>
                     <div>
-                        <p class="font-sans text-sm font-medium text-ink">Informasi Verifikasi</p>
-                        <p class="font-sans text-xs text-stone mt-0.5 leading-relaxed">Pembayaran akan diverifikasi dalam 1×24 jam kerja. Anda akan mendapat notifikasi melalui email setelah pembayaran dikonfirmasi.</p>
+                        <p class="font-sans text-sm font-medium text-ink">{{ __('messages.verification_info') }}</p>
+                        <p class="font-sans text-xs text-stone mt-0.5 leading-relaxed">{{ __('messages.verification_info_desc') }}</p>
                     </div>
                 </div>
 
@@ -347,19 +348,19 @@ $metodeBayar = [
                     {{-- Order summary card --}}
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="bg-forest px-5 py-5">
-                            <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40 mb-1">Total Pembayaran</p>
+                            <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40 mb-1">{{ __('messages.total_payment') }}</p>
                             <p class="font-serif text-3xl text-white">
                                 Rp{{ number_format($pemesanan->total_harga ?? 0, 0, ',', '.') }}
                             </p>
                         </div>
                         <div class="px-5 py-5 space-y-3">
                             <div class="flex items-start justify-between gap-3">
-                                <span class="font-sans text-xs text-stone flex-shrink-0">Kode Booking</span>
+                                <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.booking_code') }}</span>
                                 <span class="font-sans text-xs font-semibold text-forest text-right break-all">{{ $pemesanan->kode_booking ?? '-' }}</span>
                             </div>
                             <div class="h-px bg-gray-100"></div>
                             <div class="flex items-start justify-between gap-3">
-                                <span class="font-sans text-xs text-stone flex-shrink-0">Tiket</span>
+                                <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.ticket') }}</span>
                                 <span class="font-sans text-xs font-semibold text-ink text-right text-right">
                                     @php
                                         $tSummary = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', ');
@@ -368,17 +369,17 @@ $metodeBayar = [
                                 </span>
                             </div>
                             <div class="flex items-start justify-between gap-3">
-                                <span class="font-sans text-xs text-stone flex-shrink-0">Jumlah</span>
-                                <span class="font-sans text-xs font-semibold text-ink">{{ $pemesanan->detailPemesanan->count() }} tiket</span>
+                                <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.quantity') }}</span>
+                                <span class="font-sans text-xs font-semibold text-ink">{{ $pemesanan->detailPemesanan->count() }} {{ __('messages.ticket_unit') }}</span>
                             </div>
                             <div class="flex items-start justify-between gap-3">
-                                <span class="font-sans text-xs text-stone flex-shrink-0">Tanggal</span>
+                                <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.date') }}</span>
                                 <span class="font-sans text-xs font-semibold text-ink text-right">
                                     {{ isset($pemesanan->tgl_kunjungan) ? \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->isoFormat('D MMMM YYYY') : '-' }}
                                 </span>
                             </div>
                             <div class="flex items-start justify-between gap-3">
-                                <span class="font-sans text-xs text-stone flex-shrink-0">Status</span>
+                                <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.th_status') }}</span>
                                 <span class="font-sans text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
                                     {{ ucfirst($pemesanan->status ?? '-') }}
                                 </span>
@@ -392,13 +393,13 @@ $metodeBayar = [
                             <div class="w-8 h-8 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
                                 <span class="material-symbols-outlined text-forest text-sm">support_agent</span>
                             </div>
-                            <p class="font-sans text-sm font-medium text-ink">Butuh Bantuan?</p>
+                            <p class="font-sans text-sm font-medium text-ink">{{ __('messages.need_help') }}</p>
                         </div>
-                        <p class="font-sans text-xs text-stone leading-relaxed mb-4">Jika ada kendala dalam proses pembayaran, hubungi pengelola Bangkiang Jaran melalui kontak yang tersedia.</p>
+                        <p class="font-sans text-xs text-stone leading-relaxed mb-4">{{ __('messages.help_payment_desc') }}</p>
                         <a href="https://wa.me/6281234567890" target="_blank"
                            class="flex items-center justify-center gap-2 w-full font-sans text-xs font-semibold text-white bg-[#25D366] hover:bg-[#1dbd5a] transition-colors px-4 py-2.5 rounded-xl">
                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                            Hubungi via WhatsApp
+                            {{ __('messages.whatsapp_contact') }}
                         </a>
                     </div>
 
@@ -422,6 +423,10 @@ $metodeBayar = [
 
 @push('scripts')
 <script>
+    /* Navbar auto-hide (scroll down) would fight the fixed progress bar —
+       keep the navbar pinned on this page. */
+    document.body.classList.add('no-nav-hide');
+
     let activeMetode = null;
 
     function pilihMetode(id, nama, nomor, atasNama) {
@@ -559,12 +564,12 @@ $metodeBayar = [
 
         // Validate type
         if (!ALLOWED_TYPES.includes(file.type)) {
-            showError('Format file tidak didukung', 'Gunakan file JPG, PNG, atau PDF untuk bukti pembayaran Anda.');
+            showError('{{ __('messages.err_format') }}', '{{ __('messages.err_format_desc') }}');
             return;
         }
         // Validate size
         if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-            showError('Ukuran file terlalu besar', `Ukuran file maksimal ${MAX_SIZE_MB}MB. File Anda: ${formatFileSize(file.size)}.`);
+            showError('{{ __('messages.err_size') }}', `{{ __('messages.err_size_desc') }}${formatFileSize(file.size)}.`.replace(':mb', MAX_SIZE_MB));
             return;
         }
 
@@ -592,7 +597,7 @@ $metodeBayar = [
             // Small delay to let the browser render
             setTimeout(() => showState('preview'), 120);
         };
-        reader.onerror = () => showError('Gagal membaca file', 'Terjadi kesalahan saat memproses file. Silakan coba lagi.');
+        reader.onerror = () => showError('{{ __('messages.err_read') }}', '{{ __('messages.err_read_desc') }}');
         reader.readAsDataURL(file);
     }
 

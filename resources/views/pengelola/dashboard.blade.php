@@ -340,7 +340,6 @@
             ['href' => route('pengelola.verifikasi.index'), 'icon' => 'verified_user',        'label' => 'Verifikasi', 'color' => 'text-amber-600',   'bg' => 'bg-amber-50'],
             ['href' => route('pengelola.laporan.index'),    'icon' => 'monitoring',           'label' => 'Laporan',    'color' => 'text-emerald-600', 'bg' => 'bg-emerald-50'],
             ['href' => route('pengelola.galeri.index'),     'icon' => 'photo_library',        'label' => 'Galeri',     'color' => 'text-sky-600',     'bg' => 'bg-sky-50'],
-            ['href' => route('pengelola.konten.index'),     'icon' => 'article',              'label' => 'Konten',     'color' => 'text-violet-600',  'bg' => 'bg-violet-50'],
             ['href' => route('pengelola.user.index'),       'icon' => 'group',                'label' => 'Pengguna',   'color' => 'text-rose-600',    'bg' => 'bg-rose-50'],
         ];
         @endphp

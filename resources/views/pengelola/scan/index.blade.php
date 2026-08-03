@@ -77,11 +77,11 @@
                 <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center
-                            @if($belumLunas || $pemesananDibatalkan) bg-red-100 text-red-600
+                            @if($bukanHariIni || $belumLunas || $pemesananDibatalkan) bg-red-100 text-red-600
                             @elseif($sudahDigunakan) bg-amber-100 text-amber-600
                             @else bg-emerald-100 text-emerald-600
                             @endif">
-                            @if($belumLunas || $pemesananDibatalkan)
+                            @if($bukanHariIni || $belumLunas || $pemesananDibatalkan)
                                 <span class="material-symbols-outlined">block</span>
                             @elseif($sudahDigunakan)
                                 <span class="material-symbols-outlined">check_circle</span>
@@ -91,7 +91,9 @@
                         </div>
                         <div>
                             <p class="font-sans text-sm font-semibold text-gray-900">
-                                @if($belumLunas || $pemesananDibatalkan)
+                                @if($bukanHariIni)
+                                    Tiket Bukan Untuk Hari Ini
+                                @elseif($belumLunas || $pemesananDibatalkan)
                                     Tiket Tidak Valid
                                 @elseif($sudahDigunakan)
                                     Tiket Sudah Digunakan
@@ -100,7 +102,9 @@
                                 @endif
                             </p>
                             <p class="font-sans text-xs text-gray-400">
-                                @if($belumLunas)
+                                @if($bukanHariIni)
+                                    Tiket untuk kunjungan {{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y') }}. Hanya tiket hari ini yang bisa di-scan.
+                                @elseif($belumLunas)
                                     Pembayaran belum diverifikasi
                                 @elseif($pemesananDibatalkan)
                                     Pemesanan dibatalkan
@@ -112,7 +116,7 @@
                             </p>
                         </div>
                     </div>
-                    @if(!$sudahDigunakan && !$belumLunas && !$pemesananDibatalkan)
+                    @if(!$bukanHariIni && !$sudahDigunakan && !$belumLunas && !$pemesananDibatalkan)
                     <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="Konfirmasi tiket ini? Pengunjung akan dipersilakan masuk.">
                         @csrf
                         <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">
@@ -122,7 +126,7 @@
                         </button>
                     </form>
                     @endif
-                    @if($sudahDigunakan && !$detail->check_out_at && !$belumLunas && !$pemesananDibatalkan)
+                    @if(!$bukanHariIni && $sudahDigunakan && !$detail->check_out_at && !$belumLunas && !$pemesananDibatalkan)
                     <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="Konfirmasi check-out pengunjung ini?">
                         @csrf
                         <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">

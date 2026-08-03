@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('nav-mode', 'light')
 
 @section('title', 'E-Ticket — Bangkiang Jaran')
 
@@ -24,7 +25,7 @@
         {{-- Breadcrumb --}}
         <div class="mb-6 no-print" data-aos="fade-up">
             <nav class="flex items-center gap-2 text-xs text-stone font-sans">
-                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="hover:text-forest transition-colors">Riwayat</a>
+                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="hover:text-forest transition-colors">{{ __('messages.history') }}</a>
                 <span class="material-symbols-outlined text-sm text-pebble">chevron_right</span>
                 <span class="text-forest font-medium">E-Ticket</span>
             </nav>
@@ -34,11 +35,11 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6" data-aos="fade-up">
             <div class="bg-forest px-5 py-4 flex items-center justify-between">
                 <div>
-                    <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">Kode Booking</p>
+                    <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">{{ __('messages.booking_code') }}</p>
                     <p class="font-mono text-lg font-bold text-white tracking-wider">{{ $pemesanan->kode_booking }}</p>
                 </div>
                 <div class="text-right">
-                    <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">Status</p>
+                    <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">{{ __('messages.th_status') }}</p>
                     @php
                         $statusClass = match($pemesanan->status) {
                             'selesai' => 'bg-green-500',
@@ -47,10 +48,10 @@
                             default => 'bg-gray-400',
                         };
                         $statusLabel = match($pemesanan->status) {
-                            'selesai' => 'LUNAS',
-                            'pending' => 'Menunggu Bayar',
-                            'diproses' => 'Diverifikasi',
-                            'dibatalkan' => 'Dibatalkan',
+                            'selesai' => __('messages.status_lunas'),
+                            'pending' => __('messages.status_pending'),
+                            'diproses' => __('messages.status_diproses'),
+                            'dibatalkan' => __('messages.status_dibatalkan'),
                             default => ucfirst($pemesanan->status),
                         };
                     @endphp
@@ -59,15 +60,15 @@
             </div>
             <div class="px-5 py-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-stone font-sans">
                 <div>
-                    <span class="text-pebble">Tanggal Kunjungan:</span>
+                    <span class="text-pebble">{{ __('messages.visit_date') }}:</span>
                     <span class="font-medium text-ink ml-1">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->isoFormat('D MMMM YYYY') }}</span>
                 </div>
                 <div>
-                    <span class="text-pebble">Jumlah Tiket:</span>
-                    <span class="font-medium text-ink ml-1">{{ $pemesanan->detailPemesanan->count() }} tiket</span>
+                    <span class="text-pebble">{{ __('messages.jumlah_tiket') }}:</span>
+                    <span class="font-medium text-ink ml-1">{{ $pemesanan->detailPemesanan->count() }} {{ __('messages.ticket_unit') }}</span>
                 </div>
                 <div>
-                    <span class="text-pebble">Total:</span>
+                    <span class="text-pebble">{{ __('messages.total') }}:</span>
                     <span class="font-medium text-ink ml-1">Rp{{ number_format($pemesanan->total_harga, 0, ',', '.') }}</span>
                 </div>
             </div>
@@ -90,7 +91,7 @@
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full {{ $item->status_tiket === 'aktif' ? 'bg-green-500' : 'bg-gray-300' }}"></span>
                         <span class="font-sans text-[10px] uppercase tracking-wider {{ $item->status_tiket === 'aktif' ? 'text-green-600' : 'text-gray-400' }}">
-                            {{ $item->status_tiket === 'aktif' ? 'Aktif' : ucfirst($item->status_tiket) }}
+                            {{ $item->status_tiket === 'aktif' ? __('messages.status_aktif') : ucfirst($item->status_tiket) }}
                         </span>
                     </div>
                 </div>
@@ -111,23 +112,23 @@
                     <div class="min-w-0 flex-1">
                         <div class="grid grid-cols-2 gap-y-2.5 gap-x-4">
                             <div>
-                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">Kode Tiket</p>
+                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.ticket_code') }}</p>
                                 <p class="font-mono text-sm font-bold text-forest tracking-wider mt-0.5">{{ $item->kode_tiket }}</p>
                             </div>
                             <div>
                                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">
-                                    {{ $item->plat_kendaraan ? 'Plat Kendaraan' : 'Nama Pengunjung' }}
+                                    {{ $item->plat_kendaraan ? __('messages.vehicle_plate') : __('messages.visitor_name') }}
                                 </p>
                                 <p class="font-sans text-sm font-medium text-ink mt-0.5">
                                     {{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '-' }}
                                 </p>
                             </div>
                             <div>
-                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">Harga</p>
+                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.price') }}</p>
                                 <p class="font-sans text-sm text-ink mt-0.5">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
                             </div>
                             <div>
-                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">Tanggal</p>
+                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.date') }}</p>
                                 <p class="font-sans text-sm text-ink mt-0.5">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y') }}</p>
                             </div>
                         </div>
@@ -142,12 +143,12 @@
             <button onclick="window.print()"
                     class="flex-1 flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                 <span class="material-symbols-outlined text-sm">download</span>
-                Cetak / Download PDF
+                {{ __('messages.print_download') }}
             </button>
             <a href="{{ route('wisatawan.pemesanan.riwayat') }}"
                class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-stone font-sans text-sm font-medium py-3.5 rounded-xl hover:border-gray-300 hover:text-ink transition-colors">
                 <span class="material-symbols-outlined text-sm">history</span>
-                Kembali ke Riwayat
+                {{ __('messages.back_to_history') }}
             </a>
         </div>
 
@@ -155,7 +156,7 @@
         <div class="mt-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200/60 rounded-xl px-4 py-3.5 no-print" data-aos="fade-up">
             <span class="material-symbols-outlined text-amber-500 text-sm mt-0.5 flex-shrink-0">info</span>
             <p class="font-sans text-xs text-stone leading-relaxed">
-                Setiap tiket memiliki kode unik masing-masing. Pengunjung bisa masuk satu per satu tanpa harus menunggu seluruh rombongan. Tunjukkan kode tiket di pintu masuk.
+                {{ __('messages.ticket_unique_note') }}
             </p>
         </div>
     </div>

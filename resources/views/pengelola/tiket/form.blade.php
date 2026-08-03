@@ -20,9 +20,17 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.ticket_name') }}</label>
-                    <input type="text" name="nama_tiket" value="{{ old('nama_tiket', $tiket->nama_tiket ?? '') }}" required
+                    <input type="text" name="nama_tiket" value="{{ old('nama_tiket', $tiket->getRawOriginal('nama_tiket') ?? '') }}" required
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
                     @error('nama_tiket') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Nama Tiket (English)</label>
+                    <input type="text" name="nama_tiket_en" value="{{ old('nama_tiket_en', $tiket->getRawOriginal('nama_tiket_en') ?? '') }}"
+                        class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
+                    <p class="text-xs text-stone mt-1">Terjemahan bahasa Inggris (opsional — kalau kosong, situs bahasa Inggris memakai nama Indonesia).</p>
+                    @error('nama_tiket_en') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>

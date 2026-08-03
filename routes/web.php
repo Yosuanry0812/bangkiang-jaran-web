@@ -6,7 +6,6 @@ use App\Http\Controllers\Wisatawan\TiketController as WisatawanTiketController;
 use App\Http\Controllers\Wisatawan\PemesananController;
 use App\Http\Controllers\Wisatawan\PembayaranController;
 use App\Http\Controllers\Pengelola\DashboardController;
-use App\Http\Controllers\Pengelola\KontenController;
 use App\Http\Controllers\Pengelola\GaleriController;
 use App\Http\Controllers\Pengelola\TiketController as PengelolaTiketController;
 use App\Http\Controllers\Pengelola\VerifikasiController;
@@ -57,11 +56,6 @@ Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengel
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Kelola Konten
-    Route::resource('/konten', KontenController::class)->parameters([
-        'konten' => 'id'
-    ])->except(['show']);
-
     // Kelola Galeri
     Route::resource('/galeri', GaleriController::class)->parameters([
         'galeri' => 'id'
@@ -76,6 +70,9 @@ Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengel
     Route::get('/verifikasi', [VerifikasiController::class, 'index'])->name('verifikasi.index');
     Route::get('/verifikasi/{id}', [VerifikasiController::class, 'show'])->name('verifikasi.show');
     Route::post('/verifikasi/{id}/validasi', [VerifikasiController::class, 'validasi'])->name('verifikasi.validasi');
+
+    // Notifikasi realtime (polling)
+    Route::get('/notifikasi', [VerifikasiController::class, 'notifikasi'])->name('notifikasi');
 
     // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
@@ -130,7 +127,7 @@ Route::get('/logout', function () {
 })->name('logout.get');
 
 // Redirect after login berdasarkan role
-Route::get('/redirect-after-login', function () {
+Route::middleware('auth')->get('/redirect-after-login', function () {
     if (auth()->user()->role === 'pengelola') {
         return redirect()->route('pengelola.dashboard');
     }

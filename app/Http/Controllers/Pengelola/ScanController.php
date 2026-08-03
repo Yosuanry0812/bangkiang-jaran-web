@@ -54,6 +54,7 @@ class ScanController extends Controller
         $kadaluarsa = $detail->status_tiket === 'kadaluarsa';
         $pemesananDibatalkan = $pemesanan->status === 'dibatalkan';
         $belumLunas = $pemesanan->status !== 'selesai';
+        $bukanHariIni = $pemesanan->tgl_kunjungan !== now()->toDateString();
 
         $ticketsHariIni = $this->getTodayTickets();
 
@@ -61,6 +62,7 @@ class ScanController extends Controller
             'detail', 'pemesanan',
             'sudahDigunakan', 'kadaluarsa',
             'pemesananDibatalkan', 'belumLunas',
+            'bukanHariIni',
             'ticketsHariIni'
         ));
     }
@@ -96,6 +98,13 @@ class ScanController extends Controller
                 DB::rollBack();
                 return redirect()->route('pengelola.scan.index')
                     ->with('error', 'Tiket belum lunas. Status pemesanan: ' . $pemesanan->status . '.');
+            }
+
+            // Hanya tiket dengan kunjungan HARI INI yang bisa check-in
+            if ($pemesanan->tgl_kunjungan !== now()->toDateString()) {
+                DB::rollBack();
+                return redirect()->route('pengelola.scan.index')
+                    ->with('error', 'Tiket ini untuk kunjungan ' . $pemesanan->tgl_kunjungan . '. Hanya tiket hari ini (' . now()->format('d/m/Y') . ') yang bisa di-scan.');
             }
 
             $detail->update([
@@ -142,6 +151,13 @@ class ScanController extends Controller
                 DB::rollBack();
                 return redirect()->route('pengelola.scan.index')
                     ->with('error', 'Tiket ini sudah check-out sebelumnya.');
+            }
+
+            // Hanya tiket dengan kunjungan HARI INI yang bisa check-out
+            if ($detail->pemesanan->tgl_kunjungan !== now()->toDateString()) {
+                DB::rollBack();
+                return redirect()->route('pengelola.scan.index')
+                    ->with('error', 'Tiket ini untuk kunjungan ' . $detail->pemesanan->tgl_kunjungan . '. Hanya tiket hari ini (' . now()->format('d/m/Y') . ') yang bisa di-scan.');
             }
 
             $detail->update([

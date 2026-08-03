@@ -16,8 +16,20 @@ class Galeri extends Model
     protected $fillable = [
         'file',
         'keterangan',
+        'keterangan_en',
         'tipe',
     ];
+
+    /**
+     * Keterangan lokal sesuai locale situs (EN fallback ke Indonesia).
+     */
+    public function getKeteranganAttribute()
+    {
+        if (app()->getLocale() === 'en' && !empty($this->attributes['keterangan_en'])) {
+            return $this->attributes['keterangan_en'];
+        }
+        return $this->attributes['keterangan'] ?? null;
+    }
 
     public function scopeWisata($query)
     {

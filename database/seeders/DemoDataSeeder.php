@@ -46,16 +46,16 @@ class DemoDataSeeder extends Seeder
             ['kode_booking' => $codes[2],  'id_tiket' => 1, 'jumlah' => 3, 'total_harga' => 75000,  'tgl_kunjungan' => $today,                              'status' => 'diproses',  'created' => now()->subHours(12)],
             // 4. Diproses + pending payment (VERIFIKASI)
             ['kode_booking' => $codes[3],  'id_tiket' => 2, 'jumlah' => 2, 'total_harga' => 30000,  'tgl_kunjungan' => now()->addDay()->toDateString(),       'status' => 'diproses',  'created' => now()->subHours(10)],
-            // 5. Selesai + valid
-            ['kode_booking' => $codes[4],  'id_tiket' => 4, 'jumlah' => 1, 'total_harga' => 5000,   'tgl_kunjungan' => now()->subDay()->toDateString(),       'status' => 'selesai',   'created' => now()->subDays(3)],
+            // 5. Selesai + valid (tiket parkir motor diganti tiket masuk dewasa)
+            ['kode_booking' => $codes[4],  'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 20000,  'tgl_kunjungan' => now()->subDay()->toDateString(),       'status' => 'selesai',   'created' => now()->subDays(3)],
             // 6. Selesai + valid
             ['kode_booking' => $codes[5],  'id_tiket' => 1, 'jumlah' => 4, 'total_harga' => 100000, 'tgl_kunjungan' => now()->subDays(2)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(3)],
             // 7. Selesai + valid
             ['kode_booking' => $codes[6],  'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 20000,  'tgl_kunjungan' => now()->subDays(3)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(4)],
             // 8. Dibatalkan + payment ditolak
             ['kode_booking' => $codes[7],  'id_tiket' => 2, 'jumlah' => 3, 'total_harga' => 45000,  'tgl_kunjungan' => now()->addDays(5)->toDateString(),     'status' => 'dibatalkan','created' => now()->subDays(2)],
-            // 9. Selesai + valid
-            ['kode_booking' => $codes[8],  'id_tiket' => 5, 'jumlah' => 1, 'total_harga' => 10000,  'tgl_kunjungan' => now()->subDays(4)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(5)],
+            // 9. Selesai + valid (tiket parkir mobil diganti tiket masuk dewasa)
+            ['kode_booking' => $codes[8],  'id_tiket' => 1, 'jumlah' => 1, 'total_harga' => 20000,  'tgl_kunjungan' => now()->subDays(4)->toDateString(),     'status' => 'selesai',   'created' => now()->subDays(5)],
             // 10. Belum bayar
             ['kode_booking' => $codes[9],  'id_tiket' => 1, 'jumlah' => 2, 'total_harga' => 50000,  'tgl_kunjungan' => now()->addDays(10)->toDateString(),    'status' => 'pending',   'created' => now()->subHours(6)],
             // 11. Diproses + pending payment (VERIFIKASI)
@@ -80,6 +80,29 @@ class DemoDataSeeder extends Seeder
                     'updated_at'    => $p['created'],
                 ]);
                 $insertedIds[$p['kode_booking']] = $id;
+            }
+
+            // ===== DETAIL PEMESANAN (data pengunjung per tiket) =====
+            $tiketInfo = DB::table('tiket')->pluck('nama_tiket', 'id_tiket');
+            $hargaInfo = DB::table('tiket')->pluck('harga', 'id_tiket');
+            $jk = ['L', 'P'];
+
+            foreach ($pemesanan as $p) {
+                $pemesananId = $insertedIds[$p['kode_booking']];
+                for ($i = 1; $i <= $p['jumlah']; $i++) {
+                    DB::table('detail_pemesanan')->insert([
+                        'id_pemesanan'    => $pemesananId,
+                        'id_tiket'        => $p['id_tiket'],
+                        'kode_tiket'      => $p['kode_booking'] . '-' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                        'nama_tiket'      => $tiketInfo[$p['id_tiket']],
+                        'harga'           => $hargaInfo[$p['id_tiket']],
+                        'nama_pengunjung' => 'Pengunjung ' . $i,
+                        'jenis_kelamin'   => $jk[($p['id_tiket'] + $i) % 2],
+                        'status_tiket'    => $p['status'] === 'selesai' ? 'digunakan' : 'aktif',
+                        'created_at'      => $p['created'],
+                        'updated_at'      => $p['created'],
+                    ]);
+                }
             }
 
             // ===== PEMBAYARAN =====

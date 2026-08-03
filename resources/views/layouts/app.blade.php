@@ -51,149 +51,228 @@
     </script>
     <style>
         @view-transition { navigation: auto; }
+        /* Lock horizontal scroll at root — prevents swipe left/right on mobile */
+        html, body { overflow-x: clip; }
+        @supports not (overflow: clip) { html, body { overflow-x: hidden; } }
         ::selection { background: #1B3A2D; color: #F7F3EE; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         [x-cloak] { display: none !important; }
 
-        /* ─── Navbar transition ─── */
+        /* ─── Navbar ─── */
         #main-nav {
             transition:
-                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                background-color 0.35s ease,
-                backdrop-filter 0.35s ease,
-                box-shadow 0.35s ease;
+                transform 0.38s cubic-bezier(0.4,0,0.2,1),
+                background 0.32s ease,
+                border-color 0.32s ease,
+                box-shadow 0.32s ease;
         }
-        #main-nav.nav-hidden  { transform: translateY(-100%); }
-        #main-nav.nav-solid   { background-color: rgba(15,28,20,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 1px 0 rgba(255,255,255,0.04); }
-        #main-nav.nav-tinted  { background-color: rgba(15,28,20,0.50); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: none; }
-        #main-nav.nav-clear   { background-color: transparent;          backdrop-filter: none;       -webkit-backdrop-filter: none;       box-shadow: none; }
+        #main-nav.nav-hidden   { transform: translateY(-100%); }
+
+        /* dark mode — over hero images */
+        #main-nav.nav-dark-clear  { background: transparent; border-color: transparent; box-shadow: none; }
+        #main-nav.nav-transparent { background: transparent; border-color: transparent; box-shadow: none; }
+        #main-nav.nav-dark-tinted { background: rgba(10,20,14,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: rgba(255,255,255,0.06); }
+        #main-nav.nav-dark-solid  { background: rgba(10,20,14,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(255,255,255,0.05); box-shadow: 0 1px 0 rgba(255,255,255,0.03); }
+
+        /* light mode — over ivory/white pages */
+        #main-nav.nav-light       { background: rgba(247,243,238,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(27,58,45,0.08); box-shadow: 0 1px 24px rgba(0,0,0,0.06); }
+
+        /* mobile: slim bar, lighter glass so it doesn't read as a huge black slab */
+        @media (max-width: 767px) {
+            #main-nav.nav-dark-tinted { background: rgba(10,20,14,0.40); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+            #main-nav.nav-dark-solid  { background: rgba(10,20,14,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+            #main-nav.nav-light       { background: rgba(247,243,238,0.88); }
+        }
+
+        /* nav link tokens */
+        .nav-link-dark  { color: rgba(255,255,255,0.75); }
+        .nav-link-dark:hover { color: #fff; }
+        .nav-link-light { color: #4B5563; }
+        .nav-link-light:hover { color: #1B3A2D; }
+
+        /* active indicator */
+        .nav-link-active-dark  { color: #fff !important; }
+        .nav-link-active-light { color: #1B3A2D !important; font-weight: 500; }
 
         /* ─── Mobile menu ─── */
+        /* Closed menu must NOT take layout height inside the fixed header —
+           otherwise the invisible dropdown inflates the navbar's black
+           background into a thick slab on mobile. */
         #mobileMenu {
-            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition:
+                opacity 0.22s ease,
+                transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                max-height 0.24s ease,
+                visibility 0.24s;
             transform-origin: top;
-            max-height: calc(100vh - 64px);
-            max-height: calc(100dvh - 64px);
+            overflow: hidden;
+        }
+        #mobileMenu.menu-open {
+            opacity: 1;
+            transform: scaleY(1);
+            pointer-events: auto;
+            visibility: visible;
+            max-height: calc(100vh - 48px);
+            max-height: calc(100svh - 48px);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        #mobileMenu.menu-open  { opacity: 1; transform: scaleY(1); pointer-events: auto; }
-        #mobileMenu.menu-close { opacity: 0; transform: scaleY(0.97); pointer-events: none; }
+        #mobileMenu.menu-close {
+            opacity: 0;
+            transform: scaleY(0.97);
+            pointer-events: none;
+            visibility: hidden;
+            max-height: 0;
+        }
 
         @media (prefers-reduced-motion: reduce) {
             #main-nav, #mobileMenu { transition: none; }
         }
 
-        /* ─── Gray blur shapes ─── */
-        .blur-jungle { background: radial-gradient(ellipse at center, rgba(74,124,89,0.10) 0%, transparent 70%); }
-        .blur-teal   { background: radial-gradient(ellipse at center, rgba(127,175,138,0.07) 0%, transparent 70%); }
+        /* ─── Misc ─── */
+        .blur-jungle  { background: radial-gradient(ellipse at center, rgba(74,124,89,0.10) 0%, transparent 70%); }
+        .blur-teal    { background: radial-gradient(ellipse at center, rgba(127,175,138,0.07) 0%, transparent 70%); }
         .blur-sunrise { background: radial-gradient(ellipse at center, rgba(201,169,110,0.07) 0%, transparent 70%); }
 
-        /* ─── Hover ─── */
-        .soft-lift { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .soft-lift { transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s cubic-bezier(0.22,1,0.36,1); }
         .soft-lift:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.06); }
 
-        /* ─── Animations ─── */
-        .fade-in { opacity: 0; transform: translateY(24px); transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-        .fade-in.show { opacity: 1; transform: translateY(0); }
-        .fade-in-left { opacity: 0; transform: translateX(-30px); transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-        .fade-in-left.show { opacity: 1; transform: translateX(0); }
-        .fade-in-right { opacity: 0; transform: translateX(30px); transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-        .fade-in-right.show { opacity: 1; transform: translateX(0); }
+        .fade-in { opacity:0; transform:translateY(24px); transition:all 0.7s cubic-bezier(0.22,1,0.36,1); }
+        .fade-in.show { opacity:1; transform:translateY(0); }
+        .fade-in-left { opacity:0; transform:translateX(-30px); transition:all 0.7s cubic-bezier(0.22,1,0.36,1); }
+        .fade-in-left.show { opacity:1; transform:translateX(0); }
+        .fade-in-right { opacity:0; transform:translateX(30px); transition:all 0.7s cubic-bezier(0.22,1,0.36,1); }
+        .fade-in-right.show { opacity:1; transform:translateX(0); }
 
-        @keyframes sway { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(2deg); } }
-        .sway { animation: sway 6s ease-in-out infinite; transform-origin: bottom center; }
+        @keyframes sway { 0%,100%{transform:rotate(0deg);}50%{transform:rotate(2deg);} }
+        .sway { animation:sway 6s ease-in-out infinite; transform-origin:bottom center; }
+        @keyframes pulse-soft { 0%,100%{opacity:1;}50%{opacity:0.6;} }
+        .pulse-soft { animation:pulse-soft 3s ease-in-out infinite; }
 
-        @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
+        .divider-leaf { height:1px; background:linear-gradient(to right,transparent,rgba(75,83,99,0.12),transparent); }
+        .divider-gold { height:1px; background:linear-gradient(to right,transparent,rgba(156,163,175,0.15),transparent); }
 
-        /* ─── Divider ─── */
-        .divider-leaf { height: 1px; background: linear-gradient(to right, transparent, rgba(75,83,99,0.12), transparent); }
-        .divider-gold { height: 1px; background: linear-gradient(to right, transparent, rgba(156,163,175,0.15), transparent); }
-
-        /* ─── Typography helpers ─── */
         .heading-xl { @apply font-serif text-5xl md:text-7xl leading-[1.08] tracking-tight text-deep; }
         .heading-lg { @apply font-serif text-3xl md:text-5xl leading-[1.12] tracking-tight text-deep; }
         .heading-md { @apply font-serif text-2xl md:text-3xl leading-[1.2] tracking-tight text-deep; }
         .body-large { @apply font-sans text-[17px] md:text-[19px] leading-relaxed text-gray-500; }
-        .body-base { @apply font-sans text-[15px] leading-relaxed text-gray-500; }
-        .label-sm { @apply font-sans text-[13px] font-medium uppercase tracking-[0.1em] text-jungle/60; }
+        .body-base  { @apply font-sans text-[15px] leading-relaxed text-gray-500; }
+        .label-sm   { @apply font-sans text-[13px] font-medium uppercase tracking-[0.1em] text-forest/60; }
     </style>
     @stack('styles')
 </head>
 <body class="bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip" style="selection-background: #1B3A2D;">
 
     {{-- Navigation --}}
-    <header class="fixed top-0 left-0 right-0 z-50 nav-clear" id="main-nav" aria-label="Navigasi utama">
-        <div class="flex justify-between items-center px-gutter py-4 md:py-5 max-w-7xl mx-auto">
+    {{-- data-nav="dark"  → over hero (transparent→solid dark)  --}}
+    {{-- data-nav="light" → over ivory pages (always light)     --}}
+    <header id="main-nav"
+            data-nav="{{ $navMode ?? (View::hasSection('nav-mode') ? View::getSection('nav-mode') : 'light') }}"
+            class="fixed top-0 left-0 right-0 z-50 border-b border-transparent"
+            aria-label="Navigasi utama">
+        <div class="max-w-7xl mx-auto px-gutter">
+            <div class="flex items-center justify-between h-12 md:h-[68px]">
 
-            {{-- Logo --}}
-            <a href="{{ route('landing') }}" class="font-serif text-xl md:text-2xl text-white tracking-tight hover:opacity-70 transition-opacity flex-shrink-0">
-                Bangkiang Jaran
-            </a>
+                {{-- Logo --}}
+                <a href="{{ route('landing') }}"
+                   id="nav-logo"
+                   class="font-serif text-base md:text-[1.35rem] tracking-tight flex-shrink-0 whitespace-nowrap transition-colors duration-300">
+                    Bangkiang Jaran
+                </a>
 
-            {{-- Desktop nav --}}
-            <nav class="hidden md:flex items-center gap-8" aria-label="Menu desktop">
-                <a href="{{ route('landing') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.home') }}</a>
-                <a href="{{ route('tiket.index') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.tickets') }}</a>
-                @auth
-                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.history') }}</a>
-                <a href="{{ route('profile.edit') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ Auth::user()->username }}</a>
-                <a href="{{ route('logout.get') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">{{ __('messages.logout') }}</a>
-                @else
-                <a href="{{ route('login') }}" class="font-sans text-sm text-white/80 hover:text-white transition-colors">{{ __('messages.login') }}</a>
-                <a href="{{ route('register') }}" class="font-sans text-sm text-white border border-white/30 px-5 py-2 rounded-full hover:bg-white/10 transition-colors">{{ __('messages.register') }}</a>
-                @endauth
-                <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-sm text-white/50 hover:text-white transition-colors">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
-            </nav>
+                {{-- Desktop links --}}
+                <nav class="hidden md:flex items-center gap-1" aria-label="Menu desktop">
+                    @php
+                        $currentRoute = Route::currentRouteName();
+                        $links = [
+                            ['route' => 'landing',                    'label' => __('messages.home'),    'icon' => 'home'],
+                            ['route' => 'tiket.index',                'label' => __('messages.tickets'), 'icon' => 'confirmation_number'],
+                        ];
+                        if(auth()->check()) {
+                            $links[] = ['route' => 'wisatawan.pemesanan.riwayat', 'label' => __('messages.history'), 'icon' => 'history'];
+                        }
+                    @endphp
 
-            {{-- Hamburger (mobile) --}}
-            <button id="mobileMenuBtn"
-                    class="md:hidden text-white w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
-                    aria-label="{{ __('messages.open_menu') }}" aria-expanded="false" aria-controls="mobileMenu">
-                <span class="material-symbols-outlined text-2xl" id="menuIcon">menu</span>
-            </button>
+                    @foreach($links as $link)
+                    <a href="{{ route($link['route']) }}"
+                       class="nav-link relative font-sans text-sm px-4 py-2 rounded-full transition-all duration-200 {{ $currentRoute === $link['route'] ? 'nav-active' : '' }}">
+                        {{ $link['label'] }}
+                        @if($currentRoute === $link['route'])
+                        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-current opacity-50"></span>
+                        @endif
+                    </a>
+                    @endforeach
+
+                    {{-- Divider --}}
+                    <div id="nav-divider" class="w-px h-4 mx-1 transition-colors duration-300"></div>
+
+                    @auth
+                    {{-- User pill --}}
+                    <a href="{{ route('profile.edit') }}"
+                       class="nav-link inline-flex items-center gap-2 font-sans text-sm px-3.5 py-1.5 rounded-full transition-all duration-200">
+                        <span class="w-6 h-6 rounded-full bg-forest/15 flex items-center justify-center text-[10px] font-semibold text-forest uppercase leading-none flex-shrink-0">
+                            {{ substr(Auth::user()->name ?? Auth::user()->username, 0, 1) }}
+                        </span>
+                        <span class="max-w-[100px] truncate">{{ Auth::user()->username }}</span>
+                    </a>
+                    <a href="{{ route('logout.get') }}"
+                       id="nav-logout"
+                       class="font-sans text-sm px-4 py-2 rounded-full border transition-all duration-200 hover:opacity-80">
+                        {{ __('messages.logout') }}
+                    </a>
+                    @else
+                    <a href="{{ route('login') }}"
+                       class="nav-link font-sans text-sm px-4 py-2 rounded-full transition-all duration-200">
+                        {{ __('messages.login') }}
+                    </a>
+                    <a href="{{ route('register') }}"
+                       id="nav-register"
+                       class="font-sans text-sm font-medium px-5 py-2 rounded-full transition-all duration-200">
+                        {{ __('messages.register') }}
+                    </a>
+                    @endauth
+
+                    {{-- Lang --}}
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
+                       class="nav-link font-sans text-[11px] tracking-widest uppercase px-3 py-2 rounded-full transition-all duration-200 opacity-60 hover:opacity-100">
+                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                    </a>
+                </nav>
+
+                {{-- Hamburger --}}
+                <button id="mobileMenuBtn"
+                        class="md:hidden w-8 h-8 flex items-center justify-center rounded-lg transition-colors duration-200"
+                        id-icon="menuIcon"
+                        aria-label="{{ __('messages.open_menu') }}" aria-expanded="false" aria-controls="mobileMenu">
+                    <span class="material-symbols-outlined text-[18px]" id="menuIcon">menu</span>
+                </button>
+
+            </div>
         </div>
 
         {{-- Mobile menu --}}
         <div id="mobileMenu"
-             class="menu-close md:hidden border-t border-white/10"
-             style="background-color: rgba(20,28,38,0.97); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);"
+             class="menu-close md:hidden"
+             style="background: rgba(10,18,14,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06);"
              aria-label="Menu mobile">
-            <div class="px-gutter py-5 space-y-1">
-                <a href="{{ route('landing') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">home</span> {{ __('messages.home') }}
-                </a>
-                <a href="{{ route('tiket.index') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">confirmation_number</span> {{ __('messages.tickets') }}
-                </a>
+            <div class="max-w-7xl mx-auto px-gutter py-2.5 pb-4 space-y-0.5">
+                <a href="{{ route('landing') }}"          class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">home</span>{{ __('messages.home') }}</a>
+                <a href="{{ route('tiket.index') }}"      class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">confirmation_number</span>{{ __('messages.tickets') }}</a>
                 @auth
-                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">history</span> {{ __('messages.history') }}
-                </a>
-                <a href="{{ route('profile.edit') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/80 hover:text-white hover:bg-white/8 px-3 py-2.5 rounded-xl transition-all">
-                    <span class="material-symbols-outlined text-base text-white/40">person</span> {{ Auth::user()->username }}
-                </a>
-                <div class="pt-2 mt-2 border-t border-white/10 flex items-center gap-3">
-                    <a href="{{ route('logout.get') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white border border-white/20 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        <span class="material-symbols-outlined text-base">logout</span> {{ __('messages.logout') }}
+                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">history</span>{{ __('messages.history') }}</a>
+                <a href="{{ route('profile.edit') }}"     class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">person</span>{{ Auth::user()->username }}</a>
+                <div class="pt-2 mt-1 border-t border-white/8 flex gap-2">
+                    <a href="{{ route('logout.get') }}" class="flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">
+                        <span class="material-symbols-outlined text-base">logout</span>{{ __('messages.logout') }}
                     </a>
-                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="nav-mobile-link font-sans text-sm text-white/50 border border-white/10 px-4 py-2.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
-                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
-                    </a>
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-xs text-white/40 border border-white/10 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/6 transition-all uppercase tracking-widest">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
                 </div>
                 @else
-                <div class="pt-2 mt-2 border-t border-white/10 flex items-center gap-3">
-                    <a href="{{ route('login') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/80 hover:text-white border border-white/20 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        {{ __('messages.login') }}
-                    </a>
-                    <a href="{{ route('register') }}" class="nav-mobile-link flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white border border-white/30 py-2.5 rounded-xl hover:bg-white/10 transition-all">
-                        {{ __('messages.register') }}
-                    </a>
-                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="nav-mobile-link font-sans text-sm text-white/50 border border-white/10 px-4 py-2.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
-                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
-                    </a>
+                <div class="pt-2 mt-1 border-t border-white/8 flex gap-2">
+                    <a href="{{ route('login') }}"    class="flex-1 flex items-center justify-center font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">{{ __('messages.login') }}</a>
+                    <a href="{{ route('register') }}" class="flex-1 flex items-center justify-center font-sans text-sm font-medium text-white bg-forest py-1.5 rounded-xl hover:bg-leaf transition-all">{{ __('messages.register') }}</a>
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-xs text-white/40 border border-white/10 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/6 transition-all uppercase tracking-widest">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
                 </div>
                 @endauth
             </div>
@@ -273,68 +352,198 @@
 
     <script>
     (function () {
-        /* ═══════════════════════════════════════════════
-           NAVBAR — scroll hide/show + background swap
-           ─────────────────────────────────────────────
-           Rules:
-           · 0–40px          → transparent (nav-clear)
-           · 40–120px        → semi-transparent (nav-tinted)
-           · >120px scrolling DOWN → hide (nav-hidden)
-           · >120px scrolling UP   → solid (nav-solid)
+        const nav      = document.getElementById('main-nav');
+        const logo     = document.getElementById('nav-logo');
+        const navLinks = nav.querySelectorAll('.nav-link');
+        const divider  = document.getElementById('nav-divider');
+        const logout   = document.getElementById('nav-logout');
+        const register = document.getElementById('nav-register');
+        const menuBtn  = document.getElementById('mobileMenuBtn');
+        const menuIcon = document.getElementById('menuIcon');
+        const mobileMenu = document.getElementById('mobileMenu');
 
-           Dead zone: ignore direction changes < 6px
-           to prevent jitter on trackpads/momentum scroll.
-        ════════════════════════════════════════════════ */
+        /* ── Determine page mode ── */
+        const mode = nav.dataset.nav || 'light';   // 'dark' | 'light'
 
-        const nav     = document.getElementById('main-nav');
-        const TINTED  = 40;   // px – start tinting
-        const SOLID   = 120;  // px – start hide/show logic
-        const DEAD    = 6;    // px – direction dead zone
+        /* ── Token sets ── */
+        const DARK = {
+            clear:  'nav-dark-clear',
+            tinted: 'nav-dark-tinted',
+            solid:  'nav-dark-solid',
+            logoColor:    '#ffffff',
+            linkColor:    'rgba(255,255,255,0.78)',
+            linkHover:    '#ffffff',
+            dividerColor: 'rgba(255,255,255,0.12)',
+            logoutBorder: 'rgba(255,255,255,0.22)',
+            logoutColor:  'rgba(255,255,255,0.78)',
+            registerBg:   'transparent',
+            registerBorder: 'rgba(255,255,255,0.25)',
+            registerColor:  '#ffffff',
+            menuBtnColor:   '#ffffff',
+        };
+        const LIGHT = {
+            clear:  'nav-light',
+            tinted: 'nav-light',
+            solid:  'nav-light',
+            logoColor:    '#1B3A2D',
+            linkColor:    '#4B5563',
+            linkHover:    '#1B3A2D',
+            dividerColor: 'rgba(27,58,45,0.12)',
+            logoutBorder: 'rgba(27,58,45,0.2)',
+            logoutColor:  '#4B5563',
+            registerBg:   '#1B3A2D',
+            registerBorder: 'transparent',
+            registerColor:  '#ffffff',
+            menuBtnColor:   '#1B3A2D',
+        };
+        /* hero pages (landing): transparent over hero → light after scrolling past */
+        const HERO = {
+            clear:  'nav-transparent',
+            tinted: 'nav-transparent',
+            solid:  'nav-light',
+            logoColor:    '#ffffff',
+            linkColor:    'rgba(255,255,255,0.85)',
+            linkHover:    '#ffffff',
+            dividerColor: 'rgba(255,255,255,0.2)',
+            logoutBorder: 'rgba(255,255,255,0.25)',
+            logoutColor:  'rgba(255,255,255,0.85)',
+            registerBg:   'rgba(27,58,45,0.85)',
+            registerBorder: 'transparent',
+            registerColor:  '#ffffff',
+            menuBtnColor:   '#ffffff',
+        };
 
-        let lastY     = window.scrollY;
-        let ticking   = false;
-        let hidden    = false;
-        let menuOpen  = false;
+        const T = mode === 'light' ? LIGHT : (mode === 'hero' ? HERO : DARK);
 
-        function setClass(cls) {
-            nav.classList.remove('nav-clear', 'nav-tinted', 'nav-solid', 'nav-hidden');
+        /* ── Apply visual tokens ── */
+        function applyTokens(tokens) {
+            if (logo)     logo.style.color = tokens.logoColor;
+            if (divider)  divider.style.backgroundColor = tokens.dividerColor;
+            if (menuBtn)  menuBtn.style.color = tokens.menuBtnColor;
+
+            navLinks.forEach(function(a) {
+                a.style.color = tokens.linkColor;
+            });
+
+            if (logout) {
+                logout.style.color        = tokens.logoutColor;
+                logout.style.borderColor  = tokens.logoutBorder;
+                logout.style.background   = 'transparent';
+            }
+            if (register) {
+                register.style.backgroundColor = tokens.registerBg;
+                register.style.borderColor      = tokens.registerBorder;
+                register.style.color            = tokens.registerColor;
+                register.style.border           = tokens.registerBg !== 'transparent'
+                    ? 'none'
+                    : '1px solid ' + tokens.registerBorder;
+            }
+        }
+
+        /* ── Navbar state machine ── */
+        const TINTED_PX  = 50;
+        const SOLID_PX   = 130;
+        const DEAD_PX    = 6;
+        let lastY        = window.scrollY;
+        let hidden       = false;
+        let menuOpen     = false;
+        let ticking      = false;
+
+        function clearNavClasses() {
+            nav.classList.remove(
+                'nav-dark-clear','nav-dark-tinted','nav-dark-solid',
+                'nav-transparent',
+                'nav-light','nav-hidden'
+            );
+        }
+
+        function setNav(cls) {
+            clearNavClasses();
             nav.classList.add(cls);
         }
 
         function update() {
-            const curr = window.scrollY;
+            const curr  = window.scrollY;
             const delta = curr - lastY;
 
             if (menuOpen) {
-                // Menu terbuka — nav selalu tampil & solid, jangan hide
                 hidden = false;
-                setClass('nav-solid');
+                setNav(T.solid);
+                applyTokens(DARK);   // mobile menu always dark
                 lastY = curr;
                 ticking = false;
                 return;
             }
 
-            if (curr <= TINTED) {
-                // Top zone — always visible, transparent
-                hidden = false;
-                setClass('nav-clear');
-            } else if (curr <= SOLID) {
-                // Mid zone — always visible, tinted
-                hidden = false;
-                setClass('nav-tinted');
-            } else {
-                // Deep zone — react to scroll direction
-                if (Math.abs(delta) > DEAD) {
-                    if (delta > 0 && !hidden) {
-                        // scrolling DOWN → hide
-                        hidden = true;
-                        setClass('nav-hidden');
-                    } else if (delta < 0 && hidden) {
-                        // scrolling UP → show solid
-                        hidden = false;
-                        setClass('nav-solid');
+            if (mode === 'hero') {
+                // Transparent while the hero is on screen; once scrolled past
+                // the hero, the normal light navbar kicks in.
+                const heroEl   = document.getElementById('hero-section');
+                const heroEnd  = heroEl ? heroEl.offsetHeight - (window.innerWidth < 768 ? 48 : 68) : SOLID_PX;
+                if (curr <= heroEnd) {
+                    hidden = false;
+                    setNav('nav-transparent');
+                    applyTokens(HERO);
+                } else {
+                    if (Math.abs(delta) > DEAD_PX) {
+                        if (delta > 0 && !hidden) {
+                            hidden = true;
+                            setNav('nav-hidden');
+                        } else if (delta < 0 && hidden) {
+                            hidden = false;
+                            setNav(T.solid);
+                            applyTokens(LIGHT);
+                        } else if (!hidden) {
+                            setNav(T.solid);
+                            applyTokens(LIGHT);
+                        }
                     } else if (!hidden) {
-                        setClass('nav-solid');
+                        setNav(T.solid);
+                        applyTokens(LIGHT);
+                    }
+                }
+            } else if (mode === 'light') {
+                // Pages with `no-nav-hide` (e.g. payment with fixed progress bar):
+                // navbar must stay put, never hide-on-scroll.
+                if (document.body.classList.contains('no-nav-hide')) {
+                    setNav(T.solid);
+                    applyTokens(T);
+                } else if (curr > SOLID_PX && Math.abs(delta) > DEAD_PX) {
+                    if (delta > 0 && !hidden) {
+                        hidden = true;
+                        setNav('nav-hidden');
+                    } else if (delta < 0 && hidden) {
+                        hidden = false;
+                        setNav(T.solid);
+                        applyTokens(T);
+                    }
+                } else if (!hidden) {
+                    setNav(T.solid);
+                    applyTokens(T);
+                }
+            } else {
+                // Dark mode (hero pages)
+                if (curr <= TINTED_PX) {
+                    hidden = false;
+                    setNav(T.clear);
+                    applyTokens(DARK);
+                } else if (curr <= SOLID_PX) {
+                    hidden = false;
+                    setNav(T.tinted);
+                    applyTokens(DARK);
+                } else {
+                    if (Math.abs(delta) > DEAD_PX) {
+                        if (delta > 0 && !hidden) {
+                            hidden = true;
+                            setNav('nav-hidden');
+                        } else if (delta < 0 && hidden) {
+                            hidden = false;
+                            setNav(T.solid);
+                            applyTokens(DARK);
+                        } else if (!hidden) {
+                            setNav(T.solid);
+                            applyTokens(DARK);
+                        }
                     }
                 }
             }
@@ -344,95 +553,56 @@
         }
 
         if (nav) {
-            // Set initial state without waiting for scroll
+            applyTokens(T);
             update();
-
-            window.addEventListener('scroll', function () {
-                if (!ticking) {
-                    requestAnimationFrame(update);
-                    ticking = true;
-                }
+            window.addEventListener('scroll', function() {
+                if (!ticking) { requestAnimationFrame(update); ticking = true; }
             }, { passive: true });
         }
 
-        /* ═══════════════════════════════════════════════
-           MOBILE MENU — smooth open/close
-        ════════════════════════════════════════════════ */
-        const btn      = document.getElementById('mobileMenuBtn');
-        const menu     = document.getElementById('mobileMenu');
-        const menuIcon = document.getElementById('menuIcon');
-
+        /* ── Mobile menu ── */
         function openMenu() {
             menuOpen = true;
-            menu.classList.remove('menu-close');
-            menu.classList.add('menu-open');
+            mobileMenu.classList.replace('menu-close','menu-open');
             menuIcon.textContent = 'close';
-            btn.setAttribute('aria-expanded', 'true');
-            // If nav is at top, give it a solid bg so menu is readable
-            if (window.scrollY <= TINTED) {
-                nav.classList.remove('nav-clear');
-                nav.classList.add('nav-tinted');
-            }
-            setClass('nav-solid');
+            menuBtn.setAttribute('aria-expanded','true');
+            setNav(T.solid);
+            applyTokens(DARK);
             document.body.style.overflow = 'hidden';
         }
-
         function closeMenu() {
             menuOpen = false;
-            menu.classList.remove('menu-open');
-            menu.classList.add('menu-close');
+            mobileMenu.classList.replace('menu-open','menu-close');
             menuIcon.textContent = 'menu';
-            btn.setAttribute('aria-expanded', 'false');
+            menuBtn.setAttribute('aria-expanded','false');
             document.body.style.overflow = '';
-            // Restore transparent bg if at top
-            if (window.scrollY <= TINTED) {
-                nav.classList.remove('nav-tinted', 'nav-solid');
-                nav.classList.add('nav-clear');
-            }
+            update();
         }
 
-        if (btn && menu) {
-            btn.addEventListener('click', function () {
-                menuOpen ? closeMenu() : openMenu();
-            });
-
-            // Close on any link click inside mobile menu
-            menu.querySelectorAll('a').forEach(function (link) {
-                link.addEventListener('click', closeMenu);
-            });
-
-            // Close on outside click
-            document.addEventListener('click', function (e) {
-                if (menuOpen && !nav.contains(e.target)) {
-                    closeMenu();
-                }
-            });
-
-            // Close on Escape
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && menuOpen) closeMenu();
-            });
-
-            // Close on resize to desktop
-            window.addEventListener('resize', function () {
-                if (window.innerWidth >= 768 && menuOpen) closeMenu();
-            });
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() { menuOpen ? closeMenu() : openMenu(); });
+            mobileMenu.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
+            document.addEventListener('click', function(e) { if (menuOpen && !nav.contains(e.target)) closeMenu(); });
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) closeMenu(); });
+            window.addEventListener('resize', function() { if (window.innerWidth >= 768 && menuOpen) closeMenu(); });
         }
+
+        /* ── Nav link hover color ── */
+        navLinks.forEach(function(a) {
+            const orig = a.style.color;
+            a.addEventListener('mouseenter', function() { a.style.color = T.linkHover; });
+            a.addEventListener('mouseleave', function() { a.style.color = orig || T.linkColor; });
+        });
     })();
 
-    /* ═══════════════════════════════════════════════
-       AOS + GSAP init
-    ════════════════════════════════════════════════ */
+    /* ── AOS + GSAP ── */
     gsap.registerPlugin(ScrollTrigger);
     AOS.init({ duration: 800, easing: 'ease-out', once: true, offset: 80 });
-
-    const observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) entry.target.classList.add('show');
-        });
+    const _observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('show'); });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function (el) {
-        observer.observe(el);
+    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
+        _observer.observe(el);
     });
     </script>
     @stack('scripts')

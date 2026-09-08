@@ -85,15 +85,14 @@
             #main-nav.nav-light       { background: rgba(247,243,238,0.88); }
         }
 
-        /* nav link tokens */
-        .nav-link-dark  { color: rgba(255,255,255,0.75); }
-        .nav-link-dark:hover { color: #fff; }
-        .nav-link-light { color: #4B5563; }
-        .nav-link-light:hover { color: #1B3A2D; }
-
-        /* active indicator */
-        .nav-link-active-dark  { color: #fff !important; }
-        .nav-link-active-light { color: #1B3A2D !important; font-weight: 500; }
+        /* nav link tokens — use CSS custom props so :hover works */
+        .nav-link {
+            color: var(--nav-link-color, #4B5563);
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: var(--nav-link-hover, #1B3A2D);
+        }
 
         /* ─── Mobile menu ─── */
         /* Closed menu must NOT take layout height inside the fixed header —
@@ -233,10 +232,13 @@
                     </a>
                     @endauth
 
-                    {{-- Lang --}}
+                    {{-- Lang toggle --}}
                     <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
-                       class="nav-link font-sans text-[11px] tracking-widest uppercase px-3 py-2 rounded-full transition-all duration-200 opacity-60 hover:opacity-100">
-                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                       id="nav-lang-toggle"
+                       class="nav-link relative inline-flex items-center gap-0.5 font-sans text-sm px-3 py-2 rounded-full transition-all duration-200 flex-shrink-0"
+                       title="{{ app()->getLocale() === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia' }}">
+                        <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 0;">translate</span>
+                        <span class="font-semibold text-xs tracking-wide">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</span>
                     </a>
                 </nav>
 
@@ -266,13 +268,21 @@
                     <a href="{{ route('logout.get') }}" class="flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">
                         <span class="material-symbols-outlined text-base">logout</span>{{ __('messages.logout') }}
                     </a>
-                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-xs text-white/40 border border-white/10 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/6 transition-all uppercase tracking-widest">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
+                       class="inline-flex items-center justify-center gap-1 font-sans text-xs font-semibold text-white/70 border border-white/15 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
+                        <span class="material-symbols-outlined text-[14px]">translate</span>
+                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                    </a>
                 </div>
                 @else
                 <div class="pt-2 mt-1 border-t border-white/8 flex gap-2">
                     <a href="{{ route('login') }}"    class="flex-1 flex items-center justify-center font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">{{ __('messages.login') }}</a>
                     <a href="{{ route('register') }}" class="flex-1 flex items-center justify-center font-sans text-sm font-medium text-white bg-forest py-1.5 rounded-xl hover:bg-leaf transition-all">{{ __('messages.register') }}</a>
-                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="font-sans text-xs text-white/40 border border-white/10 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/6 transition-all uppercase tracking-widest">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</a>
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
+                       class="inline-flex items-center justify-center gap-1 font-sans text-xs font-semibold text-white/70 border border-white/15 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
+                        <span class="material-symbols-outlined text-[14px]">translate</span>
+                        {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
+                    </a>
                 </div>
                 @endauth
             </div>
@@ -421,9 +431,9 @@
             if (divider)  divider.style.backgroundColor = tokens.dividerColor;
             if (menuBtn)  menuBtn.style.color = tokens.menuBtnColor;
 
-            navLinks.forEach(function(a) {
-                a.style.color = tokens.linkColor;
-            });
+            // Set CSS custom props on nav — .nav-link picks them up via var()
+            nav.style.setProperty('--nav-link-color', tokens.linkColor);
+            nav.style.setProperty('--nav-link-hover', tokens.linkHover);
 
             if (logout) {
                 logout.style.color        = tokens.logoutColor;
@@ -587,12 +597,6 @@
             window.addEventListener('resize', function() { if (window.innerWidth >= 768 && menuOpen) closeMenu(); });
         }
 
-        /* ── Nav link hover color ── */
-        navLinks.forEach(function(a) {
-            const orig = a.style.color;
-            a.addEventListener('mouseenter', function() { a.style.color = T.linkHover; });
-            a.addEventListener('mouseleave', function() { a.style.color = orig || T.linkColor; });
-        });
     })();
 
     /* ── AOS + GSAP ── */

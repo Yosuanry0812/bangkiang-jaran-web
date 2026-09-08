@@ -185,8 +185,9 @@
             <div class="flex items-center gap-2">
                 {{-- Lang --}}
                 <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
-                   class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors">
-                    <span class="material-symbols-outlined" style="font-size:14px">language</span>
+                   class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                   title="{{ app()->getLocale() === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia' }}">
+                    <span class="material-symbols-outlined" style="font-size:15px">translate</span>
                     {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
                 </a>
 

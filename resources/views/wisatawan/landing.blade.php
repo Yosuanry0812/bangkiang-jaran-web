@@ -48,22 +48,9 @@
         <span id="sound-icon" class="material-symbols-outlined text-[18px]">volume_off</span>
     </button>
 
-    {{-- ── Decorative side label (desktop) ─────────────── --}}
-    <div class="absolute left-6 bottom-1/2 translate-y-1/2 z-10 hidden lg:flex flex-col items-center gap-3">
-        <div class="w-px h-16 bg-white/20"></div>
-        <p class="font-sans text-[10px] tracking-[0.3em] uppercase text-white/30 [writing-mode:vertical-lr] rotate-180">Gianyar · Bali · Indonesia</p>
-        <div class="w-px h-16 bg-white/20"></div>
-    </div>
-
     {{-- ── Hero content ────────────────────────────────── --}}
     <div id="hero-content"
          class="relative z-10 w-full max-w-7xl mx-auto px-gutter pb-16 md:pb-24 opacity-0 translate-y-8 transition-all duration-1000 ease-out">
-
-        {{-- Badge --}}
-        <div class="inline-flex items-center gap-2 mb-7">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <p class="font-sans text-[11px] tracking-[0.22em] uppercase text-white/50">Bangkiang Jaran Waterfall &nbsp;·&nbsp; Gianyar, Bali</p>
-        </div>
 
         {{-- Main heading --}}
         <h1 id="typing-heading"
@@ -680,8 +667,8 @@ function startTyping() {
     const sub = document.getElementById('typing-sub');
     if (!heading || !sub) return;
 
-    const text1 = '{{ __("messages.typing_heading") }}';
-    const text2 = '{{ __("messages.typing_sub") }}';
+    const text1 = @json(__("messages.typing_heading"));
+    const text2 = @json(__("messages.typing_sub"));
     let idx = 0, isHeading = true;
 
     function type() {

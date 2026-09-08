@@ -53,8 +53,9 @@
             </a>
             <div class="flex items-center gap-1">
                 <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
-                   class="flex items-center gap-1.5 font-body text-[13px] font-medium text-gray-500 hover:text-emerald-800 hover:bg-white/70 transition-all px-3 py-2 rounded-xl">
-                    <span class="material-symbols-outlined text-[14px]">language</span>
+                   class="inline-flex items-center gap-1 font-body text-[13px] font-medium text-gray-600 hover:text-emerald-800 hover:bg-white/70 transition-all px-3 py-2 rounded-xl"
+                   title="{{ app()->getLocale() === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia' }}">
+                    <span class="material-symbols-outlined text-[15px]">translate</span>
                     {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
                 </a>
                 <a href="{{ route('login') }}" class="font-body text-[13px] font-medium text-gray-600 hover:text-emerald-800 hover:bg-white/70 transition-all px-4 py-2 rounded-xl">{{ __('messages.login') }}</a>

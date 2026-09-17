@@ -1,256 +1,398 @@
 @extends('layouts.app')
 
-@section('title', 'Tiket Masuk — Bangkiang Jaran')
+@section('title', 'Tiket Masuk & Reservasi — Bangkiang Jaran')
+@section('nav-mode', 'hero')
 
 @section('content')
 
-{{-- ══════════════════════════════════════════ --}}
-{{--  HERO                                      --}}
-{{-- ══════════════════════════════════════════ --}}
-<section class="relative min-h-screen flex items-center overflow-hidden">
-    <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1503785640985-62d183d5cfe7?auto=format&fit=crop&w=1920&q=80"
-             class="w-full h-full object-cover" alt="Bangkiang Jaran">
-        <div class="absolute inset-0" style="background:linear-gradient(to right,rgba(0,0,0,0.72) 0%,rgba(0,0,0,0.38) 60%,rgba(0,0,0,0.18) 100%);"></div>
-        <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.45) 0%,transparent 55%);"></div>
+{{-- ══════════════════════════════════════════════════════
+     1. HERO SECTION — Cinematic & Natural Ambiance
+══════════════════════════════════════════════════════ --}}
+<section id="tiket-hero" class="relative w-full min-h-[75vh] sm:min-h-[80vh] flex flex-col justify-between overflow-hidden bg-[#0D1A12] text-white">
+
+    {{-- Background Layer with Slow Zoom --}}
+    <div class="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
+        <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
+             alt="Bangkiang Jaran Waterfall Admission"
+             class="w-full h-full object-cover scale-100 animate-slow-zoom transition-all duration-1000 ease-out"
+             style="opacity: 0.82;">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#0D1A12] via-[#0D1A12]/80 to-transparent"></div>
     </div>
-    <div class="relative z-10 w-full max-w-6xl mx-auto px-gutter py-32 lg:py-44">
-        <div class="max-w-xl" data-aos="fade-up" data-aos-duration="900">
-            <p class="font-sans text-[11px] tracking-[0.18em] uppercase text-white/50 mb-8">{{ __('messages.online_booking') }}</p>
-            <h1 class="font-serif text-[clamp(3rem,7vw,5.5rem)] leading-[1.0] text-white mb-7">
-                {{ __('messages.plan_your_journey') }}
-            </h1>
-            <p class="font-sans text-[15px] text-white/60 mb-10 leading-relaxed max-w-sm">
-                {{ __('messages.plan_your_journey_desc') }}
-            </p>
-            <div class="flex flex-wrap items-center gap-3">
-                @auth
-                <a href="{{ route('wisatawan.pemesanan.create') }}"
-                   class="inline-flex items-center gap-2 bg-white text-gray-900 font-sans text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
-                    {{ __('messages.book_ticket') }} <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                @else
-                <a href="{{ route('login') }}"
-                   class="inline-flex items-center gap-2 bg-white text-gray-900 font-sans text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-100 transition-colors">
-                    {{ __('messages.login_to_book') }} <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                @endauth
-                <a href="#tiket-list"
-                   class="inline-flex items-center gap-2 border border-white/25 text-white/80 font-sans text-sm px-6 py-3 rounded-full hover:border-white/50 hover:text-white transition-colors">
-                    {{ __('messages.view_price') }}
-                </a>
+
+    {{-- Top Spacer for Fixed Navbar --}}
+    <div class="pt-28 md:pt-36"></div>
+
+    {{-- Hero Content Body --}}
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-gutter pb-14 pt-8">
+
+        {{-- Tagline --}}
+        <p class="font-sans text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-white/90 mb-3 block"
+           data-aos="fade-up" data-aos-duration="700">
+            {{ __('messages.online_booking') }}
+        </p>
+
+        {{-- Hero Title --}}
+        <h1 class="font-serif text-[clamp(2.6rem,5.8vw,4.8rem)] leading-[1.05] text-white max-w-3xl tracking-tight mb-4 text-balance"
+            data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
+            {{ __('messages.plan_your_journey') }}
+        </h1>
+
+        {{-- Subtitle --}}
+        <p class="font-sans text-[15px] sm:text-base md:text-lg text-white/80 max-w-2xl font-light leading-relaxed mb-8"
+           data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
+            {{ __('messages.plan_your_journey_desc') }}
+        </p>
+
+        {{-- Action Buttons --}}
+        <div class="flex flex-wrap items-center gap-4 mb-10" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
+            <a href="#katalog-tiket"
+               class="inline-flex items-center gap-2.5 bg-white text-forest hover:bg-gray-100 font-sans text-sm font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                <span>{{ __('messages.select_ticket') }}</span>
+                <span class="material-symbols-outlined text-base">arrow_downward</span>
+            </a>
+
+            <a href="#panduan-pesan"
+               class="inline-flex items-center gap-2.5 font-sans text-sm text-white bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 hover:border-white/40 px-7 py-3.5 rounded-full transition-all duration-300 hover:-translate-y-0.5">
+                <span>{{ __('messages.how_to_book') }}</span>
+            </a>
+        </div>
+
+        {{-- Quick Spec Strip --}}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-white/15 max-w-4xl"
+             data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
+            <div>
+                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.operating_hours_label') }}</p>
+                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.operating_hours') }}</p>
             </div>
-            <div class="flex flex-wrap gap-x-6 gap-y-8 mt-14 pt-10 border-t border-white/10">
-                <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.operating_hours_label') }}</p>
-                    <p class="font-sans text-sm text-white/80">{{ __('messages.operating_hours') }}</p>
-                </div>
-                <div class="w-px bg-white/10 hidden md:block"></div>
-                <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.location') }}</p>
-                    <p class="font-sans text-sm text-white/80">{{ __('messages.address') }}</p>
-                </div>
-                <div class="w-px bg-white/10 hidden md:block"></div>
-                <div>
-                    <p class="font-sans text-[11px] text-white/40 tracking-widest uppercase mb-1">{{ __('messages.visitors') }}</p>
-                    <p class="font-sans text-sm text-white/80">{{ __('messages.visitors_value') }}</p>
-                </div>
+            <div>
+                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.location') }}</p>
+                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.address') }}</p>
+            </div>
+            <div>
+                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">Konfirmasi</p>
+                <p class="font-sans text-sm sm:text-base text-white font-medium">E-Ticket Instan</p>
+            </div>
+            <div>
+                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">Pembayaran</p>
+                <p class="font-sans text-sm sm:text-base text-white font-medium">QRIS & Bank</p>
             </div>
         </div>
+
     </div>
+
+    <div class="pb-4"></div>
+
 </section>
 
-{{-- ══════════════════════════════════════════ --}}
-{{--  TICKET LIST                               --}}
-{{-- ══════════════════════════════════════════ --}}
-<section id="tiket-list" class="py-24 md:py-32 px-gutter bg-white">
-    <div class="max-w-6xl mx-auto">
-        <div class="mb-16" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.ticket_price') }}</p>
-            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                <h2 class="font-serif text-4xl md:text-6xl text-gray-900 leading-[1.05]">{{ __('messages.select_your_ticket') }}</h2>
-                <p class="font-sans text-sm text-gray-400 max-w-xs leading-relaxed md:text-right">
-                    {{ __('messages.ticket_price_desc') }}
+{{-- ══════════════════════════════════════════════════════
+     2. KATALOG TIKET MASUK — Clean Admission Passes
+══════════════════════════════════════════════════════ --}}
+<section id="katalog-tiket" class="py-24 md:py-32 px-gutter bg-[#FAF8F5] text-ink relative">
+    <div class="max-w-7xl mx-auto">
+
+        {{-- Section Header --}}
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6" data-aos="fade-up">
+            <div class="max-w-xl">
+                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
+                    {{ __('messages.ticket_sec_tag') }}
+                </span>
+                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
+                    {{ __('messages.ticket_sec_title') }}
+                </h2>
+                <p class="font-sans text-stone text-sm sm:text-base font-light leading-relaxed">
+                    {{ __('messages.ticket_sec_desc') }}
                 </p>
             </div>
-            <div class="mt-8 h-px bg-gray-100"></div>
+
+            <div class="flex items-center gap-2 text-xs font-sans text-stone/70">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                <span>Semua tiket berlaku untuk 1 hari kunjungan penuh</span>
+            </div>
         </div>
 
+        {{-- Tickets Grid --}}
         @if(isset($tikets) && $tikets->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            @foreach($tikets as $t)
-            <div class="group flex flex-col bg-white border border-gray-150 rounded-2xl p-7 hover:border-gray-300 hover:shadow-sm transition-all duration-300"
-                 data-aos="fade-up" data-aos-delay="{{ $loop->index * 60 }}">
-                <div class="flex items-center justify-between mb-8">
-                    <span class="font-sans text-xs text-gray-300 tabular-nums">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
-                    <span class="inline-flex items-center gap-1.5 font-sans text-xs text-gray-400">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> {{ __('messages.available') }}
-                    </span>
-                </div>
-                <h3 class="font-serif text-2xl text-gray-900 mb-1 leading-snug">{{ $t->nama_tiket }}</h3>
-                <p class="font-sans text-sm text-gray-400 mb-8">{{ __('messages.per_person_day') }}</p>
-                <div class="mt-auto">
-                    <div class="flex items-baseline gap-1.5 mb-7">
-                        <span class="font-sans text-sm text-gray-400">Rp</span>
-                        <span class="font-serif text-4xl text-gray-900 tracking-tight">{{ number_format($t->harga, 0, ',', '.') }}</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach($tikets as $index => $t)
+            <div class="group bg-white rounded-3xl p-8 sm:p-9 border border-stone/15 hover:border-forest/40 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col justify-between"
+                 data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+
+                <div>
+                    {{-- Pass Top Meta --}}
+                    <div class="flex items-center justify-between pb-5 mb-6 border-b border-stone/10">
+                        <span class="font-sans text-[11px] uppercase tracking-widest text-forest font-semibold">
+                            {{ $t->kategori ?? 'Tiket Masuk' }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 font-sans text-xs text-stone/60">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            {{ __('messages.available') }}
+                        </span>
                     </div>
-                    <div class="h-px bg-gray-100 mb-7"></div>
-                    <ul class="space-y-2.5 mb-8">
-                        <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
-                            <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            {{ __('messages.facility_access_entry') }}
+
+                    {{-- Pass Title --}}
+                    <h3 class="font-serif text-2xl sm:text-3xl text-forest mb-2">{{ $t->nama_tiket }}</h3>
+                    <p class="font-sans text-xs text-stone font-light mb-7">{{ __('messages.ticket_entry_one_day') }}</p>
+
+                    {{-- Price Presentation --}}
+                    <div class="flex items-baseline gap-1.5 mb-7 pb-7 border-b border-stone/10">
+                        <span class="font-sans text-xs text-stone font-light">IDR</span>
+                        <span class="font-serif text-4xl sm:text-5xl text-forest font-normal tracking-tight">{{ number_format($t->harga, 0, ',', '.') }}</span>
+                        <span class="font-sans text-xs text-stone/70">/ {{ __('messages.per_person_unit') }}</span>
+                    </div>
+
+                    {{-- Inclusions Checklist --}}
+                    <ul class="space-y-3 font-sans text-xs sm:text-sm text-stone font-light mb-8">
+                        <li class="flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-forest text-base">check</span>
+                            <span>{{ __('messages.facility_access_entry') }}</span>
                         </li>
-                        <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
-                            <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            {{ __('messages.facility_valid_date_one_day') }}
+                        <li class="flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-forest text-base">check</span>
+                            <span>{{ __('messages.facility_free_access') }}</span>
                         </li>
-                        <li class="flex items-center gap-2.5 font-sans text-sm text-gray-500">
-                            <span class="material-symbols-outlined text-sm text-gray-300">check</span>
-                            {{ __('messages.email_confirmation') }}
+                        <li class="flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-forest text-base">check</span>
+                            <span>{{ __('messages.instant_confirmation_email') }}</span>
+                        </li>
+                        <li class="flex items-center gap-2.5">
+                            <span class="material-symbols-outlined text-forest text-base">check</span>
+                            <span>Jalur cepat scan QR Code di gerbang masuk</span>
                         </li>
                     </ul>
-                    <div class="flex gap-2.5">
-                        <a href="{{ route('tiket.detail', $t->id_tiket) }}"
-                           class="flex-1 text-center font-sans text-sm py-3 rounded-xl border border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-900 transition-all duration-200">
-                            {{ __('messages.detail') }}
-                        </a>
-                        @auth
-                        <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $t->id_tiket]) }}"
-                           class="flex-1 text-center font-sans text-sm font-medium py-3 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-all duration-200">
-                            {{ __('messages.book') }}
-                        </a>
-                        @else
-                        <a href="{{ route('login') }}"
-                           class="flex-1 text-center font-sans text-sm font-medium py-3 rounded-xl bg-gray-900 text-white hover:bg-gray-700 transition-all duration-200">
-                            {{ __('messages.book') }}
-                        </a>
-                        @endauth
-                    </div>
                 </div>
+
+                {{-- Action Buttons --}}
+                <div class="space-y-2.5 pt-2">
+                    @auth
+                    <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $t->id_tiket]) }}"
+                       class="w-full inline-flex items-center justify-center gap-2 text-center py-3.5 rounded-full font-sans text-xs uppercase tracking-widest font-semibold bg-forest text-white hover:bg-leaf transition-all duration-300 shadow-sm">
+                        <span>{{ __('messages.book_this_ticket') }}</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                    @else
+                    <a href="{{ route('login') }}"
+                       class="w-full inline-flex items-center justify-center gap-2 text-center py-3.5 rounded-full font-sans text-xs uppercase tracking-widest font-semibold bg-forest text-white hover:bg-leaf transition-all duration-300 shadow-sm">
+                        <span>{{ __('messages.login_and_book') }}</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                    @endauth
+
+                    <a href="{{ route('tiket.detail', $t->id_tiket) }}"
+                       class="w-full text-center block py-2.5 rounded-full font-sans text-xs text-stone/80 hover:text-forest transition-colors">
+                        {{ __('messages.breadcrumb_detail') }}
+                    </a>
+                </div>
+
             </div>
             @endforeach
         </div>
-
         @else
-        <div class="text-center py-24" data-aos="fade-up">
-            <span class="material-symbols-outlined text-5xl text-gray-200 block mb-4">confirmation_number</span>
-            <p class="font-serif text-xl text-gray-400 mb-2">{{ __('messages.no_tickets') }}</p>
-            <p class="font-sans text-sm text-gray-400">{{ __('messages.no_tickets_desc') }}</p>
+        <div class="text-center py-20 bg-white rounded-3xl border border-stone/15" data-aos="fade-up">
+            <span class="material-symbols-outlined text-4xl text-stone/40 block mb-3">confirmation_number</span>
+            <p class="font-serif text-2xl text-forest mb-2">{{ __('messages.no_tickets') }}</p>
+            <p class="font-sans text-sm text-stone font-light">{{ __('messages.no_tickets_desc') }}</p>
         </div>
         @endif
+
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════ --}}
-{{--  MENGAPA PESAN ONLINE                      --}}
-{{-- ══════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter bg-white border-t border-gray-100">
-    <div class="max-w-6xl mx-auto">
-        <div class="mb-16" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">{{ __('messages.advantages') }}</p>
-            <h2 class="font-serif text-3xl md:text-5xl text-gray-900">{{ __('messages.why_book_online') }}</h2>
+{{-- ══════════════════════════════════════════════════════
+     3. KEUNGGULAN PESAN ONLINE — 3 Core Values
+══════════════════════════════════════════════════════ --}}
+<section class="py-24 md:py-32 px-gutter bg-white text-ink relative">
+    <div class="max-w-7xl mx-auto">
+
+        {{-- Section Header --}}
+        <div class="max-w-2xl mb-16" data-aos="fade-up">
+            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
+                {{ __('messages.advantages') }}
+            </span>
+            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
+                {{ __('messages.why_book_online') }}
+            </h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
-            <div class="py-10 md:py-0 md:pr-12" data-aos="fade-up" data-aos-delay="0">
-                <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">01</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.fast_easy_process') }}</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.fast_easy_desc') }}</p>
+
+        {{-- 3 Column Values --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {{-- Value 1 --}}
+            <div class="p-8 rounded-3xl bg-[#FAF8F5] border border-stone/10" data-aos="fade-up">
+                <span class="font-serif text-3xl text-stone/40 block mb-4">01</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.fast_easy_process') }}</h3>
+                <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.fast_easy_desc') }}</p>
             </div>
-            <div class="py-10 md:py-0 md:px-12" data-aos="fade-up" data-aos-delay="80">
-                <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">02</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.secure_reliable') }}</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.secure_reliable_desc') }}</p>
+
+            {{-- Value 2 --}}
+            <div class="p-8 rounded-3xl bg-[#FAF8F5] border border-stone/10" data-aos="fade-up" data-aos-delay="100">
+                <span class="font-serif text-3xl text-stone/40 block mb-4">02</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.secure_reliable') }}</h3>
+                <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.secure_reliable_desc') }}</p>
             </div>
-            <div class="py-10 md:py-0 md:pl-12" data-aos="fade-up" data-aos-delay="160">
-                <p class="font-sans text-[11px] tracking-[0.12em] uppercase text-gray-300 mb-6">03</p>
-                <h3 class="font-serif text-xl text-gray-900 mb-3">{{ __('messages.anytime_support') }}</h3>
-                <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.anytime_support_desc') }}</p>
+
+            {{-- Value 3 --}}
+            <div class="p-8 rounded-3xl bg-[#FAF8F5] border border-stone/10" data-aos="fade-up" data-aos-delay="200">
+                <span class="font-serif text-3xl text-stone/40 block mb-4">03</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.anytime_support') }}</h3>
+                <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.anytime_support_desc') }}</p>
             </div>
+
         </div>
+
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════ --}}
-{{--  CARA PESAN                                --}}
-{{-- ══════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter border-t border-gray-100" style="background:#F8F7F5;">
-    <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-            <div data-aos="fade-right">
-                <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-5">{{ __('messages.how_to_book') }}</p>
-                <h2 class="font-serif text-3xl md:text-5xl text-gray-900 leading-[1.1] mb-14">{{ __('messages.three_steps_title') }}</h2>
-                <div class="divide-y divide-gray-200">
-                    <div class="flex gap-5 sm:gap-7 py-9">
-                        <span class="font-serif text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">1</span>
-                        <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_one_title') }}</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_one_desc') }}</p>
+{{-- ══════════════════════════════════════════════════════
+     4. PANDUAN CARA PESAN — 3 Easy Steps
+══════════════════════════════════════════════════════ --}}
+<section id="panduan-pesan" class="py-24 md:py-32 px-gutter bg-[#FAF8F5] text-ink relative">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+
+            {{-- Left Steps Timeline --}}
+            <div class="lg:col-span-6" data-aos="fade-right">
+                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
+                    {{ __('messages.how_to_book') }}
+                </span>
+                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-10 text-balance">
+                    {{ __('messages.three_steps_title') }}
+                </h2>
+
+                <div class="space-y-8">
+                    {{-- Step 1 --}}
+                    <div class="flex items-start gap-5">
+                        <span class="w-10 h-10 rounded-full bg-forest text-white font-serif text-lg flex items-center justify-center flex-shrink-0">1</span>
+                        <div>
+                            <h4 class="font-serif text-xl text-forest mb-1.5">{{ __('messages.step_one_title') }}</h4>
+                            <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed">{{ __('messages.step_one_desc') }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-5 sm:gap-7 py-9">
-                        <span class="font-serif text-[2.5rem] sm:text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">2</span>
-                        <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_two_title') }}</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_two_desc') }}</p>
+
+                    {{-- Step 2 --}}
+                    <div class="flex items-start gap-5">
+                        <span class="w-10 h-10 rounded-full bg-forest text-white font-serif text-lg flex items-center justify-center flex-shrink-0">2</span>
+                        <div>
+                            <h4 class="font-serif text-xl text-forest mb-1.5">{{ __('messages.step_two_title') }}</h4>
+                            <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed">{{ __('messages.step_two_desc') }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-5 sm:gap-7 py-9">
-                        <span class="font-serif text-[2.5rem] sm:text-[2.75rem] leading-none select-none mt-0.5 tabular-nums" style="color:#E5E1DC;">3</span>
-                        <div class="pt-1">
-                            <h4 class="font-serif text-lg text-gray-900 mb-2">{{ __('messages.step_three_title') }}</h4>
-                            <p class="font-sans text-sm text-gray-500 leading-relaxed">{{ __('messages.step_three_desc') }}</p>
+
+                    {{-- Step 3 --}}
+                    <div class="flex items-start gap-5">
+                        <span class="w-10 h-10 rounded-full bg-forest text-white font-serif text-lg flex items-center justify-center flex-shrink-0">3</span>
+                        <div>
+                            <h4 class="font-serif text-xl text-forest mb-1.5">{{ __('messages.step_three_title') }}</h4>
+                            <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed">{{ __('messages.step_three_desc') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="lg:sticky lg:top-28" data-aos="fade-left" data-aos-delay="100">
-                <div class="relative rounded-2xl overflow-hidden aspect-[4/5]">
-                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80"
-                         class="w-full h-full object-cover" alt="Bangkiang Jaran" loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                    <div class="absolute bottom-0 left-0 right-0 p-8">
-                        <p class="font-serif text-white text-xl leading-snug">{{ __('messages.experience_cta_title') }}</p>
-                        <p class="font-sans text-sm text-white/60 mt-2">{{ __('messages.location_desc_short') }}</p>
-                    </div>
+
+            {{-- Right Photo Visual Frame --}}
+            <div class="lg:col-span-6" data-aos="fade-left">
+                <div class="rounded-3xl overflow-hidden shadow-xl border border-stone/10 bg-warm h-[380px] sm:h-[480px]">
+                    <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
+                         alt="Pemesanan Tiket Bangkiang Jaran"
+                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
                 </div>
             </div>
+
         </div>
     </div>
 </section>
 
-{{-- ══════════════════════════════════════════ --}}
-{{--  FAQ                                       --}}
-{{-- ══════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter border-t border-gray-100" style="background:#F8F7F5;" x-data="{open: null}">
+{{-- ══════════════════════════════════════════════════════
+     5. TANYA JAWAB SEPUTAR TIKET (FAQ)
+══════════════════════════════════════════════════════ --}}
+<section class="py-24 md:py-32 px-gutter bg-white text-ink relative" x-data="{ openFaq: 1 }">
     <div class="max-w-3xl mx-auto">
-        <div class="mb-16" data-aos="fade-up">
-            <p class="font-sans text-[11px] tracking-[0.15em] uppercase text-gray-400 mb-4">FAQ</p>
-            <h2 class="font-serif text-3xl md:text-5xl text-gray-900">{{ __('messages.faq_title') }}</h2>
+
+        {{-- Section Header --}}
+        <div class="text-center mb-14" data-aos="fade-up">
+            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
+                FAQ
+            </span>
+            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3">
+                {{ __('messages.faq_title') }}
+            </h2>
         </div>
-        @php $faqs = [
-            ['q'=>__('messages.faq_q1'),'a'=>__('messages.faq_a1')],
-            ['q'=>__('messages.faq_q2'),'a'=>__('messages.faq_a2')],
-            ['q'=>__('messages.faq_q3'),'a'=>__('messages.faq_a3')],
-            ['q'=>__('messages.faq_q4'),'a'=>__('messages.faq_a4')],
-            ['q'=>__('messages.faq_q5'),'a'=>__('messages.faq_a5')],
-        ]; @endphp
-        <div class="divide-y divide-gray-200" data-aos="fade-up">
-            @foreach($faqs as $i => $faq)
-            <div>
-                <button class="w-full flex items-center justify-between py-6 text-left group"
-                        @click="open === {{ $i }} ? open = null : open = {{ $i }}">
-                    <span class="font-serif text-lg text-gray-900 pr-8 group-hover:text-gray-600 transition-colors">{{ $faq['q'] }}</span>
-                    <span class="flex-shrink-0 text-gray-400 transition-transform duration-300" :class="{'rotate-45': open === {{ $i }}}">
-                        <span class="material-symbols-outlined text-xl">add</span>
-                    </span>
+
+        {{-- Minimalist FAQ Items --}}
+        <div class="divide-y divide-stone/20 border-y border-stone/20">
+
+            {{-- Item 1 --}}
+            <div class="py-5" data-aos="fade-up">
+                <button @click="openFaq = (openFaq === 1 ? null : 1)"
+                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
+                    <span>{{ __('messages.faq_q1') }}</span>
+                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 1 }">+</span>
                 </button>
-                <div x-show="open === {{ $i }}" x-collapse>
-                    <p class="font-sans text-sm text-gray-500 leading-relaxed pb-6">{{ $faq['a'] }}</p>
+                <div x-show="openFaq === 1" x-collapse>
+                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
+                        {{ __('messages.faq_a1') }}
+                    </p>
                 </div>
             </div>
-            @endforeach
+
+            {{-- Item 2 --}}
+            <div class="py-5" data-aos="fade-up" data-aos-delay="60">
+                <button @click="openFaq = (openFaq === 2 ? null : 2)"
+                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
+                    <span>{{ __('messages.faq_q2') }}</span>
+                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 2 }">+</span>
+                </button>
+                <div x-show="openFaq === 2" x-collapse>
+                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
+                        {{ __('messages.faq_a2') }}
+                    </p>
+                </div>
+            </div>
+
+            {{-- Item 3 --}}
+            <div class="py-5" data-aos="fade-up" data-aos-delay="120">
+                <button @click="openFaq = (openFaq === 3 ? null : 3)"
+                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
+                    <span>{{ __('messages.faq_q3') }}</span>
+                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 3 }">+</span>
+                </button>
+                <div x-show="openFaq === 3" x-collapse>
+                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
+                        {{ __('messages.faq_a3') }}
+                    </p>
+                </div>
+            </div>
+
+            {{-- Item 4 --}}
+            <div class="py-5" data-aos="fade-up" data-aos-delay="180">
+                <button @click="openFaq = (openFaq === 4 ? null : 4)"
+                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
+                    <span>{{ __('messages.faq_q4') }}</span>
+                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 4 }">+</span>
+                </button>
+                <div x-show="openFaq === 4" x-collapse>
+                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
+                        {{ __('messages.faq_a4') }}
+                    </p>
+                </div>
+            </div>
+
         </div>
+
     </div>
 </section>
 
 @endsection
+
+@push('styles')
+<style>
+@keyframes slowZoom {
+    0% { transform: scale(1.0); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1.0); }
+}
+.animate-slow-zoom {
+    animation: slowZoom 20s ease-in-out infinite alternate;
+}
+</style>
+@endpush

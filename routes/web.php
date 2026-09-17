@@ -22,6 +22,7 @@ use App\Http\Controllers\Pengelola\PemesananOfflineController;
 
 // ========== PUBLIC ROUTES ==========
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/restoran', [LandingController::class, 'restoran'])->name('restoran');
 Route::get('/informasi', function () {
     return redirect()->route('landing');
 })->name('informasi');

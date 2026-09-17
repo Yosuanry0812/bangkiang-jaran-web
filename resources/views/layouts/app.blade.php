@@ -185,8 +185,9 @@
                     @php
                         $currentRoute = Route::currentRouteName();
                         $links = [
-                            ['route' => 'landing',                    'label' => __('messages.home'),    'icon' => 'home'],
-                            ['route' => 'tiket.index',                'label' => __('messages.tickets'), 'icon' => 'confirmation_number'],
+                            ['route' => 'landing',                    'label' => __('messages.home'),            'icon' => 'home'],
+                            ['route' => 'restoran',                   'label' => __('messages.resto_title_nav'), 'icon' => 'restaurant'],
+                            ['route' => 'tiket.index',                'label' => __('messages.tickets'),         'icon' => 'confirmation_number'],
                         ];
                         if(auth()->check()) {
                             $links[] = ['route' => 'wisatawan.pemesanan.riwayat', 'label' => __('messages.history'), 'icon' => 'history'];
@@ -260,6 +261,7 @@
              aria-label="Menu mobile">
             <div class="max-w-7xl mx-auto px-gutter py-2.5 pb-4 space-y-0.5">
                 <a href="{{ route('landing') }}"          class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">home</span>{{ __('messages.home') }}</a>
+                <a href="{{ route('restoran') }}"         class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">restaurant</span>{{ __('messages.resto_title_nav') }}</a>
                 <a href="{{ route('tiket.index') }}"      class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">confirmation_number</span>{{ __('messages.tickets') }}</a>
                 @auth
                 <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">history</span>{{ __('messages.history') }}</a>
@@ -328,7 +330,8 @@
                     <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">{{ __('messages.nav_title') }}</h4>
                     <ul class="space-y-2.5">
                         <li><a href="{{ route('landing') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.home') }}</a></li>
-                        <li><a href="#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.location') }}</a></li>
+                        <li><a href="{{ route('restoran') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.resto_title_nav') }}</a></li>
+                        <li><a href="{{ route('landing') }}#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.location') }}</a></li>
                         <li><a href="{{ route('tiket.index') }}" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.tickets') }}</a></li>
                     </ul>
                 </div>

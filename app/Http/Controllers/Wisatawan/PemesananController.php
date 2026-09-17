@@ -18,8 +18,9 @@ class PemesananController extends Controller
     {
         $tiketList = Tiket::aktif()->get();
         $tanggal = $request->input('tanggal', date('Y-m-d'));
+        $selectedId = $request->input('id_tiket', null);
 
-        return view('wisatawan.pemesanan', compact('tiketList', 'tanggal'));
+        return view('wisatawan.pemesanan', compact('tiketList', 'tanggal', 'selectedId'));
     }
 
     /**

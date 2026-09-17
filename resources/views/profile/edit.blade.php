@@ -70,7 +70,7 @@
         <div class="h-px bg-gray-100"></div>
         <div>
             <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">Username</p>
-            <p class="font-sans text-sm font-medium text-ink">@{{ Auth::user()->username }}</p>
+            <p class="font-sans text-sm font-medium text-ink">{{ '@' . Auth::user()->username }}</p>
         </div>
     </div>
 

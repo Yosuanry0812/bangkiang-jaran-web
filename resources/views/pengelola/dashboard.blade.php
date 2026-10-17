@@ -67,7 +67,7 @@
     }
 
     /* ── Chart tooltip ── */
-    .chartjs-tooltip { font-family: 'Inter', sans-serif !important; font-size: 12px !important; }
+    .chartjs-tooltip { font-family: 'Plus Jakarta Sans', sans-serif !important; font-size: 12px !important; }
 
     /* ── Scrollbar ── */
     .thin-scroll::-webkit-scrollbar       { height: 3px; }
@@ -91,7 +91,7 @@
 
     <div class="space-y-0.5">
         <h1 class="font-serif text-[26px] text-slate-900 leading-tight tracking-tight">
-            Selamat datang kembali
+            Ringkasan hari ini
         </h1>
         <p class="font-sans text-[13px] text-slate-400">{{ $today }}</p>
     </div>
@@ -213,8 +213,8 @@
                      style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
                             display:flex; flex-direction:column; align-items:center; pointer-events:none; user-select:none;">
                     <span id="donutTotal"
-                          style="font-family:'Instrument Serif',Georgia,serif; font-size:28px; line-height:1; color:#0f172a;"></span>
-                    <span style="font-family:Inter,sans-serif; font-size:10px; color:#94a3b8; margin-top:3px; text-transform:uppercase; letter-spacing:.06em;">tiket</span>
+                          style="font-family:'Newsreader',Georgia,serif; font-size:28px; line-height:1; color:#19392f;"></span>
+                    <span style="font-family:'Plus Jakarta Sans',sans-serif; font-size:10px; color:#718076; margin-top:3px; text-transform:uppercase; letter-spacing:.06em;">tiket</span>
                 </div>
             </div>
         </div>
@@ -363,8 +363,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function () {
-    var labels = {!! json_encode($grafikLabels ?? []) !!};
-    var data   = {!! json_encode($grafikData   ?? []) !!};
+    var labels = @json($grafikLabels ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    var data   = @json($grafikData ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     var total  = data.reduce(function(a, b) { return a + b; }, 0);
     var el     = document.getElementById('chartDonut');
 
@@ -383,7 +383,7 @@
     if (totalEl) totalEl.textContent = total;
 
     /* ── Palette ── */
-    var palette = ['#1e293b', '#334155', '#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0'];
+    var palette = ['#1d4a3a', '#ac7650', '#b9a06e', '#6b8874', '#c7c6a8', '#d8cec0'];
 
     /* ── Chart ── */
     new Chart(el.getContext('2d'), {
@@ -413,9 +413,9 @@
                             return '  ' + ctx.parsed + ' tiket  (' + pct + '%)';
                         }
                     },
-                    backgroundColor: '#1e293b',
-                    titleColor: '#94a3b8',
-                    bodyColor: '#f1f5f9',
+                    backgroundColor: '#19392f',
+                    titleColor: '#d6baa0',
+                    bodyColor: '#fffdf8',
                     cornerRadius: 10,
                     padding: 12,
                 }
@@ -430,16 +430,26 @@
     labels.forEach(function(lbl, i) {
         var pct = total > 0 ? ((data[i] / total) * 100).toFixed(0) : 0;
         var row = document.createElement('div');
-        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:4px 0; border-bottom:1px solid #f1f5f9;';
-        row.innerHTML =
-            '<div style="display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden;">' +
-                '<span style="width:8px; height:8px; border-radius:2px; background:' + palette[i] + '; flex-shrink:0; display:inline-block;"></span>' +
-                '<span style="font-family:Inter,sans-serif; font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + lbl + '</span>' +
-            '</div>' +
-            '<div style="display:flex; align-items:center; gap:6px; flex-shrink:0; margin-left:8px;">' +
-                '<span style="font-family:Inter,sans-serif; font-size:11px; color:#94a3b8;">' + data[i] + '</span>' +
-                '<span style="font-family:Inter,sans-serif; font-size:10px; font-weight:700; color:#1e293b; background:#f1f5f9; padding:1px 6px; border-radius:99px;">' + pct + '%</span>' +
-            '</div>';
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e4dfd3;';
+        var name = document.createElement('div');
+        name.style.cssText = 'display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden;';
+        var swatch = document.createElement('span');
+        swatch.style.cssText = 'width:8px; height:8px; border-radius:2px; flex-shrink:0; display:inline-block;';
+        swatch.style.backgroundColor = palette[i % palette.length];
+        var label = document.createElement('span');
+        label.style.cssText = 'font:11px "Plus Jakarta Sans",sans-serif; color:#526458; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;';
+        label.textContent = lbl;
+        name.append(swatch, label);
+        var values = document.createElement('div');
+        values.style.cssText = 'display:flex; align-items:center; gap:6px; flex-shrink:0; margin-left:8px;';
+        var count = document.createElement('span');
+        count.style.cssText = 'font:11px "Plus Jakarta Sans",sans-serif; color:#718076;';
+        count.textContent = data[i];
+        var percentage = document.createElement('span');
+        percentage.style.cssText = 'font:700 10px "Plus Jakarta Sans",sans-serif; color:#19392f; background:#e9e5da; padding:1px 6px; border-radius:99px;';
+        percentage.textContent = pct + '%';
+        values.append(count, percentage);
+        row.append(name, values);
         legendEl.appendChild(row);
     });
 

@@ -7,7 +7,7 @@
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -19,7 +19,7 @@
                 },
                 borderRadius: { "2xl": "1.5rem" },
                 spacing: { "xl": "80px", "container-max": "1280px", "lg": "48px", "md": "24px", "sm": "12px", "base": "8px", "xs": "4px", "gutter": "24px" },
-                fontFamily: { "display": ["Playfair Display", "serif"], "body": ["Plus Jakarta Sans", "sans-serif"] },
+                fontFamily: { "display": ["Fraunces", "serif"], "body": ["Manrope", "sans-serif"] },
                 fontSize: {
                     "display-mobile": ["40px", { lineHeight: "1.2", fontWeight: "700" }],
                     "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "600" }],
@@ -36,8 +36,10 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .card-shadow { box-shadow: 0px 4px 20px rgba(0, 50, 40, 0.04); }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
 </head>
-<body class="font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100" style="background: #f0f2ef;">
+<body class="bj-guest font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
 
     {{-- ── Subtle background texture ── --}}
     <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,100,70,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,80,60,0.05) 0%, transparent 55%);"></div>
@@ -46,9 +48,6 @@
     <nav class="relative z-10 py-5 px-8">
         <div class="flex justify-between items-center max-w-6xl mx-auto">
             <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
-                <div class="w-7 h-7 rounded-lg bg-emerald-800 flex items-center justify-center shadow-sm group-hover:bg-emerald-700 transition-colors">
-                    <span class="material-symbols-outlined text-white text-[13px]" style="font-variation-settings:'FILL' 1;">water</span>
-                </div>
                 <span class="font-display text-[15px] font-semibold text-emerald-900 tracking-wide">Bangkiang Jaran</span>
             </a>
             <div class="flex items-center gap-1">
@@ -72,6 +71,7 @@
         </div>
     </main>
 
+    <script defer src="{{ asset('js/site.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

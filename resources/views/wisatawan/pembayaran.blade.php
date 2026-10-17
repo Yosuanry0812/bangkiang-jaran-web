@@ -4,18 +4,6 @@
 @section('title', __('messages.step_payment') . ' — Bangkiang Jaran')
 
 @section('content')
-@php
-$metodeBayar = [
-    ['id'=>'BCA',     'nama'=>'Bank BCA',     'tipe'=>'bank',    'logo'=>'bca.jpg',     'nomor'=>'1234567890',   'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'BRI',     'nama'=>'Bank BRI',     'tipe'=>'bank',    'logo'=>'bri.webp',    'nomor'=>'0987654321',   'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'Mandiri', 'nama'=>'Bank Mandiri', 'tipe'=>'bank',    'logo'=>'mandiri.webp','nomor'=>'1122334455',   'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'Dana',    'nama'=>'Dana',         'tipe'=>'ewallet', 'logo'=>'dana.webp',   'nomor'=>'081234567890', 'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'OVO',     'nama'=>'OVO',          'tipe'=>'ewallet', 'logo'=>'ovo.png',     'nomor'=>'081234567890', 'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'GoPay',   'nama'=>'GoPay',        'tipe'=>'ewallet', 'logo'=>'gopay.jpg',   'nomor'=>'081234567890', 'atas_nama'=>'Pengelola Bangkiang Jaran'],
-    ['id'=>'QRIS',    'nama'=>'QRIS',         'tipe'=>'qris',    'logo'=>'qris.webp',   'nomor'=>null,           'atas_nama'=>'Pengelola Bangkiang Jaran'],
-];
-@endphp
-
 {{-- ── Fixed top progress bar ───────────────────────── --}}
 <div class="fixed top-12 md:top-[68px] left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-sm">
     <div class="max-w-5xl mx-auto px-gutter py-2.5 sm:py-3 flex items-center justify-between gap-2">
@@ -45,7 +33,7 @@ $metodeBayar = [
 </div>
 
 {{-- ── Page body ─────────────────────────────────────── --}}
-<div class="min-h-screen pt-32 md:pt-36 pb-16 px-gutter" style="background:#F8F7F5;">
+<div class="min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page">
     <div class="max-w-5xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
@@ -60,21 +48,42 @@ $metodeBayar = [
                     </div>
                     <div class="p-6 space-y-6">
 
+                        @if(session('error'))
+                        <p role="alert" class="border border-red-200 bg-red-50 p-4 text-sm text-red-800">{{ session('error') }}</p>
+                        @endif
+                        @if($errors->any())
+                        <div role="alert" class="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                            @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach
+                        </div>
+                        @endif
+                        @if($metodeBayar === [])
+                        <div class="bj-payment-unavailable">
+                            <span class="material-symbols-outlined" aria-hidden="true">info</span>
+                            <div>
+                                <h3>Detail pembayaran sedang disiapkan</h3>
+                                <p>Belum ada rekening resmi yang dipublikasikan. Jangan mentransfer dana ke nomor dari sumber lain. Pesanan Anda tetap tersimpan; kembali lagi setelah pengelola mengaktifkan metode pembayaran.</p>
+                                <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" class="bj-text-link">Lihat pesanan</a>
+                            </div>
+                        </div>
+                        @else
+
                         {{-- Bank Transfer --}}
+                        @if(collect($metodeBayar)->contains('type', 'bank'))
                         <div>
                             <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.bank_transfer') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
-                                @if($m['tipe'] === 'bank')
+                                @if($m['type'] === 'bank')
                                 <div class="border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
-                                            onclick="pilihMetode('{{ $m['id'] }}', '{{ $m['nama'] }}', '{{ $m['nomor'] }}', '{{ $m['atas_nama'] }}')"
+                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
+                                            onclick="pilihMetode(this.dataset.id, this.dataset.name)"
                                             class="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left">
                                         <div class="flex items-center gap-3">
                                             <div class="w-11 h-11 rounded-xl bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 p-1.5">
-                                                <img src="{{ asset('images/payments/' . $m['logo']) }}" alt="{{ $m['nama'] }}" class="w-full h-full object-contain">
+                                                <img src="{{ asset('images/payments/' . $m['logo']) }}" alt="" class="w-full h-full object-contain">
                                             </div>
-                                            <span class="font-sans text-sm font-medium text-ink">{{ $m['nama'] }}</span>
+                                            <span class="font-sans text-sm font-medium text-ink">{{ $m['name'] }}</span>
                                         </div>
                                         <span class="material-symbols-outlined text-pebble text-base transition-transform duration-200" id="icon-{{ $m['id'] }}">expand_more</span>
                                     </button>
@@ -82,11 +91,11 @@ $metodeBayar = [
                                         <div class="pt-4 flex items-center justify-between">
                                             <div>
                                                 <p class="font-sans text-xs text-stone mb-1">{{ __('messages.account_number') }}</p>
-                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['nomor'] }}</p>
-                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['atas_nama'] }}</p>
+                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['number'] }}</p>
+                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['account_name'] }}</p>
                                             </div>
                                             <button type="button"
-                                                    onclick="salin('{{ $m['nomor'] }}', 'salin-{{ $m['id'] }}')"
+                                                    data-number="{{ $m['number'] }}" onclick="salin(this.dataset.number, 'salin-{{ $m['id'] }}')"
                                                     class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
                                                 <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
                                                 {{ __('messages.copy') }}
@@ -98,22 +107,25 @@ $metodeBayar = [
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         {{-- E-Wallet --}}
+                        @if(collect($metodeBayar)->contains('type', 'ewallet'))
                         <div>
                             <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.e_wallet') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
-                                @if($m['tipe'] === 'ewallet')
+                                @if($m['type'] === 'ewallet')
                                 <div class="border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
-                                            onclick="pilihMetode('{{ $m['id'] }}', '{{ $m['nama'] }}', '{{ $m['nomor'] }}', '{{ $m['atas_nama'] }}')"
+                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
+                                            onclick="pilihMetode(this.dataset.id, this.dataset.name)"
                                             class="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left">
                                         <div class="flex items-center gap-3">
                                             <div class="w-11 h-11 rounded-xl bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 p-1.5">
-                                                <img src="{{ asset('images/payments/' . $m['logo']) }}" alt="{{ $m['nama'] }}" class="w-full h-full object-contain">
+                                                <img src="{{ asset('images/payments/' . $m['logo']) }}" alt="" class="w-full h-full object-contain">
                                             </div>
-                                            <span class="font-sans text-sm font-medium text-ink">{{ $m['nama'] }}</span>
+                                            <span class="font-sans text-sm font-medium text-ink">{{ $m['name'] }}</span>
                                         </div>
                                         <span class="material-symbols-outlined text-pebble text-base transition-transform duration-200" id="icon-{{ $m['id'] }}">expand_more</span>
                                     </button>
@@ -121,11 +133,11 @@ $metodeBayar = [
                                         <div class="pt-4 flex items-center justify-between">
                                             <div>
                                                 <p class="font-sans text-xs text-stone mb-1">{{ __('messages.number') }}</p>
-                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['nomor'] }}</p>
-                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['atas_nama'] }}</p>
+                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['number'] }}</p>
+                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['account_name'] }}</p>
                                             </div>
                                             <button type="button"
-                                                    onclick="salin('{{ $m['nomor'] }}', 'salin-{{ $m['id'] }}')"
+                                                    data-number="{{ $m['number'] }}" onclick="salin(this.dataset.number, 'salin-{{ $m['id'] }}')"
                                                     class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
                                                 <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
                                                 {{ __('messages.copy') }}
@@ -137,39 +149,7 @@ $metodeBayar = [
                                 @endforeach
                             </div>
                         </div>
-
-                        {{-- QRIS --}}
-                        <div>
-                            <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">QRIS</p>
-                            <div class="space-y-2">
-                                @foreach($metodeBayar as $m)
-                                @if($m['tipe'] === 'qris')
-                                <div class="border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
-                                    <button type="button"
-                                            onclick="pilihMetode('{{ $m['id'] }}', '{{ $m['nama'] }}', null, '{{ $m['atas_nama'] }}')"
-                                            class="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-11 h-11 rounded-xl bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 p-1.5">
-                                                <img src="{{ asset('images/payments/' . $m['logo']) }}" alt="{{ $m['nama'] }}" class="w-full h-full object-contain">
-                                            </div>
-                                            <span class="font-sans text-sm font-medium text-ink">{{ $m['nama'] }}</span>
-                                        </div>
-                                        <span class="material-symbols-outlined text-pebble text-base transition-transform duration-200" id="icon-{{ $m['id'] }}">expand_more</span>
-                                    </button>
-                                    <div class="hidden px-4 pb-5 pt-0 bg-gray-50 border-t border-gray-100" id="detail-{{ $m['id'] }}">
-                                        <div class="pt-5 flex flex-col items-center text-center space-y-3">
-                                            <div class="w-36 h-36 bg-white border border-gray-200 rounded-xl flex items-center justify-center shadow-sm">
-                                                <span class="material-symbols-outlined text-gray-200" style="font-size:80px;">qr_code</span>
-                                            </div>
-                                            <p class="font-sans text-xs text-stone">{{ __('messages.qris_scan_desc') }}</p>
-                                            <p class="font-sans text-xs text-pebble">a.n. {{ $m['atas_nama'] }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
-                                @endforeach
-                            </div>
-                        </div>
+                        @endif
 
                         {{-- Continue button --}}
                         <button type="button" id="btn-lanjutkan" disabled
@@ -177,6 +157,7 @@ $metodeBayar = [
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             {{ __('messages.continue_to_upload') }}
                         </button>
+                        @endif
                     </div>
                 </div>
 
@@ -396,11 +377,15 @@ $metodeBayar = [
                             <p class="font-sans text-sm font-medium text-ink">{{ __('messages.need_help') }}</p>
                         </div>
                         <p class="font-sans text-xs text-stone leading-relaxed mb-4">{{ __('messages.help_payment_desc') }}</p>
-                        <a href="https://wa.me/6281234567890" target="_blank"
+                        @if(config('payment.contact_whatsapp'))
+                        <a href="https://wa.me/{{ config('payment.contact_whatsapp') }}" target="_blank" rel="noopener noreferrer"
                            class="flex items-center justify-center gap-2 w-full font-sans text-xs font-semibold text-white bg-[#25D366] hover:bg-[#1dbd5a] transition-colors px-4 py-2.5 rounded-xl">
                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                             {{ __('messages.whatsapp_contact') }}
                         </a>
+                        @else
+                        <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" class="bj-text-link">Kembali ke detail pesanan</a>
+                        @endif
                     </div>
 
                 </div>

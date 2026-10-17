@@ -1,531 +1,226 @@
 @extends('layouts.app')
+
+@section('title', 'Bangkiang Jaran — Air Terjun di Desa Bakbakan, Gianyar')
 @section('nav-mode', 'hero')
 
 @section('content')
+@php
+    $isEnglish = app()->getLocale() === 'en';
+    $hargaMulai = $tiket->where('kategori', 'perorangan')->min('harga') ?? $tiket->min('harga');
+    $fallbackPhoto = asset('images/sejarah-bangkiang-waterfall.webp');
+    $usableGallery = $galeri->filter(fn ($item) => ! preg_match('/(?:^|\/)(?:galeri-\d+|placeholder\d*)\.(?:jpe?g|png|webp)$/i', (string) $item->file))->values();
+    $photoAt = function (int $index) use ($usableGallery, $fallbackPhoto) {
+        if ($usableGallery->isEmpty()) return ['url' => $fallbackPhoto, 'caption' => 'Air Terjun Bangkiang Jaran'];
+        $media = $usableGallery->get($index % $usableGallery->count());
+        return ['url' => asset('storage/' . ltrim((string) $media->file, '/')), 'caption' => $media->keterangan ?: 'Air Terjun Bangkiang Jaran'];
+    };
+    $stories = $isEnglish ? [
+        ['The first sound of water', 'Begin with a short walk from the village and let the cooler air lead you towards the falls.', 'An easy beginning'],
+        ['A quiet natural pool', 'Pause at the water, enjoy the green surroundings, and follow every safety direction from the local team.', 'Time to slow down'],
+        ['A valley cared for locally', 'Your visit supports the people who welcome visitors and care for Bangkiang Jaran every day.', 'Community managed'],
+    ] : [
+        ['Suara air yang pertama', 'Mulai dari perjalanan singkat melewati desa, lalu biarkan udara yang lebih sejuk menuntun Anda menuju air terjun.', 'Awal yang ringan'],
+        ['Kolam alami yang tenang', 'Berhenti sejenak di tepi air, nikmati suasana hijau, dan selalu ikuti arahan keselamatan dari tim setempat.', 'Waktu untuk melambat'],
+        ['Lembah yang dijaga bersama', 'Setiap kunjungan ikut mendukung masyarakat yang menyambut wisatawan dan merawat Bangkiang Jaran setiap hari.', 'Dikelola masyarakat'],
+    ];
+    $facilities = $isEnglish ? [
+        ['local_parking', 'Parking area', 'A practical starting point for cars and motorbikes.'],
+        ['confirmation_number', 'Digital tickets', 'Keep your verified ticket ready on your phone.'],
+        ['deck', 'Rest area', 'Pause before or after walking to the waterfall.'],
+        ['restaurant', 'Dining space', 'A simple place to rest and enjoy the village atmosphere.'],
+        ['shower', 'Changing area', 'Freshen up after spending time near the water.'],
+        ['support_agent', 'Local team', 'Ask the team on site whenever you need assistance.'],
+    ] : [
+        ['local_parking', 'Area parkir', 'Titik awal yang praktis untuk mobil dan sepeda motor.'],
+        ['confirmation_number', 'Tiket digital', 'Simpan tiket terverifikasi agar mudah dibuka dari ponsel.'],
+        ['deck', 'Area istirahat', 'Beristirahat sebelum atau setelah berjalan menuju air terjun.'],
+        ['restaurant', 'Ruang bersantap', 'Tempat sederhana untuk beristirahat sambil menikmati suasana desa.'],
+        ['shower', 'Area ganti', 'Bersihkan diri setelah menikmati waktu di dekat air.'],
+        ['support_agent', 'Tim lokal', 'Hubungi tim di lokasi saat Anda membutuhkan bantuan.'],
+    ];
+    $visitSteps = $isEnglish ? [
+        ['Choose a visit date', 'Check the available ticket options and choose the day that suits you.'],
+        ['Complete your booking', 'Enter visitor details and follow the payment instructions shown.'],
+        ['Wait for verification', 'Your e-ticket becomes active after the manager verifies the payment.'],
+        ['Prepare for the trail', 'Wear suitable footwear and keep your active ticket easy to open.'],
+        ['Enjoy Bangkiang Jaran', 'Show your ticket at the entrance and follow directions from the local team.'],
+    ] : [
+        ['Pilih tanggal kunjungan', 'Lihat tiket yang tersedia dan tentukan hari yang paling sesuai.'],
+        ['Selesaikan pemesanan', 'Isi data pengunjung lalu ikuti petunjuk pembayaran yang ditampilkan.'],
+        ['Tunggu verifikasi', 'E-tiket akan aktif setelah pembayaran dikonfirmasi oleh pengelola.'],
+        ['Siapkan perjalanan', 'Gunakan alas kaki yang sesuai dan simpan tiket aktif agar mudah dibuka.'],
+        ['Nikmati Bangkiang Jaran', 'Tunjukkan tiket di pintu masuk lalu ikuti arahan tim setempat.'],
+    ];
+@endphp
 
-{{-- ══════════════════════════════════════════════════════
-     1. HERO SECTION — Natural & Authentic Elegance
-══════════════════════════════════════════════════════ --}}
-<section id="hero-section" class="relative w-full min-h-screen min-h-svh flex flex-col justify-between overflow-hidden bg-[#0D1A12] text-white">
-
-    {{-- Background Layer --}}
-    <div class="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        {{-- Video --}}
-        <video id="hero-video"
-               class="absolute inset-0 w-full h-full object-cover scale-[1.02] transition-all duration-1000 ease-out opacity-0"
-               autoplay muted loop playsinline
-               poster="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
-               oncanplay="onVideoReady()"
-               onerror="onVideoError()">
-            <source src="{{ asset('videos/hero-bangkiang.mp4') }}" type="video/mp4">
-        </video>
-
-        {{-- High quality fallback image --}}
-        <img id="hero-img"
-             src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
-             alt="Bangkiang Jaran Waterfall"
-             fetchpriority="high"
-             onload="onImgLoaded()"
-             class="absolute inset-0 w-full h-full object-cover scale-[1.02] transition-all duration-1000 ease-out"
-             style="opacity:1;">
-
-        {{-- Soft Cinematic Overlays --}}
-        <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0D1A12] via-[#0D1A12]/80 to-transparent"></div>
-    </div>
-
-    {{-- Spacer for Fixed Navbar --}}
-    <div class="pt-24 md:pt-32"></div>
-
-    {{-- Hero Main Content Body --}}
-    <div id="hero-content"
-         class="relative z-10 w-full max-w-7xl mx-auto px-gutter py-8 md:py-12 opacity-0 translate-y-6 transition-all duration-1000 ease-out flex flex-col justify-end">
-
-        {{-- Tagline --}}
-        <p class="font-sans text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-white/90 mb-4">
-            {{ __('messages.hero_tag') }}
-        </p>
-
-        {{-- Hero Editorial Title --}}
-        <h1 class="font-serif text-[clamp(2.8rem,6.5vw,5.5rem)] leading-[1.04] text-white max-w-4xl tracking-tight mb-6 text-balance">
-            <span id="typing-heading" class="block min-h-[1.1em]"></span>
-        </h1>
-
-        {{-- Subtitle --}}
-        <p id="typing-sub"
-           class="font-sans text-[15px] sm:text-base md:text-lg text-white/80 max-w-2xl font-light leading-relaxed mb-8 min-h-[2.8em]">
-        </p>
-
-        {{-- Action Button --}}
-        <div class="flex items-center gap-4 mb-12">
-            @auth
-            <a href="{{ route('wisatawan.pemesanan.create') }}"
-               class="inline-flex items-center gap-2.5 bg-white text-forest hover:bg-gray-100 font-sans text-sm font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-                <span>{{ __('messages.hero_cta_book') }}</span>
-                <span class="material-symbols-outlined text-base">arrow_forward</span>
-            </a>
+<div class="bj-home bj-home--journey">
+    <section id="hero-section" class="bj-home-hero" data-bj-hero aria-labelledby="home-hero-title">
+        <div class="bj-home-hero__media" aria-hidden="true">
+            @if($usableGallery->isEmpty())
+                <div class="bj-home-hero__slide is-active" data-bj-hero-slide data-caption="Air Terjun Bangkiang Jaran"><img src="{{ $fallbackPhoto }}" alt="" fetchpriority="high"></div>
             @else
-            <a href="{{ route('login') }}"
-               class="inline-flex items-center gap-2.5 bg-white text-forest hover:bg-gray-100 font-sans text-sm font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-                <span>{{ __('messages.hero_cta_book') }}</span>
-                <span class="material-symbols-outlined text-base">arrow_forward</span>
-            </a>
-            @endauth
-        </div>
-
-        {{-- Clean Minimalist Spec Strip --}}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-white/15 max-w-4xl">
-            <div>
-                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.stat_height') }}</p>
-                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.stat_height_val') }}</p>
-            </div>
-            <div>
-                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.stat_source') }}</p>
-                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.stat_source_val') }}</p>
-            </div>
-            <div>
-                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.location') }}</p>
-                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.address') }}</p>
-            </div>
-            <div>
-                <p class="font-sans text-[11px] uppercase tracking-widest text-white/50 mb-1">{{ __('messages.operating_hours_label') }}</p>
-                <p class="font-sans text-sm sm:text-base text-white font-medium">{{ __('messages.operating_hours') }}</p>
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Bottom Breathing Space --}}
-    <div class="pb-6"></div>
-
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     2. THE NARRATIVE & HERITAGE — Storytelling
-══════════════════════════════════════════════════════ --}}
-<section id="narrative" class="py-24 md:py-32 px-gutter bg-[#FAF8F5] text-ink relative">
-    <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-
-            {{-- Left Column: Storytelling --}}
-            <div class="lg:col-span-6" data-aos="fade-up">
-                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-3 block">
-                    {{ __('messages.narrative_tag') }}
-                </span>
-
-                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-6 text-balance">
-                    {{ __('messages.narrative_title') }}
-                </h2>
-
-                <p class="font-serif italic text-lg sm:text-xl text-forest/90 leading-relaxed mb-6">
-                    "{{ __('messages.narrative_quote') }}"
-                </p>
-
-                <div class="space-y-4 font-sans text-[15px] sm:text-base text-stone font-light leading-relaxed">
-                    <p>{{ __('messages.narrative_p1') }}</p>
-                    <p>{{ __('messages.narrative_p2') }}</p>
-                </div>
-            </div>
-
-            {{-- Right Column: Single Clean Photography Frame --}}
-            <div class="lg:col-span-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="rounded-2xl overflow-hidden shadow-xl border border-stone/10 bg-warm h-[380px] sm:h-[480px]">
-                    <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
-                         alt="Pemandangan Alam Bangkiang Jaran"
-                         class="w-full h-full object-cover transition-transform duration-700 hover:scale-105">
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     3. EMPAT ELEMEN PENGALAMAN SUAKA — Professional Cards
-══════════════════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter bg-white relative text-ink">
-    <div class="max-w-7xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="max-w-2xl mb-16" data-aos="fade-up">
-            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                {{ __('messages.pillar_tag') }}
-            </span>
-            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-4 text-balance">
-                {{ __('messages.pillar_title') }}
-            </h2>
-            <p class="font-sans text-stone text-sm sm:text-base font-light leading-relaxed">
-                {{ __('messages.pillar_desc') }}
-            </p>
-        </div>
-
-        {{-- 4 Refined Experience Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            {{-- Card 1 --}}
-            <div class="bg-[#FAF8F5] rounded-2xl p-7 border border-stone/10 hover:border-forest/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-aos="fade-up">
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-forest/8 text-forest flex items-center justify-center mb-6">
-                        <span class="material-symbols-outlined text-2xl">water_drop</span>
+                @foreach($usableGallery->take(6) as $index => $media)
+                    <div class="bj-home-hero__slide {{ $index === 0 ? 'is-active' : '' }}" data-bj-hero-slide data-caption="{{ $media->keterangan ?: 'Air Terjun Bangkiang Jaran' }}">
+                        <img src="{{ asset('storage/' . ltrim((string) $media->file, '/')) }}" alt="" {{ $index === 0 ? 'fetchpriority=high' : 'loading=lazy' }}>
                     </div>
-                    <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.pillar_1_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.pillar_1_desc') }}</p>
+                @endforeach
+            @endif
+        </div>
+        <div class="bj-home-hero__shade" aria-hidden="true"></div>
+        <div class="bj-home-wrap bj-home-hero__content">
+            <div class="bj-home-hero__copy">
+                <p class="bj-home-kicker bj-reveal">{{ $isEnglish ? 'Bakbakan Village · Gianyar, Bali' : 'Desa Bakbakan · Gianyar, Bali' }}</p>
+                <h1 id="home-hero-title" class="bj-home-title bj-reveal">
+                    @if($isEnglish)
+                        Where the forest <em>falls</em> into light
+                    @else
+                        Di mana rimba <em>jatuh</em> menjadi cahaya
+                    @endif
+                </h1>
+                <p class="bj-home-hero__lead bj-reveal">{{ $isEnglish ? 'Follow the sound of water into a greener, quieter side of Gianyar—welcomed and cared for by the people of Bakbakan.' : 'Ikuti suara air menuju sisi Gianyar yang lebih hijau dan tenang—disambut serta dirawat oleh masyarakat Bakbakan.' }}</p>
+                <div class="bj-home-hero__actions bj-reveal">
+                    <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'See ticket prices' : 'Lihat harga tiket' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+                    <a class="bj-home-button bj-home-button--ghost" href="#kisah">{{ $isEnglish ? 'Explore the waterfall' : 'Jelajahi air terjun' }}</a>
                 </div>
             </div>
 
-            {{-- Card 2 --}}
-            <div class="bg-[#FAF8F5] rounded-2xl p-7 border border-stone/10 hover:border-forest/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="100">
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-forest/8 text-forest flex items-center justify-center mb-6">
-                        <span class="material-symbols-outlined text-2xl">pool</span>
+            <div class="bj-home-hero__bottom bj-reveal">
+                <dl class="bj-home-stats">
+                    <div><dt><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span>{{ $isEnglish ? 'Location' : 'Lokasi' }}</span></dt><dd>Bakbakan, Gianyar</dd></div>
+                    <div><dt><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span>{{ $isEnglish ? 'Open daily' : 'Buka setiap hari' }}</span></dt><dd>07.00–18.00</dd></div>
+                    @if($hargaMulai !== null)<div><dt><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><span>{{ $isEnglish ? 'Tickets from' : 'Tiket mulai' }}</span></dt><dd>Rp {{ number_format($hargaMulai, 0, ',', '.') }}</dd></div>@endif
+                </dl>
+
+                @if($usableGallery->count() > 1)
+                    <div class="bj-home-hero__controls" aria-label="{{ $isEnglish ? 'Hero photos' : 'Foto pembuka' }}">
+                        <span class="bj-home-hero__caption" data-bj-hero-caption>{{ $usableGallery->first()->keterangan ?: 'Air Terjun Bangkiang Jaran' }}</span>
+                        <span class="bj-home-hero__count"><strong data-bj-hero-current>01</strong> / {{ str_pad(min($usableGallery->count(), 6), 2, '0', STR_PAD_LEFT) }}</span>
+                        <span class="bj-home-hero__progress" aria-hidden="true"><i data-bj-hero-progress></i></span>
+                        <button type="button" data-bj-hero-prev aria-label="{{ $isEnglish ? 'Previous photo' : 'Foto sebelumnya' }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>
+                        <button type="button" data-bj-hero-next aria-label="{{ $isEnglish ? 'Next photo' : 'Foto berikutnya' }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
                     </div>
-                    <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.pillar_2_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.pillar_2_desc') }}</p>
+                @endif
+            </div>
+        </div>
+        <a class="bj-home-hero__scroll" href="#kisah" aria-label="{{ $isEnglish ? 'Scroll to explore' : 'Gulir untuk menjelajah' }}"><span>{{ $isEnglish ? 'Scroll' : 'Gulir' }}</span><i aria-hidden="true"></i></a>
+    </section>
+
+    <main class="bj-home-paper">
+        <section id="kisah" class="bj-home-intro" aria-labelledby="home-intro-title">
+            <div class="bj-home-wrap bj-home-intro__grid">
+                <div class="bj-home-intro__copy bj-reveal">
+                    <p class="bj-home-kicker">{{ $isEnglish ? 'Welcome to Bangkiang Jaran' : 'Selamat datang di Bangkiang Jaran' }}</p>
+                    <h2 id="home-intro-title">{{ $isEnglish ? 'Hidden in the calm of ' : 'Tersembunyi dalam tenangnya ' }}<em>Bakbakan</em></h2>
+                    <p>{{ $isEnglish ? 'Bangkiang Jaran brings together falling water, a natural pool, and the everyday warmth of a Balinese village. The walk is short, but the atmosphere invites you to stay a little longer.' : 'Bangkiang Jaran mempertemukan aliran air, kolam alami, dan kehangatan keseharian desa Bali. Perjalanannya singkat, tetapi suasananya mengajak Anda tinggal sedikit lebih lama.' }}</p>
+                    <a class="bj-home-text-link" href="#perjalanan">{{ $isEnglish ? 'Follow the journey' : 'Ikuti perjalanannya' }}<span class="material-symbols-outlined" aria-hidden="true">south_east</span></a>
+                </div>
+                <div class="bj-home-intro__photos">
+                    @for($i = 0; $i < 3; $i++)
+                        @php($photo = $photoAt($i + 1))
+                        <figure class="bj-home-intro__photo bj-home-intro__photo--{{ $i + 1 }} bj-reveal" data-bj-parallax><img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" loading="lazy"></figure>
+                    @endfor
                 </div>
             </div>
+            <div class="bj-home-wrap bj-home-facts bj-reveal">
+                <div><strong>5–10</strong><span>{{ $isEnglish ? 'minutes of relaxed walking' : 'menit berjalan santai' }}</span></div>
+                <div><strong>07.00</strong><span>{{ $isEnglish ? 'opening time every day' : 'mulai buka setiap hari' }}</span></div>
+                <div><strong>{{ $tiket->count() }}</strong><span>{{ $isEnglish ? 'active ticket options' : 'pilihan tiket aktif' }}</span></div>
+                <div><strong>100%</strong><span>{{ $isEnglish ? 'digital booking flow' : 'alur pemesanan digital' }}</span></div>
+            </div>
+        </section>
 
-            {{-- Card 3 --}}
-            <div class="bg-[#FAF8F5] rounded-2xl p-7 border border-stone/10 hover:border-forest/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="200">
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-forest/8 text-forest flex items-center justify-center mb-6">
-                        <span class="material-symbols-outlined text-2xl">forest</span>
+        <section id="perjalanan" class="bj-home-stories" aria-labelledby="stories-title">
+            <div class="bj-home-wrap bj-home-section-head bj-home-section-head--wide bj-reveal">
+                <div><p class="bj-home-kicker">{{ $isEnglish ? 'A slower journey' : 'Perjalanan yang lebih pelan' }}</p><h2 id="stories-title">{{ $isEnglish ? 'Follow the water ' : 'Ikuti aliran air ' }}<em>{{ $isEnglish ? 'into the green' : 'menuju hijau' }}</em></h2></div>
+                <p>{{ $isEnglish ? 'Move through Bangkiang Jaran one moment at a time, from the village path to the cool edge of the water.' : 'Nikmati Bangkiang Jaran satu momen demi satu momen, dari jalur desa hingga tepian air yang sejuk.' }}</p>
+            </div>
+            <div class="bj-home-story-list">
+                @foreach($stories as $index => [$title, $copy, $eyebrow])
+                    @php($photo = $photoAt($index + 4))
+                    <article class="bj-home-story {{ $index % 2 ? 'bj-home-story--reverse' : '' }}">
+                        <figure class="bj-home-story__media bj-reveal" data-bj-parallax><img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" loading="lazy"><span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span></figure>
+                        <div class="bj-home-story__copy bj-reveal"><p class="bj-home-kicker">{{ $eyebrow }}</p><h3>{{ $title }}</h3><p>{{ $copy }}</p></div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="bj-home-ticket" aria-labelledby="home-ticket-title">
+            <div class="bj-home-wrap">
+                <div class="bj-home-section-head bj-home-section-head--dark bj-reveal">
+                    <div><p class="bj-home-kicker">{{ $isEnglish ? 'Tickets & visit' : 'Tiket & kunjungan' }}</p><h2 id="home-ticket-title">{{ $isEnglish ? 'Pick your ticket, ' : 'Pilih tiket, ' }}<em>{{ $isEnglish ? 'plan your day' : 'rencanakan hari' }}</em></h2></div>
+                    <p>{{ $isEnglish ? 'Choose from the active ticket options, then continue to the secure booking flow.' : 'Pilih dari tiket yang sedang aktif, lalu lanjutkan ke alur pemesanan yang aman.' }}</p>
+                </div>
+                <div class="bj-home-ticket__layout">
+                    <div class="bj-home-ticket__choices">
+                        @forelse($tiket->take(3) as $index => $ticket)
+                            @php($photo = $photoAt($index + 7))
+                            <article class="bj-home-ticket-card bj-reveal"><img src="{{ $photo['url'] }}" alt="" loading="lazy"><div><small>{{ $isEnglish ? 'Ticket' : 'Tiket' }} {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</small><h3>{{ $ticket->nama_tiket }}</h3><p>Rp {{ number_format($ticket->harga, 0, ',', '.') }} <span>/ {{ $isEnglish ? 'person' : 'orang' }}</span></p></div><a href="{{ route('tiket.index') }}" aria-label="{{ $isEnglish ? 'Choose' : 'Pilih' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></article>
+                        @empty
+                            <p class="bj-home-ticket__empty">{{ $isEnglish ? 'Ticket information will be available soon.' : 'Informasi tiket akan segera tersedia.' }}</p>
+                        @endforelse
                     </div>
-                    <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.pillar_3_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.pillar_3_desc') }}</p>
+                    <aside class="bj-home-ticket__summary bj-reveal">
+                        <p class="bj-home-kicker">{{ $isEnglish ? 'Your visit' : 'Kunjungan Anda' }}</p><h3>{{ $isEnglish ? 'Ready when you are' : 'Siap saat Anda siap' }}</h3>
+                        <ul><li><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>{{ $isEnglish ? 'Choose your date online' : 'Pilih tanggal secara online' }}</li><li><span class="material-symbols-outlined" aria-hidden="true">verified</span>{{ $isEnglish ? 'Payment verified by the manager' : 'Pembayaran diverifikasi pengelola' }}</li><li><span class="material-symbols-outlined" aria-hidden="true">qr_code_2</span>{{ $isEnglish ? 'Show the active e-ticket on arrival' : 'Tunjukkan e-tiket aktif saat tiba' }}</li></ul>
+                        @if($hargaMulai !== null)<div class="bj-home-ticket__price"><span>{{ $isEnglish ? 'Tickets from' : 'Tiket mulai' }}</span><strong>Rp {{ number_format($hargaMulai, 0, ',', '.') }}</strong></div>@endif
+                        <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Start booking' : 'Mulai pesan' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+                    </aside>
                 </div>
             </div>
+        </section>
 
-            {{-- Card 4 --}}
-            <div class="bg-[#FAF8F5] rounded-2xl p-7 border border-stone/10 hover:border-forest/20 hover:shadow-md transition-all duration-300 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="300">
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-forest/8 text-forest flex items-center justify-center mb-6">
-                        <span class="material-symbols-outlined text-2xl">restaurant</span>
-                    </div>
-                    <h3 class="font-serif text-xl sm:text-2xl text-forest mb-3">{{ __('messages.pillar_4_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed">{{ __('messages.pillar_4_desc') }}</p>
+        <section class="bj-home-facilities" aria-labelledby="facilities-title">
+            <div class="bj-home-wrap">
+                <div class="bj-home-section-head bj-reveal"><div><p class="bj-home-kicker">{{ $isEnglish ? 'Facilities' : 'Fasilitas' }}</p><h2 id="facilities-title">{{ $isEnglish ? 'Everything you need, ' : 'Semua yang dibutuhkan, ' }}<em>{{ $isEnglish ? 'close at hand' : 'tetap dekat' }}</em></h2></div><p>{{ $isEnglish ? 'Simple facilities help make the visit more comfortable from arrival to the walk back.' : 'Fasilitas sederhana membantu membuat kunjungan lebih nyaman sejak tiba hingga perjalanan pulang.' }}</p></div>
+                <div class="bj-home-facilities__layout">
+                    @php($facilityPhoto = $photoAt(10))
+                    <figure class="bj-home-facilities__photo bj-reveal" data-bj-parallax><img src="{{ $facilityPhoto['url'] }}" alt="{{ $facilityPhoto['caption'] }}" loading="lazy"><figcaption>{{ $isEnglish ? 'Your visit begins in Bakbakan village' : 'Perjalanan Anda dimulai dari Desa Bakbakan' }}</figcaption></figure>
+                    <div class="bj-home-facilities__grid">@foreach($facilities as [$icon, $title, $copy])<article class="bj-home-facility bj-reveal"><span class="material-symbols-outlined" aria-hidden="true">{{ $icon }}</span><h3>{{ $title }}</h3><p>{{ $copy }}</p></article>@endforeach</div>
                 </div>
             </div>
+        </section>
 
-        </div>
-
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     4. ARSIP VISUAL — Dynamic Promotion Gallery
-══════════════════════════════════════════════════════ --}}
-@if(isset($galeri) && $galeri->count() > 0)
-<section id="galeri" class="py-24 md:py-32 px-gutter bg-[#FAF8F5] relative text-ink" x-data="{ lightbox: false, activeSrc: '', activeCaption: '' }">
-    <div class="max-w-7xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6" data-aos="fade-up">
-            <div class="max-w-xl">
-                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                    {{ __('messages.gallery_sec_tag') }}
-                </span>
-                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
-                    {{ __('messages.gallery_sec_title') }}
-                </h2>
-                <p class="font-sans text-stone text-sm sm:text-base font-light leading-relaxed">
-                    {{ __('messages.gallery_sec_desc') }}
-                </p>
-            </div>
-
-            <p class="font-sans text-xs text-stone/70">
-                {{ __('messages.gallery_zoom_hint') }}
-            </p>
-        </div>
-
-        {{-- Gallery Grid (Dynamic & Responsive) --}}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            @foreach($galeri as $index => $media)
-            <div class="relative rounded-2xl overflow-hidden bg-warm group cursor-pointer border border-stone/10 h-48 sm:h-64 shadow-sm"
-                 data-aos="fade-up" data-aos-delay="{{ ($index % 4) * 60 }}"
-                 @click="lightbox = true; activeSrc = '{{ asset('storage/' . $media->file) }}'; activeCaption = '{{ addslashes($media->keterangan ?? 'Bangkiang Jaran Waterfall') }}'">
-
-                <img src="{{ asset('storage/' . $media->file) }}"
-                     alt="{{ $media->keterangan ?? 'Bangkiang Jaran Waterfall' }}"
-                     loading="lazy"
-                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
-
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-white">
-                    <p class="font-sans text-xs sm:text-sm font-medium text-white line-clamp-1">{{ $media->keterangan ?? 'Bangkiang Jaran' }}</p>
-                    <span class="font-sans text-[10px] uppercase tracking-widest text-white/60 mt-0.5">Gianyar, Bali</span>
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-    </div>
-
-    {{-- Clean Lightbox Modal --}}
-    <div x-show="lightbox"
-         x-cloak
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 backdrop-blur-none"
-         x-transition:enter-end="opacity-100 backdrop-blur-md"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 backdrop-blur-md"
-         x-transition:leave-end="opacity-0 backdrop-blur-none"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md"
-         @keydown.escape.window="lightbox = false">
-
-        <button @click="lightbox = false"
-                class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
-            <span class="material-symbols-outlined text-2xl">close</span>
-        </button>
-
-        <div class="max-w-5xl w-full flex flex-col items-center" @click.outside="lightbox = false">
-            <img :src="activeSrc"
-                 class="max-h-[80vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
-                 alt="Preview">
-            <p x-text="activeCaption" class="font-sans text-xs sm:text-sm text-white/90 mt-4 text-center max-w-lg font-light tracking-wide"></p>
-        </div>
-    </div>
-
-</section>
-@endif
-
-{{-- ══════════════════════════════════════════════════════
-     5. LOKASI & AKSESIBILITAS — Clean Directions & Map
-══════════════════════════════════════════════════════ --}}
-<section id="lokasi" class="py-24 md:py-32 px-gutter bg-white relative text-ink">
-    <div class="max-w-7xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="max-w-2xl mb-14" data-aos="fade-up">
-            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                {{ __('messages.travel_sec_tag') }}
-            </span>
-            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
-                {{ __('messages.travel_sec_title') }}
-            </h2>
-            <p class="font-sans text-stone text-sm sm:text-base font-light leading-relaxed">
-                {{ __('messages.travel_sec_desc') }}
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-
-            {{-- Google Map Embed Frame --}}
-            <div class="lg:col-span-7 rounded-2xl overflow-hidden shadow-sm border border-stone/15 h-[380px] sm:h-[450px]" data-aos="fade-up">
-                <iframe src="https://www.google.com/maps?q=-8.511979,115.328486&output=embed&z=15"
-                        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-
-            {{-- Right Travel Guide & Directions --}}
-            <div class="lg:col-span-5 space-y-6" data-aos="fade-up" data-aos-delay="100">
-
-                {{-- Travel Times List --}}
-                <div class="bg-[#FAF8F5] p-6 rounded-2xl border border-stone/10">
-                    <p class="font-sans text-xs uppercase tracking-widest text-forest font-semibold mb-4">{{ __('messages.travel_time') }} Estimasi</p>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="pb-2 border-b border-stone/10">
-                            <p class="font-sans text-xs text-stone">{{ __('messages.travel_ubud') }}</p>
-                            <p class="font-sans text-sm font-semibold text-forest mt-0.5">{{ __('messages.travel_ubud_sub') }}</p>
-                        </div>
-                        <div class="pb-2 border-b border-stone/10">
-                            <p class="font-sans text-xs text-stone">{{ __('messages.travel_sanur') }}</p>
-                            <p class="font-sans text-sm font-semibold text-forest mt-0.5">{{ __('messages.travel_sanur_sub') }}</p>
-                        </div>
-                        <div class="pb-2 border-b border-stone/10">
-                            <p class="font-sans text-xs text-stone">{{ __('messages.travel_kuta') }}</p>
-                            <p class="font-sans text-sm font-semibold text-forest mt-0.5">{{ __('messages.travel_kuta_sub') }}</p>
-                        </div>
-                        <div class="pb-2 border-b border-stone/10">
-                            <p class="font-sans text-xs text-stone">{{ __('messages.travel_airport') }}</p>
-                            <p class="font-sans text-sm font-semibold text-forest mt-0.5">{{ __('messages.travel_airport_sub') }}</p>
-                        </div>
+        <section id="galeri" class="bj-home-scroll-gallery" data-bj-scroll-gallery aria-labelledby="moments-title">
+            <div class="bj-home-scroll-gallery__stage">
+                <div class="bj-home-scroll-gallery__heading bj-reveal"><p class="bj-home-kicker">{{ $isEnglish ? 'Gallery' : 'Galeri' }}</p><h2 id="moments-title">{{ $isEnglish ? 'Moments from ' : 'Momen dari ' }}<em>{{ $isEnglish ? 'the valley' : 'lembah' }}</em></h2><p>{{ $isEnglish ? 'Move through a collection of water, light, and quiet green.' : 'Bergeraklah melalui kumpulan momen air, cahaya, dan hijaunya suasana.' }}</p></div>
+                <div class="bj-home-scroll-gallery__viewport" data-bj-gallery data-bj-gallery-viewport>
+                    <div class="bj-home-scroll-gallery__track" data-bj-gallery-track data-direction="left">
+                        @for($i = 0; $i < 12; $i++)
+                            @php($photo = $photoAt(11 + $i))
+                            <button type="button" class="bj-home-scroll-gallery__photo bj-home-scroll-gallery__photo--{{ ($i % 6) + 1 }}" data-gallery-open data-gallery-src="{{ $photo['url'] }}" data-gallery-caption="{{ $photo['caption'] }}" aria-label="{{ $isEnglish ? 'Enlarge photo' : 'Perbesar foto' }}: {{ $photo['caption'] }}">
+                                <img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" loading="lazy">
+                                <span>{{ $photo['caption'] }}</span>
+                            </button>
+                        @endfor
                     </div>
                 </div>
-
-                {{-- Practical Advice --}}
-                <div class="bg-[#FAF8F5] p-6 rounded-2xl border border-stone/10">
-                    <p class="font-sans text-xs uppercase tracking-widest text-forest font-semibold mb-3">{{ __('messages.etiquette_title') }}</p>
-                    <ul class="space-y-2.5 font-sans text-xs sm:text-sm text-stone font-light">
-                        <li class="flex items-start gap-2.5">
-                            <span class="material-symbols-outlined text-forest text-base mt-0.5">check</span>
-                            <span>{{ __('messages.etiquette_1') }}</span>
-                        </li>
-                        <li class="flex items-start gap-2.5">
-                            <span class="material-symbols-outlined text-forest text-base mt-0.5">check</span>
-                            <span>{{ __('messages.etiquette_2') }}</span>
-                        </li>
-                        <li class="flex items-start gap-2.5">
-                            <span class="material-symbols-outlined text-forest text-base mt-0.5">check</span>
-                            <span>{{ __('messages.etiquette_3') }}</span>
-                        </li>
-                    </ul>
-                </div>
-
-                {{-- Google Maps Direct Link --}}
-                <a href="https://www.google.com/maps?q=-8.511979,115.328486" target="_blank"
-                   class="inline-flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-medium py-3.5 rounded-full hover:bg-leaf transition-all duration-300 shadow-sm">
-                    <span class="material-symbols-outlined text-base">near_me</span>
-                    <span>{{ __('messages.open_in_gmaps') }}</span>
-                </a>
-
+                <div class="bj-home-scroll-gallery__progress" aria-hidden="true"><span data-bj-scroll-gallery-progress></span></div>
             </div>
+        </section>
 
-        </div>
-    </div>
-</section>
+        <section class="bj-home-pledge" aria-label="{{ $isEnglish ? 'Responsible visit reminder' : 'Pengingat kunjungan bertanggung jawab' }}">@php($pledgePhoto = $photoAt(5))<img src="{{ $pledgePhoto['url'] }}" alt="" loading="lazy"><div class="bj-home-pledge__shade" aria-hidden="true"></div><blockquote class="bj-reveal">{{ $isEnglish ? 'Take nothing but photos. Leave nothing but footprints.' : 'Bawa pulang hanya foto. Tinggalkan hanya jejak langkah.' }}</blockquote></section>
 
-{{-- ══════════════════════════════════════════════════════
-     6. INFORMASI PENTING (FAQ) — Minimalist Accordion
-══════════════════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter bg-[#FAF8F5] relative text-ink" x-data="{ openFaq: 1 }">
-    <div class="max-w-3xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="text-center mb-14" data-aos="fade-up">
-            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                {{ __('messages.faq_sec_tag') }}
-            </span>
-            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3">
-                {{ __('messages.faq_sec_title') }}
-            </h2>
-        </div>
-
-        {{-- Minimalist FAQ Items --}}
-        <div class="divide-y divide-stone/20 border-y border-stone/20">
-
-            {{-- Item 1 --}}
-            <div class="py-5" data-aos="fade-up">
-                <button @click="openFaq = (openFaq === 1 ? null : 1)"
-                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
-                    <span>{{ __('messages.faq_q1') }}</span>
-                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 1 }">+</span>
-                </button>
-                <div x-show="openFaq === 1" x-collapse>
-                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
-                        {{ __('messages.faq_a1') }}
-                    </p>
-                </div>
+        <section class="bj-home-steps" aria-labelledby="steps-title">
+            <div class="bj-home-wrap bj-home-steps__layout">
+                <div class="bj-home-steps__intro bj-reveal"><p class="bj-home-kicker">{{ $isEnglish ? 'Plan with ease' : 'Rencanakan dengan mudah' }}</p><h2 id="steps-title">{{ $isEnglish ? 'Five steps from plan to ' : 'Lima langkah dari rencana menuju ' }}<em>{{ $isEnglish ? 'waterfall' : 'air terjun' }}</em></h2><p>{{ $isEnglish ? 'Everything is clearer when the practical details are prepared before you arrive.' : 'Perjalanan terasa lebih tenang ketika kebutuhan praktis sudah disiapkan sebelum tiba.' }}</p><a class="bj-home-button bj-home-button--forest" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Plan your visit' : 'Rencanakan kunjungan' }}</a></div>
+                <ol class="bj-home-steps__list">@foreach($visitSteps as $index => [$title, $copy])<li class="bj-reveal"><span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span><div><h3>{{ $title }}</h3><p>{{ $copy }}</p></div></li>@endforeach</ol>
             </div>
+        </section>
 
-            {{-- Item 2 --}}
-            <div class="py-5" data-aos="fade-up" data-aos-delay="60">
-                <button @click="openFaq = (openFaq === 2 ? null : 2)"
-                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
-                    <span>{{ __('messages.faq_q2') }}</span>
-                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 2 }">+</span>
-                </button>
-                <div x-show="openFaq === 2" x-collapse>
-                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
-                        {{ __('messages.faq_a2') }}
-                    </p>
-                </div>
+        <section class="bj-home-faq" aria-labelledby="home-faq-title">
+            <div class="bj-home-wrap bj-home-faq__layout">
+                <div class="bj-home-faq__intro bj-reveal"><p class="bj-home-kicker">{{ __('messages.promo_faq_label') }}</p><h2 id="home-faq-title">{{ $isEnglish ? 'Good to ' : 'Baik untuk ' }}<em>{{ $isEnglish ? 'know' : 'diketahui' }}</em></h2><p>{{ $isEnglish ? 'Practical answers for a calmer visit to Bangkiang Jaran.' : 'Jawaban praktis untuk kunjungan yang lebih tenang ke Bangkiang Jaran.' }}</p></div>
+                <div class="bj-home-faq__items">@for($i = 1; $i <= 4; $i++)<details class="bj-reveal" {{ $i === 1 ? 'open' : '' }}><summary>{{ __('messages.promo_faq_q' . $i) }}<span class="material-symbols-outlined" aria-hidden="true">add</span></summary><p>{{ __('messages.promo_faq_a' . $i) }}</p></details>@endfor</div>
             </div>
+        </section>
+    </main>
 
-            {{-- Item 3 --}}
-            <div class="py-5" data-aos="fade-up" data-aos-delay="120">
-                <button @click="openFaq = (openFaq === 3 ? null : 3)"
-                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
-                    <span>{{ __('messages.faq_q3') }}</span>
-                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 3 }">+</span>
-                </button>
-                <div x-show="openFaq === 3" x-collapse>
-                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
-                        {{ __('messages.faq_a3') }}
-                    </p>
-                </div>
-            </div>
+    <section class="bj-home-cta" aria-labelledby="home-cta-title">
+        <div class="bj-home-wrap bj-home-cta__content bj-reveal"><p class="bj-home-kicker">{{ $isEnglish ? 'Plan your visit' : 'Rencanakan kunjungan' }}</p><h2 id="home-cta-title">{{ $isEnglish ? 'Ready to hear the ' : 'Siap mendengar ' }}<em>{{ $isEnglish ? 'roar?' : 'derunya?' }}</em></h2><p>{{ $isEnglish ? 'Choose your date, prepare your journey, and let the valley welcome you.' : 'Pilih tanggal kunjungan, siapkan perjalanan, dan biarkan lembah menyambut Anda.' }}</p><div class="bj-home-cta__actions">@if(config('payment.contact_whatsapp'))<a class="bj-home-button bj-home-button--whatsapp" href="https://wa.me/{{ config('payment.contact_whatsapp') }}" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">chat</span>{{ $isEnglish ? 'Chat on WhatsApp' : 'Chat via WhatsApp' }}</a>@endif<a class="bj-home-button bj-home-button--ghost" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Check ticket prices' : 'Lihat harga tiket' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div></div>
+        <div class="bj-home-ribbons" aria-hidden="true">@foreach(['left', 'right'] as $row => $direction)<div class="bj-home-ribbon" data-bj-marquee data-direction="{{ $direction }}">@for($copy = 0; $copy < 2; $copy++)<div class="bj-home-ribbon__set">@for($i = 0; $i < 6; $i++)@php($photo = $photoAt($i + 2 + ($row * 5)))<img src="{{ $photo['url'] }}" alt="" loading="lazy">@endfor</div>@endfor</div>@endforeach</div>
+    </section>
+</div>
 
-            {{-- Item 4 --}}
-            <div class="py-5" data-aos="fade-up" data-aos-delay="180">
-                <button @click="openFaq = (openFaq === 4 ? null : 4)"
-                        class="w-full flex items-center justify-between text-left font-serif text-lg sm:text-xl text-forest hover:text-leaf transition-colors cursor-pointer">
-                    <span>{{ __('messages.faq_q4') }}</span>
-                    <span class="font-sans text-lg text-stone ml-4 transition-transform duration-300" :class="{ 'rotate-45': openFaq === 4 }">+</span>
-                </button>
-                <div x-show="openFaq === 4" x-collapse>
-                    <p class="font-sans text-xs sm:text-sm text-stone font-light leading-relaxed pt-3 max-w-2xl">
-                        {{ __('messages.faq_a4') }}
-                    </p>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-</section>
-
+<dialog id="bj-gallery-dialog" class="bj-gallery-dialog" aria-label="{{ $isEnglish ? 'Photo gallery' : 'Galeri foto' }}"><button type="button" data-gallery-close aria-label="{{ $isEnglish ? 'Close gallery' : 'Tutup galeri' }}">×</button><img src="" alt=""><p></p></dialog>
 @endsection
-
-@push('styles')
-<style>
-/* Hero Reveal Transitions */
-#hero-img { transition: opacity 0.8s ease, transform 1.2s ease-out; }
-#hero-video { transition: opacity 0.8s ease; }
-#hero-content { transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
-</style>
-@endpush
-
-@push('scripts')
-<script>
-let heroRevealed = false;
-
-function onImgLoaded() {
-    revealHero();
-}
-
-function onVideoReady() {
-    const img = document.getElementById('hero-img');
-    const vid = document.getElementById('hero-video');
-    if (vid) vid.style.opacity = '1';
-    if (img) img.style.opacity = '0';
-    revealHero();
-}
-
-function onVideoError() {
-    const vid = document.getElementById('hero-video');
-    if (vid) vid.style.display = 'none';
-    revealHero();
-}
-
-function revealHero() {
-    if (heroRevealed) return;
-    heroRevealed = true;
-
-    const content = document.getElementById('hero-content');
-    if (content) {
-        content.classList.remove('opacity-0', 'translate-y-6');
-    }
-
-    setTimeout(startTyping, 350);
-}
-
-function startTyping() {
-    const heading = document.getElementById('typing-heading');
-    const sub = document.getElementById('typing-sub');
-    if (!heading || !sub) return;
-
-    const text1 = @json(__("messages.hero_title_lead"));
-    const text2 = @json(__("messages.hero_desc_lead"));
-    let idx = 0, isHeading = true;
-
-    function type() {
-        const target = isHeading ? heading : sub;
-        const text   = isHeading ? text1 : text2;
-        if (idx < text.length) {
-            target.textContent = text.slice(0, idx + 1);
-            idx++;
-            setTimeout(type, isHeading ? 35 + Math.random() * 20 : 15 + Math.random() * 10);
-        } else if (isHeading) {
-            isHeading = false; idx = 0;
-            setTimeout(type, 200);
-        }
-    }
-    type();
-}
-
-(function () {
-    const img = document.getElementById('hero-img');
-    const vid = document.getElementById('hero-video');
-    if (img && img.complete) revealHero();
-    if (vid && vid.readyState >= 3) onVideoReady();
-})();
-</script>
-@endpush

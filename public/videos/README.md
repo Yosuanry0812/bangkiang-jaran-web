@@ -7,11 +7,11 @@ hero-bangkiang.mp4
 ```
 
 **Spesifikasi yang disarankan:**
-- Format: MP4 (H.264/H.265)
+- Format: MP4 (H.264 agar kompatibel luas)
 - Resolusi: 1920×1080 atau 2560×1440
 - Durasi: 15–60 detik (loop friendly)
 - Ukuran: < 15 MB (compressed untuk web)
-- Audio: Bisa ada audio, tapi default muted — user bisa toggle sound
+- Audio: Sebaiknya dihapus saat ekspor; video hero diputar tanpa suara
 
 **Tips encoding (ffmpeg):**
 ```bash

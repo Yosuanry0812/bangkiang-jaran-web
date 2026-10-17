@@ -64,9 +64,9 @@ class DatabaseSeeder extends Seeder
 
         // ========== TIKET ==========
         $tikets = [
-            ['nama_tiket' => 'Tiket Masuk Dewasa',               'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Masuk Anak-Anak',            'harga' => 15000, 'kategori' => 'perorangan', 'status' => 'aktif'],
-            ['nama_tiket' => 'Tiket Masuk Domestik (WNA)',       'harga' => 30000, 'kategori' => 'perorangan', 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Dewasa',                  'nama_tiket_en' => 'Adult Admission',       'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Anak',                     'nama_tiket_en' => 'Child Admission',       'harga' => 15000, 'kategori' => 'perorangan', 'status' => 'aktif'],
+            ['nama_tiket' => 'Tiket Wisatawan Mancanegara',   'nama_tiket_en' => 'International Visitor', 'harga' => 30000, 'kategori' => 'perorangan', 'status' => 'aktif'],
         ];
         foreach ($tikets as $t) {
             DB::table('tiket')->updateOrInsert(

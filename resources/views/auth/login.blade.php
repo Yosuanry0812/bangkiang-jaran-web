@@ -7,7 +7,6 @@
     <div class="hidden md:flex relative flex-col justify-between overflow-hidden min-h-[600px]">
         {{-- Background image --}}
         <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
-             onerror="this.src='https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80'"
              alt="Bangkiang Jaran"
              class="absolute inset-0 w-full h-full object-cover">
 
@@ -18,15 +17,14 @@
         {{-- Top logo area --}}
         <div class="relative z-10 p-8">
             <div class="inline-flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                    <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">water</span>
-                </div>
                 <span class="font-display text-white font-semibold text-lg tracking-wide">Bangkiang Jaran</span>
             </div>
         </div>
 
-        {{-- Spacer --}}
-        <div class="flex-1"></div>
+        <div class="relative z-10 p-8 text-white">
+            <p class="text-[11px] uppercase tracking-[.2em] text-white/70 mb-3">Desa Bakbakan · Gianyar</p>
+            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Perjalanan dimulai di sini.</p>
+        </div>
     </div>
 
     {{-- ── Right: Login Form ───────────────────────────── --}}
@@ -36,10 +34,10 @@
         <div class="mb-8">
             <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-body font-semibold tracking-[0.15em] uppercase px-3 py-1.5 rounded-full mb-5">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Selamat Datang Kembali
+                Akun Pengunjung
             </div>
             <h1 class="font-display text-[2rem] font-semibold text-gray-900 leading-tight mb-2">Masuk ke Akun</h1>
-            <p class="font-body text-[14px] text-gray-400 leading-relaxed">Kelola petualangan tropis Anda bersama kami.</p>
+            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Masuk untuk memesan tiket dan melihat status kunjungan Anda.</p>
         </div>
 
         {{-- Alert messages --}}
@@ -151,7 +149,7 @@
             Masuk dengan Google
         </a>
 
-        <p class="mt-4 text-center font-body text-[12px] text-gray-400">Akun Google baru wajib set password setelah login pertama.</p>
+        <p class="mt-4 text-center font-body text-[12px] text-gray-400">Anda dapat mengatur kata sandi lewat halaman akun setelah masuk dengan Google.</p>
 
         {{-- Register link --}}
         <p class="mt-6 text-center font-body text-[13px] text-gray-400">

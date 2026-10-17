@@ -115,10 +115,13 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-2">{{ __('messages.payment_proof') }}</p>
                 @if ($pemesanan->pembayaran->bukti_bayar)
-                    <a href="{{ asset('storage/' . $pemesanan->pembayaran->bukti_bayar) }}" target="_blank">
+                    <a href="{{ asset('storage/' . $pemesanan->pembayaran->bukti_bayar) }}" target="_blank" rel="noopener noreferrer">
+                        @if(strtolower(pathinfo($pemesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) === 'pdf')
+                        <span class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm text-forest"><span class="material-symbols-outlined">picture_as_pdf</span> Buka bukti pembayaran PDF</span>
+                        @else
                         <img src="{{ asset('storage/' . $pemesanan->pembayaran->bukti_bayar) }}" alt="{{ __('messages.payment_proof') }}"
-                            class="max-h-48 rounded-xl border border-gray-300-200 cursor-pointer hover:opacity-90 transition"
-                            onclick="window.open(this.src, '_blank')">
+                            class="max-h-48 rounded-xl border border-gray-300-200 cursor-pointer hover:opacity-90 transition">
+                        @endif
                     </a>
                 @else
                     <p class="text-gray-500-400 italic">{{ __('messages.no_payment_proof') }}</p>

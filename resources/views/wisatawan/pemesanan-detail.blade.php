@@ -140,6 +140,13 @@
 
         {{-- Actions --}}
         <div class="mt-8 flex flex-col sm:flex-row gap-3 no-print" data-aos="fade-up">
+            @if($pemesanan->status !== 'dibatalkan' && (!$pemesanan->pembayaran || $pemesanan->pembayaran->status === 'ditolak'))
+            <a href="{{ route('wisatawan.pembayaran.create', $pemesanan->id_pemesanan) }}"
+               class="flex-1 flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
+                <span class="material-symbols-outlined text-sm">payments</span>
+                {{ $pemesanan->pembayaran?->status === 'ditolak' ? 'Unggah Ulang Bukti Bayar' : __('messages.pay_btn') }}
+            </a>
+            @endif
             <button onclick="window.print()"
                     class="flex-1 flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                 <span class="material-symbols-outlined text-sm">download</span>

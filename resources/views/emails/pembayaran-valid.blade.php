@@ -1,43 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family: 'Segoe UI', Arial, sans-serif; background: #f0fdf4; margin: 0; padding: 0;">
-<div style="max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-<div style="background: linear-gradient(135deg, #0d9488, #065f46); padding: 40px 30px; text-align: center;">
-<h1 style="color: #ffffff; margin: 0; font-size: 24px;">🎉 Pembayaran Terverifikasi!</h1>
-<p style="color: #ccfbf1; margin: 8px 0 0;">Tiket Anda Siap Digunakan</p>
-</div>
-<div style="padding: 30px;">
-<h2 style="color: #065f46; margin-top: 0;">Halo, {{ $pemesanan->user->name }}!</h2>
-<p style="color: #4b5563;">Pembayaran Anda telah diverifikasi dan <strong>disetujui</strong>. Berikut kode tiket masing-masing pengunjung:</p>
-
-@php $allItems = $pemesanan->detailPemesanan()->get(); @endphp
-
-<div style="background: #f0fdf4; border-radius: 12px; padding: 16px; margin: 16px 0;">
-<table style="width: 100%; border-collapse: collapse;">
-<tr><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">No</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Jenis Tiket</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Nama / Plat</th><th style="text-align: left; padding: 8px 4px; color: #065f46; font-size: 12px; border-bottom: 1px solid #d1fae5;">Kode Tiket</th></tr>
-@foreach($allItems as $idx => $item)
-<tr><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $idx + 1 }}</td><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $item->nama_tiket }}</td><td style="padding: 6px 4px; color: #4b5563; font-size: 13px;">{{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '-' }}</td><td style="padding: 6px 4px; font-family: monospace; font-weight: bold; color: #0d9488; font-size: 14px; letter-spacing: 1px;">{{ $item->kode_tiket }}</td></tr>
-@endforeach
+@extends('emails.layout')
+@section('title', 'Pembayaran terverifikasi')
+@section('content')
+<p style="margin:0 0 12px;color:#a46147;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;">PEMBAYARAN TERVERIFIKASI</p>
+<h1 style="margin:0 0 20px;color:#173d34;font-family:Georgia,serif;font-size:36px;font-weight:normal;line-height:1.13;">Tiket Anda siap digunakan.</h1>
+<p style="margin:0 0 23px;color:#516059;font-size:14px;line-height:1.8;">Halo {{ $pemesanan->user->name }}, pembayaran untuk pesanan <strong>{{ $pemesanan->kode_booking }}</strong> telah disetujui. Tunjukkan kode tiket masing-masing pengunjung saat masuk.</p>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 25px;border-collapse:collapse;">
+    <tr style="background:#eae7dc;"><th align="left" style="padding:11px;color:#173d34;font-size:11px;">Tiket</th><th align="left" style="padding:11px;color:#173d34;font-size:11px;">Pengunjung / Plat</th><th align="left" style="padding:11px;color:#173d34;font-size:11px;">Kode</th></tr>
+    @foreach($pemesanan->detailPemesanan as $item)
+    <tr><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->nama_tiket }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '—' }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#173d34;font-size:12px;font-weight:bold;">{{ $item->kode_tiket }}</td></tr>
+    @endforeach
 </table>
-</div>
-
-<table style="width: 100%; margin: 16px 0; background: #f9fafb; border-radius: 12px; padding: 16px;">
-<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Kode Booking:</strong></td><td style="padding: 6px 0; color: #0d9488; font-size: 18px; font-weight: bold;">{{ $pemesanan->kode_booking }}</td></tr>
-<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Tanggal Kunjungan:</strong></td><td style="padding: 6px 0; color: #374151; font-size: 13px;">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d F Y') }}</td></tr>
-<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Total Tiket:</strong></td><td style="padding: 6px 0; color: #374151; font-size: 13px;">{{ $allItems->count() }} tiket</td></tr>
-<tr><td style="padding: 6px 0; color: #374151; font-size: 13px;"><strong>Status:</strong></td><td style="padding: 6px 0;"><span style="background: #10b981; color: #ffffff; padding: 4px 12px; border-radius: 20px; font-size: 11px;">LUNAS - Siap Digunakan</span></td></tr>
-</table>
-
-<p style="color: #4b5563;">Tunjukkan kode tiket masing-masing di pintu masuk. Setiap tiket memiliki kode unik, jadi bisa masuk satu per satu tanpa harus menunggu rombongan.</p>
-
-<div style="text-align: center; margin: 30px 0;">
-<a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" style="display: inline-block; background: #0d9488; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Lihat E-Ticket</a>
-</div>
-</div>
-<div style="background: #f9fafb; padding: 20px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-<p style="color: #9ca3af; font-size: 12px; margin: 0;">© {{ date('Y') }} Bangkiang Jaran Waterfall. Desa Bakbakan, Gianyar, Bali.</p>
-</div>
-</div>
-</body>
-</html>
+<p style="margin:0 0 25px;color:#516059;font-size:13px;line-height:1.75;">Tanggal kunjungan: <strong>{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y') }}</strong>. Setiap tiket memiliki kode tersendiri.</p>
+<a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" style="display:inline-block;padding:15px 24px;background:#173d34;color:#fff;text-decoration:none;font-size:13px;font-weight:bold;">Buka e-ticket →</a>
+@endsection

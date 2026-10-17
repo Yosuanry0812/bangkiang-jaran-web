@@ -33,9 +33,10 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         @forelse ($galeri ?? [] as $g)
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden group">
-            <div class="relative overflow-hidden">
-                <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500"
-                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image'">
+            <div class="relative overflow-hidden h-44 bg-[#e9e5da] flex items-center justify-center">
+                <span class="text-xs text-[#66736c]">Foto tidak tersedia</span>
+                <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                     onerror="this.remove()">
                 @if($g->tipe === 'restoran')
                 <span class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Restoran</span>
                 @endif

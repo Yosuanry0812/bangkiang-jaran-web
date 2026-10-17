@@ -77,7 +77,7 @@
 
             {{-- Hero area --}}
             <div class="relative h-40 bg-gradient-to-br from-emerald-900 via-emerald-700 to-emerald-500">
-                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80')] bg-cover bg-center opacity-20"></div>
+                <div class="absolute inset-0 bj-ticket-verify-motif" aria-hidden="true"></div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-5">
                     <p class="text-[10px] uppercase tracking-widest text-white/60">E-Ticket</p>

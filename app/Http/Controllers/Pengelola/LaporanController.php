@@ -46,7 +46,7 @@ class LaporanController extends Controller
                 'periode_awal' => $request->periode_awal,
                 'periode_akhir' => $request->periode_akhir,
                 'tipe' => $tipe,
-            ]);
+            ])->setPaper('a4', 'landscape');
             return $pdf->download('laporan-kunjungan-' . $request->periode_awal . '-sampai-' . $request->periode_akhir . '.pdf');
         }
 
@@ -85,7 +85,7 @@ class LaporanController extends Controller
                 'periode_awal' => $request->periode_awal,
                 'periode_akhir' => $request->periode_akhir,
                 'tipe' => $tipe,
-            ]);
+            ])->setPaper('a4', 'landscape');
             return $pdf->download('laporan-transaksi-' . $request->periode_awal . '-sampai-' . $request->periode_akhir . '.pdf');
         }
 

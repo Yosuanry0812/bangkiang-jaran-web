@@ -4,7 +4,7 @@
 @section('title', ($tiket->nama_tiket ?? __('messages.breadcrumb_detail')) . ' — Bangkiang Jaran')
 
 @section('content')
-<div class="min-h-screen" style="background:#F8F7F5;">
+<div class="min-h-screen bj-transaction-page">
 
     {{-- ── Breadcrumb ──────────────────────────────────────── --}}
     <div class="pt-20 sm:pt-28 pb-0 px-gutter">
@@ -137,11 +137,18 @@
                             <div class="mt-6 space-y-2.5">
                                 @if($tiket->status == 'aktif')
                                 @auth
+                                @if(Auth::user()->role === 'wisatawan')
                                 <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $tiket->id_tiket]) }}"
                                    class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                                     <span class="material-symbols-outlined text-sm">shopping_cart</span>
                                     {{ __('messages.book_now_btn') }}
                                 </a>
+                                @else
+                                <a href="{{ route('pengelola.dashboard') }}"
+                                   class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
+                                    Buka dashboard pengelola
+                                </a>
+                                @endif
                                 @else
                                 <a href="{{ route('login') }}"
                                    class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">

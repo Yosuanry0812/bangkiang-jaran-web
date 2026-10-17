@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,200&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,8 +16,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
-                        sans:  ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Fraunces', 'Georgia', 'serif'],
+                        sans:  ['Manrope', 'system-ui', 'sans-serif'],
                     },
                 }
             }
@@ -56,9 +56,11 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
     </style>
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
 </head>
 
-<body class="font-sans antialiased bg-slate-50 text-slate-800 min-h-screen overflow-x-clip">
+<body class="bj-admin font-sans antialiased bg-slate-50 text-slate-800 min-h-screen overflow-x-clip">
 <div x-data="{ sidebarOpen: false }"
      x-effect="document.body.style.overflow = sidebarOpen ? 'hidden' : ''"
      @keydown.escape.window="sidebarOpen = false"
@@ -334,6 +336,7 @@ function notifikasi() {
     };
 }
 </script>
+<script defer src="{{ asset('js/site.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

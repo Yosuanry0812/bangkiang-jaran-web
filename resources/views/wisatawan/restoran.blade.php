@@ -1,362 +1,199 @@
 @extends('layouts.app')
-@section('title', 'Restoran Kepulauan Rasa — Bangkiang Jaran')
+
+@section('title', __('messages.dining_label') . ' — Bangkiang Jaran')
 @section('nav-mode', 'hero')
 
 @section('content')
-
-{{-- ══════════════════════════════════════════════════════
-     1. HERO SECTION — Cinematic & Natural Ambiance
-══════════════════════════════════════════════════════ --}}
-<section id="resto-hero" class="relative w-full min-h-[85vh] flex flex-col justify-between overflow-hidden bg-[#0D1A12] text-white">
-
-    {{-- Background Layer with Subtle Ken-Burns Zoom — dinamis: pakai foto restoran pertama dari pengelola jika ada --}}
-    @php $heroResto = isset($galeriRestoran) && $galeriRestoran->count() > 0 ? $galeriRestoran->first() : null; @endphp
-    <div class="absolute inset-0 z-0 select-none pointer-events-none overflow-hidden">
-        <img src="{{ $heroResto ? asset('storage/' . $heroResto->file) : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&q=80' }}"
-             alt="{{ $heroResto->keterangan ?? 'Restoran Kepulauan Rasa Bangkiang Jaran' }}"
-             class="w-full h-full object-cover scale-100 animate-slow-zoom transition-all duration-1000 ease-out"
-             style="opacity: 0.85;">
-        <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#0D1A12] via-[#0D1A12]/80 to-transparent"></div>
-    </div>
-
-    {{-- Top Spacer for Fixed Navbar --}}
-    <div class="pt-28 md:pt-36"></div>
-
-    {{-- Hero Content Body --}}
-    <div class="relative z-10 w-full max-w-7xl mx-auto px-gutter pb-16 pt-8">
-
-        {{-- Tagline --}}
-        <p class="font-sans text-xs md:text-sm font-medium tracking-[0.2em] uppercase text-white/90 mb-3 block"
-           data-aos="fade-up" data-aos-duration="700">
-            {{ __('messages.resto_label') }}
-        </p>
-
-        {{-- Hero Serif Title --}}
-        <h1 class="font-serif text-[clamp(2.8rem,6vw,5.2rem)] leading-[1.04] text-white max-w-4xl tracking-tight mb-4 text-balance"
-            data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
-            {{ __('messages.resto_name') }}
-        </h1>
-
-        {{-- Subtitle --}}
-        <p class="font-sans text-[15px] sm:text-base md:text-lg text-white/80 max-w-2xl font-light leading-relaxed mb-8"
-           data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
-            {{ __('messages.resto_desc') }}
-        </p>
-
-        {{-- Action Button --}}
-        <div class="flex items-center gap-4 mb-10" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
-            <a href="#filosofi"
-               class="inline-flex items-center gap-2.5 bg-white text-forest hover:bg-gray-100 font-sans text-sm font-semibold px-8 py-3.5 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-                <span>{{ __('messages.learn_more') }}</span>
-                <span class="material-symbols-outlined text-base">arrow_downward</span>
-            </a>
-        </div>
-
-        {{-- Operating Hours Strip --}}
-        <div class="pt-6 border-t border-white/15 max-w-xl flex items-center gap-3 text-white/70 font-sans text-xs sm:text-sm"
-             data-aos="fade-up" data-aos-delay="400" data-aos-duration="800">
-            <span class="material-symbols-outlined text-base text-white/80">schedule</span>
-            <span>{{ __('messages.resto_hours_detail') }}</span>
-        </div>
-
-    </div>
-
-    <div class="pb-4"></div>
-
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     2. THE RESTAURANT PHILOSOPHY — Story & Ingredients
-══════════════════════════════════════════════════════ --}}
-<section id="filosofi" class="py-24 md:py-32 px-gutter bg-[#FAF8F5] text-ink relative overflow-hidden">
-    <div class="max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-
-            {{-- Left Story Column --}}
-            <div class="lg:col-span-6" data-aos="fade-right" data-aos-duration="800">
-                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-3 block">
-                    {{ __('messages.resto_phil_tag') }}
-                </span>
-
-                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-6 text-balance">
-                    {{ __('messages.resto_phil_title') }}
-                </h2>
-
-                <p class="font-serif italic text-lg sm:text-xl text-forest/90 leading-relaxed mb-6">
-                    "{{ __('messages.resto_phil_quote') }}"
-                </p>
-
-                <div class="space-y-4 font-sans text-[15px] sm:text-base text-stone font-light leading-relaxed mb-8">
-                    <p>{{ __('messages.resto_phil_p1') }}</p>
-                    <p>{{ __('messages.resto_phil_p2') }}</p>
-                </div>
-
-                {{-- Highlights List --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-stone/15">
-                    <div>
-                        <span class="material-symbols-outlined text-forest text-2xl mb-1">local_dining</span>
-                        <p class="font-sans text-xs font-semibold text-forest">{{ __('messages.resto_feat_1') }}</p>
-                    </div>
-                    <div>
-                        <span class="material-symbols-outlined text-forest text-2xl mb-1">eco</span>
-                        <p class="font-sans text-xs font-semibold text-forest">{{ __('messages.resto_feat_2') }}</p>
-                    </div>
-                    <div>
-                        <span class="material-symbols-outlined text-forest text-2xl mb-1">deck</span>
-                        <p class="font-sans text-xs font-semibold text-forest">{{ __('messages.resto_feat_3') }}</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Right Photo Grid — dinamis: ambil foto restoran ke-2 & ke-3 dari pengelola bila ada, fallback curated --}}
-            @php
-                $filoA = isset($galeriRestoran) && $galeriRestoran->count() > 1 ? $galeriRestoran[1] : null;
-                $filoB = isset($galeriRestoran) && $galeriRestoran->count() > 2 ? $galeriRestoran[2] : null;
-            @endphp
-            <div class="lg:col-span-6" data-aos="fade-left" data-aos-duration="800">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="rounded-2xl overflow-hidden shadow-sm h-64 sm:h-80 border border-stone/10 bg-warm group">
-                        <img src="{{ $filoA ? asset('storage/' . $filoA->file) : 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80' }}"
-                             alt="{{ $filoA->keterangan ?? 'Hidangan Tradisional Bali' }}"
-                             class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108">
-                    </div>
-                    <div class="rounded-2xl overflow-hidden shadow-sm h-64 sm:h-80 border border-stone/10 bg-warm mt-8 group">
-                        <img src="{{ $filoB ? asset('storage/' . $filoB->file) : 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80' }}"
-                             alt="{{ $filoB->keterangan ?? 'Minuman Tropis Segar' }}"
-                             class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     3. DINING AMBIANCE & SEATING AREAS — Visual Showcase
-══════════════════════════════════════════════════════ --}}
-<section class="py-24 md:py-32 px-gutter bg-white text-ink relative">
-    <div class="max-w-7xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="max-w-2xl mb-16" data-aos="fade-up" data-aos-duration="800">
-            <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                {{ __('messages.resto_ambiance_tag') }}
-            </span>
-            <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
-                {{ __('messages.resto_ambiance_title') }}
-            </h2>
-        </div>
-
-        {{-- 3 Area Cards with Refined Luxury Editorial Styling --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-            {{-- Area 1: Gazebo Tepi Sungai --}}
-            <div class="group bg-[#FAF8F5] rounded-3xl p-8 sm:p-9 border border-stone/15 hover:border-forest/30 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col justify-between"
-                 data-aos="fade-up" data-aos-duration="800">
-                <div>
-                    {{-- Header with Elegant Monoline Emblem & Index --}}
-                    <div class="flex items-center justify-between mb-8 pb-6 border-b border-stone/10">
-                        <div class="w-12 h-12 rounded-full bg-[#EDE8E1] group-hover:bg-forest text-forest group-hover:text-white transition-colors duration-500 flex items-center justify-center p-2.5">
-                            <svg class="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 9L12 3L21 9V10H3V9Z"/>
-                                <path d="M6 10V18"/>
-                                <path d="M12 10V18"/>
-                                <path d="M18 10V18"/>
-                                <path d="M4 18H20"/>
-                                <path d="M2 21C6 20 8 22 12 21C16 20 18 22 22 21"/>
-                            </svg>
-                        </div>
-                        <span class="font-serif text-2xl text-stone/40 group-hover:text-forest transition-colors duration-300">01</span>
-                    </div>
-
-                    <h3 class="font-serif text-2xl text-forest mb-3">{{ __('messages.resto_amb_1_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed mb-6">{{ __('messages.resto_amb_1_desc') }}</p>
-                </div>
-                <div class="pt-5 border-t border-stone/10 flex items-center gap-2 text-xs font-sans text-stone/70">
-                    <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
-                    <span>Suasana Tepi Aliran Sungai</span>
-                </div>
-            </div>
-
-            {{-- Area 2: Bale Utama Terbuka --}}
-            <div class="group bg-[#FAF8F5] rounded-3xl p-8 sm:p-9 border border-stone/15 hover:border-forest/30 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col justify-between"
-                 data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
-                <div>
-                    {{-- Header with Elegant Monoline Emblem & Index --}}
-                    <div class="flex items-center justify-between mb-8 pb-6 border-b border-stone/10">
-                        <div class="w-12 h-12 rounded-full bg-[#EDE8E1] group-hover:bg-forest text-forest group-hover:text-white transition-colors duration-500 flex items-center justify-center p-2.5">
-                            <svg class="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 9L12 2L22 9"/>
-                                <path d="M4 9H20"/>
-                                <path d="M5 9V19"/>
-                                <path d="M19 9V19"/>
-                                <path d="M9 19V13H15V19"/>
-                                <path d="M3 19H21"/>
-                            </svg>
-                        </div>
-                        <span class="font-serif text-2xl text-stone/40 group-hover:text-forest transition-colors duration-300">02</span>
-                    </div>
-
-                    <h3 class="font-serif text-2xl text-forest mb-3">{{ __('messages.resto_amb_2_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed mb-6">{{ __('messages.resto_amb_2_desc') }}</p>
-                </div>
-                <div class="pt-5 border-t border-stone/10 flex items-center gap-2 text-xs font-sans text-stone/70">
-                    <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
-                    <span>Kapasitas Rombongan & Keluarga</span>
-                </div>
-            </div>
-
-            {{-- Area 3: Lesehan Rumpun Bambu --}}
-            <div class="group bg-[#FAF8F5] rounded-3xl p-8 sm:p-9 border border-stone/15 hover:border-forest/30 hover:shadow-xl hover:-translate-y-1.5 transition-all duration-500 flex flex-col justify-between"
-                 data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
-                <div>
-                    {{-- Header with Elegant Monoline Emblem & Index --}}
-                    <div class="flex items-center justify-between mb-8 pb-6 border-b border-stone/10">
-                        <div class="w-12 h-12 rounded-full bg-[#EDE8E1] group-hover:bg-forest text-forest group-hover:text-white transition-colors duration-500 flex items-center justify-center p-2.5">
-                            <svg class="w-full h-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 3V21"/>
-                                <path d="M16 3V21"/>
-                                <path d="M6 8H10"/>
-                                <path d="M6 14H10"/>
-                                <path d="M14 10H18"/>
-                                <path d="M14 16H18"/>
-                                <path d="M8 8C12 7 14 5 13 3C11 4 9 6 8 8Z"/>
-                                <path d="M16 12C20 11 22 9 21 7C19 8 17 10 16 12Z"/>
-                            </svg>
-                        </div>
-                        <span class="font-serif text-2xl text-stone/40 group-hover:text-forest transition-colors duration-300">03</span>
-                    </div>
-
-                    <h3 class="font-serif text-2xl text-forest mb-3">{{ __('messages.resto_amb_3_title') }}</h3>
-                    <p class="font-sans text-stone text-xs sm:text-sm font-light leading-relaxed mb-6">{{ __('messages.resto_amb_3_desc') }}</p>
-                </div>
-                <div class="pt-5 border-t border-stone/10 flex items-center gap-2 text-xs font-sans text-stone/70">
-                    <span class="w-1.5 h-1.5 rounded-full bg-forest"></span>
-                    <span>Relaksasi Lesehan Rindang</span>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-</section>
-
-{{-- ══════════════════════════════════════════════════════
-     4. DOKUMENTASI & GALERI RESTORAN (Dinamis + Lightbox)
-══════════════════════════════════════════════════════ --}}
 @php
-    $curatedRestoPhotos = [
-        ['src' => 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80', 'title' => 'Suasana Gazebo Utama Restoran'],
-        ['src' => 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80', 'title' => 'Hidangan Tradisional Bali Berempah'],
-        ['src' => 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80', 'title' => 'Minuman Tropis & Kelapa Segar'],
-        ['src' => 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80', 'title' => 'Sajian Ikan Bakar Sambal Matah'],
+    $isEnglish = app()->getLocale() === 'en';
+    $restaurantPhotos = $galeriRestoran->values();
+    $photoAt = function (int $index) use ($restaurantPhotos) {
+        if ($restaurantPhotos->isEmpty()) {
+            return null;
+        }
+
+        $photo = $restaurantPhotos[$index % $restaurantPhotos->count()];
+
+        return [
+            'url' => asset('storage/' . $photo->file),
+            'caption' => $photo->keterangan ?: 'Restoran Bangkiang Jaran',
+        ];
+    };
+    $heroPhoto = $photoAt(0);
+    $featuredPhoto = $photoAt(1);
+    $guideCards = [
+        [
+            'title' => $isEnglish ? 'A calm table after the trail' : 'Meja yang tenang seusai perjalanan',
+            'copy' => $isEnglish
+                ? 'A comfortable place to pause, gather, and enjoy the atmosphere of Bakbakan village.'
+                : 'Ruang nyaman untuk beristirahat, berkumpul, dan menikmati suasana Desa Bakbakan.',
+            'meta' => $isEnglish ? 'A place to pause' : 'Tempat untuk beristirahat',
+        ],
+        [
+            'title' => $isEnglish ? 'Local flavours, served simply' : 'Rasa lokal, disajikan dengan sederhana',
+            'copy' => $isEnglish
+                ? 'Ask the on-site team about the latest dishes, availability, and group arrangements.'
+                : 'Tanyakan menu terbaru, ketersediaan, dan kebutuhan rombongan kepada tim di lokasi.',
+            'meta' => $isEnglish ? 'Dining information' : 'Informasi bersantap',
+        ],
     ];
 @endphp
 
-<section class="py-24 md:py-32 px-gutter bg-[#FAF8F5] text-ink relative" x-data="{ lightbox: false, activeSrc: '', activeCaption: '' }">
-    <div class="max-w-7xl mx-auto">
-
-        {{-- Section Header --}}
-        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6" data-aos="fade-up" data-aos-duration="800">
-            <div class="max-w-xl">
-                <span class="font-sans text-xs uppercase tracking-[0.2em] text-forest/70 font-semibold mb-2 block">
-                    {{ __('messages.resto_gallery_label') }}
-                </span>
-                <h2 class="font-serif text-[clamp(2.2rem,4vw,3.4rem)] text-forest leading-[1.08] mb-3 text-balance">
-                    {{ __('messages.resto_gallery_heading') }}
-                </h2>
-                <p class="font-sans text-stone text-sm sm:text-base font-light leading-relaxed">
-                    {{ __('messages.resto_gallery_desc') }}
-                </p>
-            </div>
-
-            <p class="font-sans text-xs text-stone/70">
-                {{ __('messages.gallery_zoom_hint') }}
-            </p>
-        </div>
-
-        {{-- Gallery Grid --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            @if(isset($galeriRestoran) && $galeriRestoran->count() > 0)
-                @foreach($galeriRestoran as $index => $g)
-                <div class="relative rounded-2xl overflow-hidden bg-warm group cursor-pointer border border-stone/10 h-48 sm:h-64 shadow-sm"
-                     data-aos="fade-up" data-aos-delay="{{ ($index % 4) * 60 }}" data-aos-duration="700"
-                     @click="lightbox = true; activeSrc = '{{ asset('storage/' . $g->file) }}'; activeCaption = '{{ addslashes($g->keterangan ?? 'Restoran Kepulauan Rasa') }}'">
-
-                    <img src="{{ asset('storage/' . $g->file) }}"
-                         alt="{{ $g->keterangan ?? 'Restoran' }}"
-                         loading="lazy"
-                         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108">
-
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-white">
-                        <p class="font-sans text-xs sm:text-sm font-medium text-white line-clamp-1">{{ $g->keterangan ?? 'Restoran Kepulauan Rasa' }}</p>
-                    </div>
-                </div>
-                @endforeach
+<div class="bj-restaurant-page">
+    <svg class="bj-restaurant-icon-sprite" aria-hidden="true">
+        <symbol id="bj-resto-icon-restaurant" viewBox="0 0 24 24"><path d="M7 3v7M4.5 3v4.5A2.5 2.5 0 0 0 7 10h0a2.5 2.5 0 0 0 2.5-2.5V3M7 10v11M15 3v18M15 3c3.1 1.5 4.5 4.1 4.5 7.5H15"/></symbol>
+        <symbol id="bj-resto-icon-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m5.5 17 4.2-4.2 3.1 3.1 2.1-2.1 3.6 3.2M17.5 2v4M15.5 4h4"/></symbol>
+        <symbol id="bj-resto-icon-expand" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></symbol>
+        <symbol id="bj-resto-icon-arrow-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+        <symbol id="bj-resto-icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+        <symbol id="bj-resto-icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+        <symbol id="bj-resto-icon-chat" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-11.7 7.1L4 20l1.4-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 9.2c.7 2 1.8 3.1 3.8 3.8"/></symbol>
+    </svg>
+    <header id="hero-section" class="bj-restaurant-hero">
+        <div class="bj-restaurant-hero__media" @if($heroPhoto) data-bj-parallax @endif aria-hidden="true">
+            @if($heroPhoto)
+                <img src="{{ $heroPhoto['url'] }}" alt="" fetchpriority="high">
             @else
-                @foreach($curatedRestoPhotos as $index => $item)
-                <div class="relative rounded-2xl overflow-hidden bg-warm group cursor-pointer border border-stone/10 h-48 sm:h-64 shadow-sm"
-                     data-aos="fade-up" data-aos-delay="{{ $index * 80 }}" data-aos-duration="700"
-                     @click="lightbox = true; activeSrc = '{{ $item['src'] }}'; activeCaption = '{{ addslashes($item['title']) }}'">
-
-                    <img src="{{ $item['src'] }}"
-                         alt="{{ $item['title'] }}"
-                         loading="lazy"
-                         class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108">
-
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-white">
-                        <p class="font-sans text-xs sm:text-sm font-medium text-white line-clamp-1">{{ $item['title'] }}</p>
-                    </div>
+                <div class="bj-restaurant-placeholder bj-restaurant-placeholder--hero">
+                    <svg class="bj-restaurant-icon"><use href="#bj-resto-icon-restaurant"/></svg>
                 </div>
-                @endforeach
             @endif
         </div>
+        <div class="bj-restaurant-hero__shade" aria-hidden="true"></div>
 
-    </div>
+        <div class="bj-restaurant-wrap bj-restaurant-hero__content">
+            <nav class="bj-restaurant-breadcrumb bj-reveal" aria-label="Breadcrumb">
+                <a href="{{ route('landing') }}">{{ $isEnglish ? 'Home' : 'Beranda' }}</a>
+                <span aria-hidden="true">/</span>
+                <span>{{ $isEnglish ? 'Restaurant' : 'Restoran' }}</span>
+            </nav>
 
-    {{-- Clean Lightbox Modal --}}
-    <div x-show="lightbox"
-         x-cloak
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 backdrop-blur-none"
-         x-transition:enter-end="opacity-100 backdrop-blur-md"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 backdrop-blur-md"
-         x-transition:leave-end="opacity-0 backdrop-blur-none"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md"
-         @keydown.escape.window="lightbox = false">
-
-        <button @click="lightbox = false"
-                class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer">
-            <span class="material-symbols-outlined text-2xl">close</span>
-        </button>
-
-        <div class="max-w-5xl w-full flex flex-col items-center" @click.outside="lightbox = false">
-            <img :src="activeSrc"
-                 class="max-h-[80vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
-                 alt="Preview">
-            <p x-text="activeCaption" class="font-sans text-xs sm:text-sm text-white/90 mt-4 text-center max-w-lg font-light tracking-wide"></p>
+            <div class="bj-restaurant-hero__copy">
+                <p class="bj-restaurant-kicker bj-reveal">
+                    <span aria-hidden="true"></span>{{ $isEnglish ? 'Dining at Bangkiang Jaran' : 'Bersantap di Bangkiang Jaran' }}
+                </p>
+                <h1 class="bj-reveal" data-bj-split>
+                    {{ $isEnglish ? 'Flavours from the ' : 'Rasa yang tumbuh dari ' }}<em>{{ $isEnglish ? 'valley' : 'lembah' }}</em>
+                </h1>
+                <p class="bj-restaurant-hero__lead bj-reveal">
+                    {{ $isEnglish
+                        ? 'Take a quiet pause after the waterfall trail. Discover a simple dining space surrounded by the calm of Bakbakan village.'
+                        : 'Ambil jeda yang tenang setelah menyusuri air terjun. Temukan ruang bersantap sederhana di tengah suasana Desa Bakbakan.' }}
+                </p>
+            </div>
         </div>
-    </div>
+    </header>
 
-</section>
+    <main class="bj-restaurant-paper">
+        <section id="restoran-galeri" class="bj-restaurant-feature" aria-labelledby="restaurant-feature-title">
+            <div class="bj-restaurant-wrap bj-restaurant-feature__grid">
+                <div class="bj-restaurant-feature__media bj-reveal" @if($featuredPhoto) data-bj-parallax @endif>
+                    @if($featuredPhoto)
+                        <button type="button" data-gallery-open data-gallery-src="{{ $featuredPhoto['url'] }}" data-gallery-caption="{{ $featuredPhoto['caption'] }}" aria-label="{{ $isEnglish ? 'Enlarge restaurant photo' : 'Perbesar foto restoran' }}: {{ $featuredPhoto['caption'] }}">
+                            <img src="{{ $featuredPhoto['url'] }}" alt="{{ $featuredPhoto['caption'] }}" loading="lazy">
+                            <span class="bj-restaurant-zoom" aria-hidden="true"><svg class="bj-restaurant-icon"><use href="#bj-resto-icon-expand"/></svg></span>
+                        </button>
+                    @else
+                        <div class="bj-restaurant-placeholder">
+                            <svg class="bj-restaurant-icon"><use href="#bj-resto-icon-image"/></svg>
+                            <small>{{ $isEnglish ? 'Main restaurant photo' : 'Foto utama restoran' }}</small>
+                        </div>
+                    @endif
+                </div>
 
+                <div class="bj-restaurant-feature__copy bj-reveal">
+                    <p class="bj-restaurant-kicker"><span aria-hidden="true"></span>{{ $isEnglish ? 'Start here' : 'Mulai dari sini' }}</p>
+                    <h2 id="restaurant-feature-title">{{ $isEnglish ? 'A pleasant pause by the waterfall' : 'Jeda yang menyenangkan di dekat air terjun' }}</h2>
+                    <p>{{ __('messages.dining_about_copy') }}</p>
+                    <a class="bj-restaurant-text-link" href="{{ route('landing') }}#lokasi">
+                        {{ $isEnglish ? 'See the location' : 'Lihat lokasi' }}
+                        <svg class="bj-restaurant-icon" aria-hidden="true"><use href="#bj-resto-icon-arrow"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="bj-restaurant-guides" aria-labelledby="restaurant-guides-title">
+            <div class="bj-restaurant-wrap">
+                <div class="bj-restaurant-guides__heading bj-reveal">
+                    <p class="bj-restaurant-kicker"><span aria-hidden="true"></span>{{ $isEnglish ? 'Discover more' : 'Kenali lebih dekat' }}</p>
+                    <h2 id="restaurant-guides-title" class="sr-only">{{ $isEnglish ? 'Restaurant highlights' : 'Pilihan restoran' }}</h2>
+                </div>
+
+                <div class="bj-restaurant-guides__grid">
+                    @foreach($guideCards as $index => $card)
+                    @php($guidePhoto = $photoAt($index + 2))
+                    <article class="bj-restaurant-card bj-reveal">
+                        <div class="bj-restaurant-card__media" @if($guidePhoto) data-bj-parallax @endif>
+                            @if($guidePhoto)
+                                <button type="button" data-gallery-open data-gallery-src="{{ $guidePhoto['url'] }}" data-gallery-caption="{{ $guidePhoto['caption'] }}" aria-label="{{ $isEnglish ? 'Enlarge restaurant photo' : 'Perbesar foto restoran' }}: {{ $guidePhoto['caption'] }}">
+                                    <img src="{{ $guidePhoto['url'] }}" alt="{{ $guidePhoto['caption'] }}" loading="lazy">
+                                    <span class="bj-restaurant-card__arrow" aria-hidden="true"><svg class="bj-restaurant-icon"><use href="#bj-resto-icon-arrow-ne"/></svg></span>
+                                </button>
+                            @else
+                                <div class="bj-restaurant-placeholder">
+                                    <svg class="bj-restaurant-icon"><use href="#bj-resto-icon-image"/></svg>
+                                    <small>{{ $isEnglish ? 'Restaurant photo' : 'Foto restoran' }} {{ $index + 2 }}</small>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="bj-restaurant-card__body">
+                            <p class="bj-restaurant-card__meta"><svg class="bj-restaurant-icon" aria-hidden="true"><use href="#bj-resto-icon-clock"/></svg>{{ $card['meta'] }}</p>
+                            <h3>{{ $card['title'] }}</h3>
+                            <p>{{ $card['copy'] }}</p>
+                        </div>
+                    </article>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <section class="bj-restaurant-cta" aria-labelledby="restaurant-cta-title">
+        <div class="bj-restaurant-wrap bj-restaurant-cta__content bj-reveal">
+            <p class="bj-restaurant-kicker"><span aria-hidden="true"></span>{{ $isEnglish ? 'Plan your visit' : 'Rencanakan kunjungan' }}</p>
+            <h2 id="restaurant-cta-title">{{ $isEnglish ? 'Ready to enjoy the ' : 'Siap menikmati ' }}<em>{{ $isEnglish ? 'pause?' : 'jedanya?' }}</em></h2>
+            <p>{{ $isEnglish
+                ? 'Ask our team about today’s menu, seating availability, and arrangements for your group.'
+                : 'Tanyakan menu hari ini, ketersediaan tempat, dan pengaturan untuk rombongan Anda kepada tim kami.' }}</p>
+            <div class="bj-restaurant-cta__actions">
+                @if(config('payment.contact_whatsapp'))
+                <a class="bj-home-button bj-home-button--whatsapp" href="https://wa.me/{{ config('payment.contact_whatsapp') }}" target="_blank" rel="noopener noreferrer">
+                    <svg class="bj-restaurant-icon" aria-hidden="true"><use href="#bj-resto-icon-chat"/></svg>{{ $isEnglish ? 'Chat on WhatsApp' : 'Chat via WhatsApp' }}
+                </a>
+                @endif
+                <a class="bj-home-button bj-home-button--ghost" href="{{ route('tiket.index') }}">
+                    {{ $isEnglish ? 'Check ticket prices' : 'Lihat harga tiket' }}<svg class="bj-restaurant-icon" aria-hidden="true"><use href="#bj-resto-icon-arrow"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <div class="bj-restaurant-ribbons" aria-hidden="true">
+            @foreach(['left', 'right'] as $rowIndex => $direction)
+            <div class="bj-home-ribbon bj-restaurant-ribbon" data-bj-marquee data-direction="{{ $direction }}">
+                @for($copy = 0; $copy < 2; $copy++)
+                <div class="bj-home-ribbon__set">
+                    @for($i = 0; $i < 6; $i++)
+                    @php($ribbonPhoto = $photoAt($i + ($rowIndex * 6)))
+                    @if($ribbonPhoto)
+                        <img src="{{ $ribbonPhoto['url'] }}" alt="" loading="lazy">
+                    @else
+                        <div class="bj-restaurant-ribbon__placeholder">
+                            <svg class="bj-restaurant-icon"><use href="#bj-resto-icon-restaurant"/></svg>
+                        </div>
+                    @endif
+                    @endfor
+                </div>
+                @endfor
+            </div>
+            @endforeach
+        </div>
+    </section>
+</div>
+
+<dialog id="bj-gallery-dialog" class="bj-gallery-dialog" aria-label="{{ __('messages.dining_gallery_title') }}">
+    <button type="button" data-gallery-close aria-label="{{ $isEnglish ? 'Close gallery' : 'Tutup galeri' }}">×</button>
+    <img src="" alt="">
+    <p></p>
+</dialog>
 @endsection
-
-@push('styles')
-<style>
-@keyframes slowZoom {
-    0% { transform: scale(1.0); }
-    50% { transform: scale(1.04); }
-    100% { transform: scale(1.0); }
-}
-.animate-slow-zoom {
-    animation: slowZoom 20s ease-in-out infinite alternate;
-}
-.hover\:scale-108:hover {
-    transform: scale(1.08);
-}
-</style>
-@endpush

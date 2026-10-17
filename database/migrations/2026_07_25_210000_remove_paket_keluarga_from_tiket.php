@@ -14,12 +14,16 @@ return new class extends Migration
             ->delete();
 
         // Ubah enum kategori — hapus 'paket'
-        DB::statement("ALTER TABLE tiket MODIFY COLUMN kategori ENUM('perorangan', 'kendaraan') NOT NULL DEFAULT 'perorangan'");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE tiket MODIFY COLUMN kategori ENUM('perorangan', 'kendaraan') NOT NULL DEFAULT 'perorangan'");
+        }
     }
 
     public function down(): void
     {
         // Kembalikan enum (tiket yg dihapus tidak dikembalikan otomatis)
-        DB::statement("ALTER TABLE tiket MODIFY COLUMN kategori ENUM('perorangan', 'kendaraan', 'paket') NOT NULL DEFAULT 'perorangan'");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE tiket MODIFY COLUMN kategori ENUM('perorangan', 'kendaraan', 'paket') NOT NULL DEFAULT 'perorangan'");
+        }
     }
 };

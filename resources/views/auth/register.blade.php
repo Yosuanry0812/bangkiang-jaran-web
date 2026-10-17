@@ -7,7 +7,6 @@
     <div class="hidden md:flex relative flex-col justify-between overflow-hidden min-h-[640px]">
         {{-- Background image --}}
         <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
-             onerror="this.src='https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=80'"
              alt="Bangkiang Jaran"
              class="absolute inset-0 w-full h-full object-cover">
 
@@ -18,15 +17,14 @@
         {{-- Top logo area --}}
         <div class="relative z-10 p-8">
             <div class="inline-flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                    <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings:'FILL' 1;">water</span>
-                </div>
                 <span class="font-display text-white font-semibold text-lg tracking-wide">Bangkiang Jaran</span>
             </div>
         </div>
 
-        {{-- Spacer --}}
-        <div class="flex-1"></div>
+        <div class="relative z-10 p-8 text-white">
+            <p class="text-[11px] uppercase tracking-[.2em] text-white/70 mb-3">Desa Bakbakan · Gianyar</p>
+            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Siapkan kunjungan Anda.</p>
+        </div>
     </div>
 
     {{-- ── Right: Register Form ────────────────────────── --}}
@@ -39,7 +37,7 @@
                 Akun Baru
             </div>
             <h1 class="font-display text-[1.9rem] font-semibold text-gray-900 leading-tight mb-2">Buat Akun</h1>
-            <p class="font-body text-[14px] text-gray-400 leading-relaxed">Mulai petualangan Anda bersama Bangkiang Jaran.</p>
+            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Buat akun untuk memesan tiket dan menyimpan detail kunjungan.</p>
         </div>
 
         {{-- Alert --}}

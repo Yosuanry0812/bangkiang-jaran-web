@@ -8,6 +8,7 @@ use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class PembayaranController extends Controller
 {
@@ -17,12 +18,14 @@ class PembayaranController extends Controller
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
 
-        if ($pemesanan->pembayaran) {
+        if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
                 ->with('info', 'Pembayaran sudah pernah diajukan.');
         }
 
-        return view('wisatawan.pembayaran', compact('pemesanan'));
+        $metodeBayar = config('payment.methods');
+
+        return view('wisatawan.pembayaran', compact('pemesanan', 'metodeBayar'));
     }
 
     public function store(Request $request, $id_pemesanan)
@@ -31,18 +34,23 @@ class PembayaranController extends Controller
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
 
-        if ($pemesanan->pembayaran) {
+        if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return back()->with('error', 'Pembayaran sudah pernah diajukan.');
         }
 
+        $availableMethods = array_column(config('payment.methods'), 'id');
+        if ($availableMethods === []) {
+            return back()->with('error', 'Metode pembayaran belum tersedia. Hubungi pengelola sebelum melakukan transfer.');
+        }
+
         $request->validate([
-            'metode'      => ['required', 'string', 'max:50'],
-            'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'metode'      => ['required', 'string', Rule::in($availableMethods)],
+            'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], [
             'metode.required'       => 'Pilih metode pembayaran.',
             'bukti_bayar.required'  => 'Upload bukti transfer.',
             'bukti_bayar.mimes'     => 'Format file harus: jpg, jpeg, png, atau pdf.',
-            'bukti_bayar.max'       => 'Ukuran file maksimal 2MB.',
+            'bukti_bayar.max'       => 'Ukuran file maksimal 5MB.',
         ]);
 
         // Handle file upload aman
@@ -59,24 +67,35 @@ class PembayaranController extends Controller
         }
 
         // Rename dengan nama acak
-        $filename = 'bukti_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/bukti', $filename);
+        $path = $file->store('bukti', 'public');
 
         if (!$path) {
             return back()->withErrors(['bukti_bayar' => 'Gagal menyimpan file. Coba lagi.'])->withInput();
         }
 
-        // Strip the 'public/' prefix so the path is relative to storage/app/public
-        $pathDisplay = ltrim(str_replace('public', '', $path), '/');
-
-        Pembayaran::create([
-            'id_pemesanan' => $pemesanan->id_pemesanan,
+        $oldPath = $pemesanan->pembayaran?->bukti_bayar;
+        $attributes = [
             'total'        => $pemesanan->total_harga,
             'metode'       => $request->metode,
-            'bukti_bayar'  => $pathDisplay,
+            'bukti_bayar'  => $path,
             'status'       => 'pending',
             'tgl_bayar'    => now()->toDateString(),
-        ]);
+        ];
+
+        try {
+            if ($pemesanan->pembayaran) {
+                $pemesanan->pembayaran->update($attributes);
+            } else {
+                Pembayaran::create(['id_pemesanan' => $pemesanan->id_pemesanan] + $attributes);
+            }
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($path);
+            throw $e;
+        }
+
+        if ($oldPath && $oldPath !== $path) {
+            Storage::disk('public')->delete($oldPath);
+        }
 
         return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
             ->with('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi pengelola.');

@@ -34,8 +34,6 @@
             <div class="w-20 h-20 rounded-2xl bg-gray-200 flex items-center justify-center overflow-hidden shadow-md">
                 <span class="material-symbols-outlined text-stone text-[2.5rem] select-none leading-none" style="font-variation-settings:'FILL' 1,'wght' 300;">person</span>
             </div>
-            {{-- online dot --}}
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-white"></span>
         </div>
 
         <h2 class="font-serif text-[1.2rem] text-ink leading-snug mb-0.5">{{ Auth::user()->name }}</h2>
@@ -161,7 +159,7 @@
                         <span class="material-symbols-outlined text-[15px]">save</span>
                         Simpan Perubahan
                     </button>
-                    <a href="{{ route('landing') }}"
+                    <a href="{{ Auth::user()->role === 'pengelola' ? route('pengelola.dashboard') : route('landing') }}"
                        class="font-sans text-[13px] text-stone border border-gray-200 px-6 py-2.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
                         Batal
                     </a>
@@ -199,7 +197,7 @@
                     <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Kata Sandi Baru</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 group-focus-within:text-forest transition-colors">lock</span>
-                        <input name="password" type="password" required minlength="8"
+                        <input id="new-pwd" name="password" type="password" required minlength="8"
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-ink text-[13px] rounded-xl pl-10 pr-10 focus:bg-white focus:border-forest/40 focus:ring-4 focus:ring-forest/8 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('password') border-red-400 bg-red-50 @enderror"
                                placeholder="Minimal 8 karakter">
                         <button type="button" onclick="togglePwd('new-pwd','eye-new')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-stone transition-colors">

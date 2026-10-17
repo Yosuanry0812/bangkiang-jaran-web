@@ -30,6 +30,7 @@ class TiketController extends Controller
             'nama_tiket_en' => ['nullable', 'string', 'max:100'],
             'harga'         => ['required', 'numeric', 'min:0'],
             'kategori'      => ['required', 'in:perorangan,kendaraan'],
+            'status'        => ['required', 'in:aktif,nonaktif'],
         ], [
             'nama_tiket.required' => 'Nama tiket wajib diisi.',
             'harga.required'      => 'Harga tiket wajib diisi.',
@@ -58,6 +59,7 @@ class TiketController extends Controller
             'nama_tiket_en' => ['nullable', 'string', 'max:100'],
             'harga'         => ['required', 'numeric', 'min:0'],
             'kategori'      => ['required', 'in:perorangan,kendaraan'],
+            'status'        => ['required', 'in:aktif,nonaktif'],
         ]);
 
         $tiket->update($request->only(['nama_tiket', 'nama_tiket_en', 'harga', 'kategori', 'status']));

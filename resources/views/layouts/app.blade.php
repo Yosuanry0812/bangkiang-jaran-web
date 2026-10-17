@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Rencanakan kunjungan ke Air Terjun Bangkiang Jaran di Desa Bakbakan, Gianyar. Temukan informasi tempat, lokasi, dan tiket dalam satu tempat.">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="image" href="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" fetchpriority="high">
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -38,8 +39,8 @@
                         deep:     '#1B3A2D',
                     },
                     fontFamily: {
-                        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Fraunces', 'Georgia', 'serif'],
+                        sans: ['Manrope', 'system-ui', 'sans-serif'],
                     },
                     spacing: {
                         'gutter': '24px',
@@ -62,12 +63,13 @@
         /* ─── Navbar ─── */
         #main-nav {
             transition:
-                transform 0.38s cubic-bezier(0.4,0,0.2,1),
+                transform 0.30s cubic-bezier(0.4,0,0.2,1),
                 background 0.32s ease,
                 border-color 0.32s ease,
                 box-shadow 0.32s ease;
+            will-change: transform;
         }
-        #main-nav.nav-hidden   { transform: translateY(-100%); }
+        #main-nav.nav-hidden   { transform: translate3d(0,-110%,0); }
 
         /* dark mode — over hero images */
         #main-nav.nav-dark-clear  { background: transparent; border-color: transparent; box-shadow: none; }
@@ -76,13 +78,13 @@
         #main-nav.nav-dark-solid  { background: rgba(10,20,14,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(255,255,255,0.05); box-shadow: 0 1px 0 rgba(255,255,255,0.03); }
 
         /* light mode — over ivory/white pages */
-        #main-nav.nav-light       { background: rgba(247,243,238,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(27,58,45,0.08); box-shadow: 0 1px 24px rgba(0,0,0,0.06); }
+        #main-nav.nav-light       { background: rgba(247,243,238,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-color: rgba(27,58,45,0.08); box-shadow: 0 10px 32px rgba(9,42,32,0.09); }
 
         /* mobile: slim bar, lighter glass so it doesn't read as a huge black slab */
         @media (max-width: 767px) {
             #main-nav.nav-dark-tinted { background: rgba(10,20,14,0.40); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
             #main-nav.nav-dark-solid  { background: rgba(10,20,14,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-            #main-nav.nav-light       { background: rgba(247,243,238,0.88); }
+            #main-nav.nav-light       { background: rgba(247,243,238,0.96); }
         }
 
         /* nav link tokens — use CSS custom props so :hover works */
@@ -160,8 +162,11 @@
         .label-sm   { @apply font-sans text-[13px] font-medium uppercase tracking-[0.1em] text-forest/60; }
     </style>
     @stack('styles')
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
 </head>
-<body class="bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip" style="selection-background: #1B3A2D;">
+<body class="bj-public bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
+    <a class="bj-skip-link" href="#main-content">{{ app()->getLocale() === 'id' ? 'Langsung ke konten' : 'Skip to content' }}</a>
 
     {{-- Navigation --}}
     {{-- data-nav="dark"  → over hero (transparent→solid dark)  --}}
@@ -174,14 +179,12 @@
             <div class="flex items-center justify-between h-12 md:h-[68px]">
 
                 {{-- Logo --}}
-                <a href="{{ route('landing') }}"
-                   id="nav-logo"
-                   class="font-serif text-base md:text-[1.35rem] tracking-tight flex-shrink-0 whitespace-nowrap transition-colors duration-300">
-                    Bangkiang Jaran
+                <a href="{{ route('landing') }}" id="nav-logo" class="bj-site-brand flex-shrink-0 transition-colors duration-300" aria-label="Bangkiang Jaran — {{ __('messages.home') }}">
+                    <span class="bj-site-brand__copy"><strong>Bangkiang Jaran</strong><small>Waterfall · Gianyar</small></span>
                 </a>
 
                 {{-- Desktop links --}}
-                <nav class="hidden md:flex items-center gap-1" aria-label="Menu desktop">
+                <nav class="bj-desktop-nav hidden xl:flex items-center" aria-label="Menu desktop">
                     @php
                         $currentRoute = Route::currentRouteName();
                         $links = [
@@ -189,25 +192,30 @@
                             ['route' => 'restoran',                   'label' => __('messages.resto_title_nav'), 'icon' => 'restaurant'],
                             ['route' => 'tiket.index',                'label' => __('messages.tickets'),         'icon' => 'confirmation_number'],
                         ];
-                        if(auth()->check()) {
+                        if(auth()->check() && auth()->user()->role === 'wisatawan') {
                             $links[] = ['route' => 'wisatawan.pemesanan.riwayat', 'label' => __('messages.history'), 'icon' => 'history'];
                         }
                     @endphp
 
+                    <div class="bj-desktop-nav__links">
                     @foreach($links as $link)
                     <a href="{{ route($link['route']) }}"
-                       class="nav-link relative font-sans text-sm px-4 py-2 rounded-full transition-all duration-200 {{ $currentRoute === $link['route'] ? 'nav-active' : '' }}">
+                       class="nav-link relative font-sans text-sm px-4 py-3 transition-all duration-200 {{ $currentRoute === $link['route'] ? 'nav-active' : '' }}">
                         {{ $link['label'] }}
                         @if($currentRoute === $link['route'])
-                        <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-current opacity-50"></span>
+                        <span class="bj-nav-active-mark" aria-hidden="true"></span>
                         @endif
                     </a>
                     @endforeach
+                    </div>
 
-                    {{-- Divider --}}
+                    <div class="bj-desktop-nav__actions">
                     <div id="nav-divider" class="w-px h-4 mx-1 transition-colors duration-300"></div>
 
                     @auth
+                    @if(Auth::user()->role === 'pengelola')
+                    <a href="{{ route('pengelola.dashboard') }}" class="nav-link font-sans text-sm px-4 py-2">Dashboard</a>
+                    @endif
                     {{-- User pill --}}
                     <a href="{{ route('profile.edit') }}"
                        class="nav-link inline-flex items-center gap-2 font-sans text-sm px-3.5 py-1.5 rounded-full transition-all duration-200">
@@ -226,11 +234,6 @@
                        class="nav-link font-sans text-sm px-4 py-2 rounded-full transition-all duration-200">
                         {{ __('messages.login') }}
                     </a>
-                    <a href="{{ route('register') }}"
-                       id="nav-register"
-                       class="font-sans text-sm font-medium px-5 py-2 rounded-full transition-all duration-200">
-                        {{ __('messages.register') }}
-                    </a>
                     @endauth
 
                     {{-- Lang toggle --}}
@@ -241,11 +244,16 @@
                         <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 0;">translate</span>
                         <span class="font-semibold text-xs tracking-wide">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</span>
                     </a>
+                    <a href="{{ route('tiket.index') }}" id="nav-book" class="bj-nav-book">
+                        <span>{{ app()->getLocale() === 'en' ? 'Book now' : 'Pesan tiket' }}</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                    </a>
+                    </div>
                 </nav>
 
                 {{-- Hamburger --}}
                 <button id="mobileMenuBtn"
-                        class="md:hidden w-8 h-8 flex items-center justify-center rounded-lg transition-colors duration-200"
+                        class="xl:hidden w-11 h-11 flex items-center justify-center rounded-lg transition-colors duration-200"
                         id-icon="menuIcon"
                         aria-label="{{ __('messages.open_menu') }}" aria-expanded="false" aria-controls="mobileMenu">
                     <span class="material-symbols-outlined text-[18px]" id="menuIcon">menu</span>
@@ -256,7 +264,7 @@
 
         {{-- Mobile menu --}}
         <div id="mobileMenu"
-             class="menu-close md:hidden"
+             class="menu-close xl:hidden"
              style="background: rgba(10,18,14,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06);"
              aria-label="Menu mobile">
             <div class="max-w-7xl mx-auto px-gutter py-2.5 pb-4 space-y-0.5">
@@ -264,7 +272,11 @@
                 <a href="{{ route('restoran') }}"         class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">restaurant</span>{{ __('messages.resto_title_nav') }}</a>
                 <a href="{{ route('tiket.index') }}"      class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">confirmation_number</span>{{ __('messages.tickets') }}</a>
                 @auth
+                @if(Auth::user()->role === 'wisatawan')
                 <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">history</span>{{ __('messages.history') }}</a>
+                @else
+                <a href="{{ route('pengelola.dashboard') }}" class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">space_dashboard</span>Dashboard</a>
+                @endif
                 <a href="{{ route('profile.edit') }}"     class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">person</span>{{ Auth::user()->username }}</a>
                 <div class="pt-2 mt-1 border-t border-white/8 flex gap-2">
                     <a href="{{ route('logout.get') }}" class="flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">
@@ -292,7 +304,7 @@
     </header>
 
     {{-- Content --}}
-    <main class="flex-grow">
+    <main id="main-content" tabindex="-1" class="flex-grow">
         @yield('content')
         {{ $slot ?? '' }}
     </main>
@@ -310,12 +322,6 @@
                            style="background:rgba(255,255,255,0.07); color:rgba(247,243,238,0.6);"
                            aria-label="Instagram">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                        </a>
-                        <a href="#" target="_blank" rel="noopener"
-                           class="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:-translate-y-0.5"
-                           style="background:rgba(255,255,255,0.07); color:rgba(247,243,238,0.6);"
-                           aria-label="YouTube">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                         </a>
                         <a href="https://www.tiktok.com/@bangkiang.jaran.w?_r=1&_t=ZS-98KJbSvTEWe" target="_blank" rel="noopener"
                            class="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:-translate-y-0.5"
@@ -349,7 +355,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">mail</span>
-                            <a href="mailto:info@bangkiangjaran.com" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">info@bangkiangjaran.com</a>
+                            <a href="{{ route('landing') }}#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.location') }}</a>
                         </li>
                     </ul>
                 </div>
@@ -456,7 +462,8 @@
         /* ── Navbar state machine ── */
         const TINTED_PX  = 50;
         const SOLID_PX   = 130;
-        const DEAD_PX    = 6;
+        const DEAD_PX    = 2;
+        const HERO_HIDE_PX = 32;
         let lastY        = window.scrollY;
         let hidden       = false;
         let menuOpen     = false;
@@ -489,31 +496,26 @@
             }
 
             if (mode === 'hero') {
-                // Transparent while the hero is on screen; once scrolled past
-                // the hero, the normal light navbar kicks in.
+                // Scroll down hides the bar. Scrolling back up reveals a
+                // transparent bar over the hero and a full light bar below it.
                 const heroEl   = document.getElementById('hero-section');
                 const heroEnd  = heroEl ? heroEl.offsetHeight - (window.innerWidth < 768 ? 48 : 68) : SOLID_PX;
-                if (curr <= heroEnd) {
+                const inHero   = curr <= heroEnd;
+
+                if (curr <= DEAD_PX) {
                     hidden = false;
                     setNav('nav-transparent');
                     applyTokens(HERO);
-                } else {
-                    if (Math.abs(delta) > DEAD_PX) {
-                        if (delta > 0 && !hidden) {
-                            hidden = true;
-                            setNav('nav-hidden');
-                        } else if (delta < 0 && hidden) {
-                            hidden = false;
-                            setNav(T.solid);
-                            applyTokens(LIGHT);
-                        } else if (!hidden) {
-                            setNav(T.solid);
-                            applyTokens(LIGHT);
-                        }
-                    } else if (!hidden) {
-                        setNav(T.solid);
-                        applyTokens(LIGHT);
-                    }
+                } else if (curr > HERO_HIDE_PX && Math.abs(delta) > DEAD_PX && delta > 0) {
+                    hidden = true;
+                    setNav('nav-hidden');
+                } else if (Math.abs(delta) > DEAD_PX && delta < 0) {
+                    hidden = false;
+                    setNav(inHero ? 'nav-transparent' : T.solid);
+                    applyTokens(inHero ? HERO : LIGHT);
+                } else if (!hidden) {
+                    setNav(inHero ? 'nav-transparent' : T.solid);
+                    applyTokens(inHero ? HERO : LIGHT);
                 }
             } else if (mode === 'light') {
                 // Pages with `no-nav-hide` (e.g. payment with fixed progress bar):
@@ -597,21 +599,28 @@
             mobileMenu.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
             document.addEventListener('click', function(e) { if (menuOpen && !nav.contains(e.target)) closeMenu(); });
             document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) closeMenu(); });
-            window.addEventListener('resize', function() { if (window.innerWidth >= 768 && menuOpen) closeMenu(); });
+            window.addEventListener('resize', function() { if (window.innerWidth >= 1280 && menuOpen) closeMenu(); });
         }
 
     })();
 
     /* ── AOS + GSAP ── */
-    gsap.registerPlugin(ScrollTrigger);
-    AOS.init({ duration: 800, easing: 'ease-out', once: true, offset: 80 });
-    const _observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('show'); });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
-        _observer.observe(el);
-    });
+    if (window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+    if (window.AOS) AOS.init({ duration: 800, easing: 'ease-out', once: true, offset: 80 });
+    if ('IntersectionObserver' in window) {
+        const _observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('show'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
+            _observer.observe(el);
+        });
+    } else {
+        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
+            el.classList.add('show');
+        });
+    }
     </script>
+    <script defer src="{{ asset('js/site.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

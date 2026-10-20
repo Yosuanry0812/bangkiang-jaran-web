@@ -2,6 +2,41 @@ document.documentElement.classList.add('js-motion');
 
 document.addEventListener('DOMContentLoaded', () => {
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    // Animate the real ticket count once it enters view; keep its final value without JS.
+    const count = document.querySelector('[data-bj-count]');
+    if (count && !reducedMotion.matches && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect();
+            const target = Number(count.dataset.bjCount);
+            if (!Number.isFinite(target) || target <= 0) return;
+            const start = performance.now();
+            const tick = now => {
+                const progress = Math.min((now - start) / 900, 1);
+                count.textContent = String(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+                if (progress < 1 && !reducedMotion.matches) requestAnimationFrame(tick);
+                else count.textContent = String(target);
+            };
+            requestAnimationFrame(tick);
+        }, { threshold: .3 });
+        observer.observe(count);
+    }
+    document.querySelectorAll('[data-stitch-gallery]').forEach(gallery => {
+        const viewport = gallery.querySelector('[data-bj-gallery-viewport]');
+        const prev = gallery.querySelector('[data-stitch-prev]');
+        const next = gallery.querySelector('[data-stitch-next]');
+        if (!viewport || !prev || !next) return;
+        const update = () => {
+            prev.disabled = viewport.scrollLeft <= 1;
+            next.disabled = viewport.scrollLeft + viewport.clientWidth >= viewport.scrollWidth - 1;
+        };
+        const move = direction => viewport.scrollBy({ left: direction * viewport.clientWidth * .8, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+        prev.addEventListener('click', () => move(-1));
+        next.addEventListener('click', () => move(1));
+        viewport.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update, { passive: true });
+        update();
+    });
     const heroVideo = document.querySelector('[data-hero-video]');
     if (heroVideo) {
         const syncVideo = () => {
@@ -241,6 +276,41 @@ document.addEventListener('DOMContentLoaded', () => {
         reset();
     });
 
+    document.querySelectorAll('[data-bj-route-planner]').forEach(planner => {
+        const destination = '-8.511979,115.328486';
+        const map = planner.querySelector('[data-bj-route-map]');
+        const openMap = planner.querySelector('[data-route-open]');
+        const selection = planner.querySelector('[data-route-selection]');
+        const buttons = [...planner.querySelectorAll('[data-route-origin]')];
+        const updateRoute = (button, origin = button.dataset.routeOrigin) => {
+            buttons.forEach(item => {
+                const active = item === button;
+                item.classList.toggle('is-active', active);
+                item.setAttribute('aria-pressed', String(active));
+                const icon = item.querySelector('i');
+                if (icon) icon.textContent = active ? 'check' : 'radio_button_unchecked';
+            });
+            if (!origin) return;
+            if (selection) selection.textContent = button.dataset.routeLabel || origin;
+            if (map) map.src = `https://www.google.com/maps?saddr=${encodeURIComponent(origin)}&daddr=${destination}&output=embed`;
+            if (openMap) openMap.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${destination}`;
+        };
+        buttons.forEach(button => button.addEventListener('click', () => {
+            if (!button.hasAttribute('data-route-current')) {
+                updateRoute(button);
+                return;
+            }
+            if (!navigator.geolocation) return;
+            button.setAttribute('aria-busy', 'true');
+            navigator.geolocation.getCurrentPosition(position => {
+                button.removeAttribute('aria-busy');
+                updateRoute(button, `${position.coords.latitude},${position.coords.longitude}`);
+            }, () => {
+                button.removeAttribute('aria-busy');
+            }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+        }));
+    });
+
     const galleryDialog = document.querySelector('#bj-gallery-dialog');
     if (galleryDialog && typeof galleryDialog.showModal === 'function') {
         const image = galleryDialog.querySelector('img');
@@ -378,6 +448,22 @@ document.addEventListener('DOMContentLoaded', () => {
         choices.forEach(choice => choice.addEventListener('change', updateTicketEstimate));
         quantityInput?.addEventListener('input', updateTicketEstimate);
         updateTicketEstimate();
+    }
+
+    // Start the photo reveal when its figure enters the viewport.
+    const unrollPhotos = document.querySelectorAll('.bj-home-intro__photo, .bj-home-story__media, .bj-home-facilities__photo');
+    if ('IntersectionObserver' in window && !reducedMotion.matches) {
+        const unrollObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting || reducedMotion.matches) return;
+                entry.target.classList.add('is-unrolling');
+                unrollObserver.unobserve(entry.target);
+            });
+        }, { threshold: .15, rootMargin: '0px 0px -10% 0px' });
+        unrollPhotos.forEach(photo => unrollObserver.observe(photo));
+        reducedMotion.addEventListener('change', () => {
+            if (reducedMotion.matches) unrollObserver.disconnect();
+        });
     }
 
     const items = document.querySelectorAll('.bj-reveal, .bj-motion-media, [data-bj-split]');

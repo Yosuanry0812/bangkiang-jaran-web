@@ -1,10 +1,10 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="w-full max-w-5xl grid md:grid-cols-[1fr_1.2fr] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-gray-100/80">
+<div class="bj-auth-card bj-auth-register w-full max-w-5xl grid md:grid-cols-[1fr_1.2fr] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-gray-100/80">
 
     {{-- ── Left: Image Panel ───────────────────────────── --}}
-    <div class="hidden md:flex relative flex-col justify-between overflow-hidden min-h-[640px]">
+    <div class="bj-auth-image hidden md:flex relative flex-col justify-between overflow-hidden min-h-[640px]">
         {{-- Background image --}}
         <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
              alt="Bangkiang Jaran"
@@ -28,7 +28,7 @@
     </div>
 
     {{-- ── Right: Register Form ────────────────────────── --}}
-    <div class="flex flex-col justify-center px-8 py-10 md:px-12 md:py-10 bg-white overflow-y-auto">
+    <div class="bj-auth-form flex flex-col justify-center px-8 py-10 md:px-12 md:py-10 bg-white overflow-y-auto">
 
         {{-- Header --}}
         <div class="mb-7">

@@ -25,7 +25,7 @@
             <div class="bj-booking-hero__grid">
                 <div class="bj-booking-hero__copy">
                     <p class="bj-booking-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Your visit begins here' : 'Perjalanan Anda dimulai di sini' }}</p>
-                    <h1 id="booking-title" class="bj-reveal" data-bj-split>{{ $isEnglish ? 'Reserve a quiet day by the waterfall.' : 'Pesan satu hari tenang di air terjun.' }}</h1>
+                    <h1 id="booking-title" class="bj-reveal" data-bj-split>{{ $isEnglish ? 'Plan your visit.' : 'Rencanakan kunjungan Anda.' }}</h1>
                     <p class="bj-booking-hero__lead bj-reveal">{{ $isEnglish ? 'Choose your visit date and the right ticket for every guest. The next step will collect visitor details.' : 'Pilih tanggal kunjungan dan tiket yang sesuai untuk setiap pengunjung. Data pengunjung akan dilengkapi pada langkah berikutnya.' }}</p>
                 </div>
                 <ol class="bj-booking-progress bj-reveal" aria-label="{{ $isEnglish ? 'Booking progress' : 'Progres pemesanan' }}">
@@ -108,7 +108,7 @@
                     <div class="bj-booking-summary__items" x-show="selectedTickets().length > 0" x-cloak x-transition.opacity.duration.250ms>
                         <template x-for="item in selectedTickets()" :key="item.id"><div><p><strong x-text="item.nama"></strong><small x-text="item.qty + ' × Rp ' + item.harga.toLocaleString('id-ID')"></small></p><span x-text="'Rp ' + (item.qty * item.harga).toLocaleString('id-ID')"></span></div></template>
                     </div>
-                    <div class="bj-booking-summary__total"><p><small>{{ $isEnglish ? 'Total payment' : 'Total pembayaran' }}</small><span>{{ $isEnglish ? 'All access and operational fees included.' : 'Sudah termasuk akses dan biaya operasional.' }}</span></p><strong x-text="'Rp ' + total().toLocaleString('id-ID')">Rp 0</strong></div>
+                    <div class="bj-booking-summary__total"><p><small>{{ $isEnglish ? 'Total payment' : 'Total pembayaran' }}</small><span>{{ $isEnglish ? 'Total for the tickets selected.' : 'Total tiket yang dipilih.' }}</span></p><strong x-text="'Rp ' + total().toLocaleString('id-ID')">Rp 0</strong></div>
                     <button type="submit" class="bj-booking-submit" :disabled="selectedTickets().length === 0 || submitting" :aria-busy="submitting"><span><small>{{ $isEnglish ? 'Next step' : 'Langkah berikutnya' }}</small><strong x-show="selectedTickets().length > 0 && !submitting">{{ $isEnglish ? 'Visitor details' : 'Data pengunjung' }}</strong><strong x-show="selectedTickets().length === 0 && !submitting">{{ __('messages.select_tickets_first') }}</strong><strong x-show="submitting">{{ $isEnglish ? 'Preparing reservation...' : 'Menyiapkan reservasi...' }}</strong></span><span class="bj-booking-submit__icon material-symbols-outlined" aria-hidden="true" x-text="submitting ? 'progress_activity' : 'arrow_forward'">arrow_forward</span></button>
                     <p class="bj-booking-summary__note"><span class="material-symbols-outlined" aria-hidden="true">lock</span>{{ __('messages.no_charge_yet') }}</p>
                 </div>
@@ -153,3 +153,4 @@ function ticketBooking(prices, names, initialDate, preSelectedId, initialTickets
 </script>
 @endpush
 @endsection
+

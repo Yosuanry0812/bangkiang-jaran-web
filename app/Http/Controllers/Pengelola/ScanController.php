@@ -77,7 +77,7 @@ class ScanController extends Controller
 
         DB::beginTransaction();
         try {
-            $detail = DetailPemesanan::where('kode_tiket', $kode)->first();
+            $detail = DetailPemesanan::where('kode_tiket', $kode)->lockForUpdate()->first();
 
             if (!$detail) {
                 DB::rollBack();
@@ -119,7 +119,7 @@ class ScanController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Gagal memproses tiket: ' . $e->getMessage());
+                ->with('error', 'Gagal memproses tiket. Silakan coba lagi.');
         }
     }
 
@@ -133,7 +133,7 @@ class ScanController extends Controller
 
         DB::beginTransaction();
         try {
-            $detail = DetailPemesanan::where('kode_tiket', $kode)->first();
+            $detail = DetailPemesanan::where('kode_tiket', $kode)->lockForUpdate()->first();
 
             if (!$detail) {
                 DB::rollBack();
@@ -171,7 +171,7 @@ class ScanController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Gagal check-out: ' . $e->getMessage());
+                ->with('error', 'Gagal check-out. Silakan coba lagi.');
         }
     }
 }

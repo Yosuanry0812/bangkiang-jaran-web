@@ -317,7 +317,7 @@ Middleware terdaftar: `CheckRole`, `Localization` (set locale dari `session`), `
 
 ## 8. Desain System — Tropical Sanctuary
 
-Sumber: `docs/DESIGN.md` + `tailwind.config.js` + `resources/views/**/*.blade.php`. Tema: **Tropical Elegance** — mewah tropis, minimal + tactile, foto alam jadi hero.
+Sumber rujukan: `docs/DESIGN.md`. Tema: **Tropical Elegance** — atmosfer resor alam tropis yang tenang, mewah, minimal + tactile, mengedepankan fotografi dokumentasi riil sebagai focal point.
 
 ### Palet Warna (Material 3 inspired)
 
@@ -340,52 +340,52 @@ Sumber: `docs/DESIGN.md` + `tailwind.config.js` + `resources/views/**/*.blade.ph
 
 ### Tipografi
 
-- **Heading**: `Playfair Display` — editorial, eksklusif (display-lg 64px/700, headline-md 32px/600)
-- **Body/UI**: `Plus Jakarta Sans` — apertur terbuka, legibilitas (body-lg 18px/400, label-md 14px/600 uppercase tracked)
+- **Heading**: `Playfair Display` / `Fraunces` — editorial, eksklusif (display-lg 64px/700, headline-md 32px/600)
+- **Body/UI**: `Plus Jakarta Sans` / `Manrope` — apertur terbuka, legibilitas tinggi (body-lg 18px/400, label-md 14px/600 uppercase tracked)
 - Negatif tracking di display desktop, label uppercase + `letterSpacing 0.05em`.
 
-### Layout & Spacing
+### Layout, Spacing & Elevation
 
-- Desktop: 12 kolom, gutter 24px, container max `1280px`, antar-section `80px (xl)`.
-- Tablet: 6 kolom, gutter 24px, margin 32px.
-- Mobile: 2 kolom, gutter 16px, margin 20px.
-- Unit `8px` base (4,12,24,48,80). Hero text offset agar foto air terjun tetap focal.
+- **Desktop**: 12 kolom, gutter 24px, container max `1280px`, antar-section `80px (xl)`.
+- **Tablet**: 6 kolom, gutter 24px, margin 32px.
+- **Mobile**: 2 kolom, gutter 16px, margin 20px.
+- **Unit `8px` base** (4, 12, 24, 48, 80). Hero text offset agar foto air terjun tetap focal.
+- **Elevation**: L0 base `#fbf9f4`, L1 cards/inputs `#ffffff` + `0 4px 20px rgba(0,50,40,.04)`, L2 modal `0 12px 40px rgba(0,50,40,.08)`.
+- **Radius**: Tombol/input `12px` (`rounded-lg`), container/kartu `24px` (`rounded-2xl`), chip pill `full`.
 
-### Elevation
+### Arsitektur Layering CSS
 
-- L0 base: `#fbf9f4`
-- L1 cards/inputs: `#ffffff` + `0 4px 20px rgba(0,50,40,.04)`
-- L2 modal: `#ffffff` + `0 12px 40px rgba(0,50,40,.08)`
-- Nav sticky: `backdrop-blur 10px`, `bg-white/80`, transparan di hero → glass on scroll.
+Untuk menjaga stabilitas styling antara halaman legasi dan pembaruan terkini, CSS dibagi menjadi 4 layer berjenjang:
+1. `resources/css/app.css` — Tailwind directives, scrollbar custom, print styles (dikompilasi Vite ke `public/build`).
+2. `public/css/site.css` — Gaya pondasi dasar aplikasi.
+3. `public/css/visual-refresh.css` — Layer presentasi editorial (ritme Sekumpul Waterfall, slider foto dinamis, tipografi Fraunces/Manrope).
+4. `public/css/responsive-refinement.css` — **Lapisan adaptasi responsif menyeluruh** (safe wrapping string panjang, stacking grid mobile, touch target minimum 44px, mitigasi overflow 320px–1440px).
 
-### Radius & Bentuk
+### Standar Uji Responsif (Responsive Acceptance Bar)
 
-- Button/input `12px` (`lg`), card/container `24px` (`xl`), chip pill `full`. Foto grid ikut `24px`.
-
-### Komponen
-
-- **Button**: primary filled emerald/white, secondary outlined 1.5px, tertiary wood underline. Hover lift subtle.
-- **Card tiket**: radius 24, image full-bleed top, padding 24, shadow L1, badge kategori.
-- **Input**: stroke `#bec9c4`, focus emerald + glow 4px.
-- **Chip**: `secondary-container` bg, `on-secondary-container` text.
-- **Nav**: desktop transparent → glass; link `Plus Jakarta Sans Bold 14px uppercase`. Mobile drawer Alpine.
+Semua halaman antarmuka wajib lolos verifikasi visual pada 5 resolusi layar:
+- `320px`: Ponsel terkecil — tidak ada horizontal overflow, padding kontainer minimal 16px.
+- `375px`: Ponsel modern — teks terbaca nyaman, tombol CTA mudah dijangkau.
+- `768px`: Tablet portrait — form & rincian membagi grid 2 kolom secara proporsional.
+- `1024px`: Tablet landscape / laptop ringkas — sidebar rincian/ringkasan sticky proporsional.
+- `1280px–1440px`: Desktop lebar — batas kontainer `1280px` agar panjang baris nyaman dibaca.
 
 ### Halaman Kunci untuk Referensi Desain
 
-- `wisatawan/landing.blade.php` (~1100 baris) — hero, narrative, 4 pilar, tiket grid, galeri zoom, resto teaser, travel, etika, FAQ accordion, finale CTA
-- `wisatawan/restoran.blade.php` — philosophy, menu tabs (Alpine), ambiance 3 card, booking WA
-- `wisatawan/tiket.blade.php` — filter tanggal, qty stepper (Alpine), ringkasan pajak 10%
+- `wisatawan/landing.blade.php` (~1100 baris) — hero fotografis, narasi warisan, 4 pilar pengalaman, tiket grid, galeri zoom, resto teaser, travel info, etika, FAQ accordion, finale CTA
+- `wisatawan/restoran.blade.php` — filosofi "Kepulauan Rasa", menu tabs (Alpine), ambiance cards, reservasi WA
+- `wisatawan/tiket.blade.php` — filter tanggal, qty stepper (Alpine), ringkasan transaksi
 - `wisatawan/pemesanan.blade.php`, `pemesanan-data-diri.blade.php`, `pemesanan-sukses.blade.php`, `pemesanan-detail.blade.php` (e-ticket QR)
-- `wisatawan/pembayaran.blade.php` — metode, drag&drop upload, preview, validasi 5MB
-- `pengelola/dashboard.blade.php` — KPI grid, Chart.js pie, tabel terbaru
-- `pengelola/scan/index.blade.php` — input kode, kamera (butuh HTTPS), status badge
-
+- `wisatawan/pembayaran.blade.php` — metode transfer/QRIS, upload area bukti, live preview, sidebar ringkasan adaptif
 ### Aset Frontend
 
 - `resources/css/app.css` — Tailwind directives, custom scrollbar, print style
 - `resources/js/app.js` — bootstrap `Alpine.start()`, `axios`, Vite HMR
 - `vite.config.js` — input `css/app.css` + `js/app.js`
 - `tailwind.config.js` — content `resources/views/**/*.blade.php`, plugin `@tailwindcss/forms`, font `Figtree` fallback
+- `public/css/site.css` — dasar layout & komponen umum
+- `public/css/visual-refresh.css` — gaya presentasi editorial terkini & hero slider
+- `public/css/responsive-refinement.css` — lapisan penyempurnaan responsif lintas viewport
 
 ---
 
@@ -445,6 +445,8 @@ bangkiang-jaran-web/
 ├── public/
 │   ├── index.php
 │   ├── build/ (Vite manifest)                # hasil npm run build
+│   ├── css/                                  # site.css, visual-refresh.css, responsive-refinement.css
+│   ├── js/site.js                            # runtime interaksi & slider
 │   ├── images/, videos/                      # aset statis
 │   └── storage → storage/app/public          # symlink
 ├── resources/
@@ -841,6 +843,8 @@ php artisan schedule:run   # di cron tiap menit
 | Kebutuhan | File |
 |-----------|------|
 | **Ganti warna/tema** | `docs/DESIGN.md` (token) + `tailwind.config.js` + `resources/css/app.css` |
+| **Perbaikan responsif (320px–1440px)** | `public/css/responsive-refinement.css` |
+| **Gaya editorial & hero slider** | `public/css/visual-refresh.css` + `public/js/site.js` |
 | **Ganti font** | `tailwind.config.js` (`fontFamily`) + `resources/views/layouts/*.blade.php` (Google Fonts link) |
 | **Tambah tiket baru default** | `database/seeders/DatabaseSeeder.php` (`$tikets`) |
 | **Ubah harga/logic pajak** | `PemesananController` + `wisatawan/tiket.blade.php` (Alpine calc) — pajak 10% di ringkasan |

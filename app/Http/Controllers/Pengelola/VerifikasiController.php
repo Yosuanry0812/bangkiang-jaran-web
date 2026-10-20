@@ -86,14 +86,16 @@ class VerifikasiController extends Controller
             'action' => ['required', 'in:valid,ditolak'],
         ]);
 
-        $pemesanan = Pemesanan::with('pembayaran')->findOrFail($id);
-
-        if (!$pemesanan->pembayaran) {
-            return back()->with('error', 'Belum ada pembayaran untuk pemesanan ini.');
-        }
-
         DB::beginTransaction();
         try {
+            $pemesanan = Pemesanan::whereKey($id)->lockForUpdate()->firstOrFail();
+            $pembayaran = Pembayaran::where('id_pemesanan', $id)->lockForUpdate()->first();
+            if (!$pembayaran || $pembayaran->status !== 'pending' || $pemesanan->status !== 'pending') {
+                DB::rollBack();
+                return back()->with('error', 'Pembayaran tidak sedang menunggu verifikasi.');
+            }
+            $pemesanan->setRelation('pembayaran', $pembayaran);
+
             if ($request->action === 'valid') {
                 $pemesanan->pembayaran->update([
                     'status' => 'valid',
@@ -136,7 +138,8 @@ class VerifikasiController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            \Log::error('Verifikasi pembayaran gagal.', ['exception' => get_class($e)]);
+            return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
         }
     }
 }

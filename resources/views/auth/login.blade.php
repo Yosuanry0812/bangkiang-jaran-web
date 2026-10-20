@@ -1,10 +1,10 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="w-full max-w-5xl grid md:grid-cols-[1fr_1.1fr] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-gray-100/80">
+<div class="bj-auth-card bj-auth-login w-full max-w-5xl grid md:grid-cols-[1fr_1.1fr] bg-white rounded-3xl overflow-hidden shadow-2xl shadow-black/10 border border-gray-100/80">
 
     {{-- ── Left: Image Panel ───────────────────────────── --}}
-    <div class="hidden md:flex relative flex-col justify-between overflow-hidden min-h-[600px]">
+    <div class="bj-auth-image hidden md:flex relative flex-col justify-between overflow-hidden min-h-[600px]">
         {{-- Background image --}}
         <img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}"
              alt="Bangkiang Jaran"
@@ -15,29 +15,35 @@
         <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,30,20,0.85) 0%, transparent 55%);"></div>
 
         {{-- Top logo area --}}
-        <div class="relative z-10 p-8">
-            <div class="inline-flex items-center gap-2.5">
-                <span class="font-display text-white font-semibold text-lg tracking-wide">Bangkiang Jaran</span>
-            </div>
-        </div>
+        <div class="bj-login-location relative z-10 p-8"><span class="bj-login-location-dot" aria-hidden="true"></span> Desa Bakbakan · Gianyar, Bali</div>
 
         <div class="relative z-10 p-8 text-white">
-            <p class="text-[11px] uppercase tracking-[.2em] text-white/70 mb-3">Desa Bakbakan · Gianyar</p>
-            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Perjalanan dimulai di sini.</p>
+            <p class="bj-login-image-eyebrow">Cagar Wisata Alam</p>
+            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Perjalanan <em>dimulai</em> di sini.</p>
+            <p class="bj-login-image-note">Selamat datang di Bangkiang Jaran. Masuki ruang hening air terjun di Gianyar, Bali, di mana tradisi menyatu dengan keasrian alam.</p>
+            <div class="bj-login-image-footer">Harmoni Tri Hita Karana</div>
         </div>
     </div>
 
     {{-- ── Right: Login Form ───────────────────────────── --}}
-    <div class="flex flex-col justify-center px-8 py-10 md:px-12 md:py-12 bg-white">
+    <div class="bj-auth-form flex flex-col justify-center px-8 py-10 md:px-12 md:py-12 bg-white">
+
+        <div class="bj-login-header">
+            <a href="{{ route('landing') }}" class="bj-login-brand"><span class="bj-login-monogram">B</span><span><strong>Bangkiang Jaran</strong><small>Gianyar · Bali</small></span></a>
+            <div class="bj-login-header-actions">
+                <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="bj-login-language" aria-label="{{ app()->getLocale() === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia' }}">{{ app()->getLocale() === 'id' ? 'ID / EN' : 'EN / ID' }}</a>
+                <a href="{{ route('register') }}" class="bj-login-register">Daftar Akun</a>
+            </div>
+        </div>
 
         {{-- Header --}}
-        <div class="mb-8">
+        <div class="bj-login-intro mb-8">
             <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-body font-semibold tracking-[0.15em] uppercase px-3 py-1.5 rounded-full mb-5">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Akun Pengunjung
+                Portal Pengunjung & Reservasi
             </div>
             <h1 class="font-display text-[2rem] font-semibold text-gray-900 leading-tight mb-2">Masuk ke Akun</h1>
-            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Masuk untuk memesan tiket dan melihat status kunjungan Anda.</p>
+            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Masuk untuk memesan tiket, mengecek status reservasi, dan mengelola kunjungan wisata Anda.</p>
         </div>
 
         {{-- Alert messages --}}
@@ -61,7 +67,7 @@
         @endif
 
         {{-- Form --}}
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        <form id="login-form" method="POST" action="{{ route('login') }}" class="space-y-5">
             @csrf
 
             {{-- Email / Username --}}
@@ -72,7 +78,7 @@
                     <input id="login" type="text" name="login" value="{{ old('login') }}"
                            required autofocus autocomplete="username"
                            class="w-full h-12 bg-gray-50 border border-gray-200 text-gray-900 text-[14px] rounded-2xl pl-11 pr-4 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('login') border-red-400 bg-red-50 focus:border-red-400 focus:ring-red-400/10 @enderror"
-                           placeholder="email@contoh.com">
+                           placeholder="nama@email.com atau username">
                 </div>
                 @error('login')
                     <p class="mt-1.5 flex items-center gap-1 text-[12px] text-red-500 font-body">
@@ -97,7 +103,8 @@
                            placeholder="••••••••">
                     {{-- Toggle password visibility --}}
                     <button type="button" onclick="togglePwd('password','eye-login')"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
+                            aria-label="Tampilkan password" aria-pressed="false"
+                            class="bj-password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                         <span id="eye-login" class="material-symbols-outlined text-[18px]">visibility_off</span>
                     </button>
                 </div>
@@ -109,20 +116,15 @@
             </div>
 
             {{-- Remember me --}}
-            <div class="flex items-center gap-3">
-                <button type="button" id="remember-toggle" onclick="toggleRemember()"
-                        class="relative w-10 h-5 rounded-full transition-colors duration-300 bg-gray-200 flex-shrink-0 focus:outline-none focus:ring-4 focus:ring-emerald-500/20"
-                        role="switch" aria-checked="false">
-                    <span id="remember-knob" class="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300"></span>
-                </button>
-                <input type="checkbox" id="remember_me" name="remember" class="sr-only">
-                <label for="remember-toggle" class="font-body text-[13px] text-gray-500 select-none cursor-pointer">Ingat saya</label>
+            <div class="bj-remember">
+                <input type="checkbox" id="remember_me" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                <label for="remember_me">Ingat saya</label>
             </div>
 
             {{-- Submit --}}
             <button type="submit"
                     class="group w-full h-12 flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-body text-[14px] font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-800/25 hover:-translate-y-0.5 active:translate-y-0 mt-2">
-                Masuk
+                <span class="bj-login-submit-text">Masuk ke Akun</span>
                 <span class="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-0.5">arrow_forward</span>
             </button>
         </form>
@@ -156,6 +158,7 @@
             Belum punya akun?
             <a href="{{ route('register') }}" class="font-semibold text-emerald-700 hover:text-emerald-600 transition-colors ml-1">Daftar sekarang</a>
         </p>
+        <div class="bj-login-footer"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span> Portal resmi Bangkiang Jaran</div>
     </div>
 </div>
 
@@ -168,20 +171,18 @@ function togglePwd(inputId, iconId) {
     const isHidden = input.type === 'password';
     input.type = isHidden ? 'text' : 'password';
     icon.textContent = isHidden ? 'visibility' : 'visibility_off';
+    const button = icon.closest('button');
+    button.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
+    button.setAttribute('aria-pressed', String(isHidden));
 }
 
-let rememberOn = false;
-function toggleRemember() {
-    rememberOn = !rememberOn;
-    const btn   = document.getElementById('remember-toggle');
-    const knob  = document.getElementById('remember-knob');
-    const chk   = document.getElementById('remember_me');
-    btn.setAttribute('aria-checked', rememberOn);
-    btn.classList.toggle('bg-emerald-600', rememberOn);
-    btn.classList.toggle('bg-gray-200', !rememberOn);
-    knob.style.transform = rememberOn ? 'translateX(20px)' : 'translateX(0)';
-    chk.checked = rememberOn;
-}
+document.getElementById('login-form')?.addEventListener('submit', function () {
+    const button = this.querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.querySelector('.bj-login-submit-text').textContent = 'Memverifikasi akun...';
+    button.setAttribute('aria-busy', 'true');
+});
+
 </script>
 @endpush
 @endsection

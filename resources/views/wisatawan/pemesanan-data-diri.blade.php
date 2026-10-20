@@ -10,8 +10,8 @@
     <header class="bj-visitor-intro" aria-labelledby="visitor-title">
         <div class="bj-visitor-wrap bj-visitor-intro__inner">
             <div class="bj-visitor-intro__copy">
-                <p class="bj-visitor-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Reservation manifest' : 'Manifest reservasi' }}</p>
-                <h1 id="visitor-title" class="bj-reveal" data-bj-split>{{ $isEnglish ? 'A few details before the waterfall.' : 'Sedikit detail sebelum menuju air terjun.' }}</h1>
+                <p class="bj-visitor-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Visitor details' : 'Data pengunjung' }}</p>
+                <h1 id="visitor-title" class="bj-reveal" data-bj-split>{{ $isEnglish ? 'Complete visitor details.' : 'Lengkapi data pengunjung.' }}</h1>
                 <p class="bj-visitor-intro__lead bj-reveal">{{ $isEnglish ? 'Each visitor receives an individual entry ticket. Complete the details below so your arrival is smooth and personal.' : 'Setiap pengunjung akan menerima tiket masuk pribadi. Lengkapi data berikut agar kedatangan Anda berjalan lancar.' }}</p>
             </div>
             <div class="bj-visitor-intro__folio bj-reveal" aria-label="{{ $isEnglish ? 'Reservation details' : 'Detail reservasi' }}">
@@ -67,3 +67,4 @@
     </main>
 </div>
 @endsection
+

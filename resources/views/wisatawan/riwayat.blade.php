@@ -36,7 +36,7 @@
                 </div>
 
                 <section class="bj-history-list" aria-labelledby="history-list-title">
-                    <header class="bj-history-list__head bj-reveal"><div><p>{{ $isEnglish ? 'Reservation archive' : 'Arsip reservasi' }}</p><h2 id="history-list-title">{{ $isEnglish ? 'Your booking timeline' : 'Linimasa pemesanan Anda' }}</h2></div><span>{{ $total }} {{ $isEnglish ? 'records' : 'catatan' }}</span></header>
+                    <header class="bj-history-list__head bj-reveal"><div><p>{{ $isEnglish ? 'Reservation archive' : 'Arsip reservasi' }}</p><h2 id="history-list-title">{{ $isEnglish ? 'Your bookings' : 'Daftar pemesanan' }}</h2></div><span>{{ $total }} {{ $isEnglish ? 'records' : 'catatan' }}</span></header>
 
                     @foreach($pemesanan as $i => $item)
                         @php
@@ -70,7 +70,7 @@
                     @endforeach
                 </section>
             @else
-                <section class="bj-history-empty bj-reveal" aria-labelledby="history-empty-title"><span class="material-symbols-outlined" aria-hidden="true">water_drop</span><p>{{ $isEnglish ? 'Your next quiet day is waiting.' : 'Hari tenang Anda berikutnya sedang menunggu.' }}</p><h2 id="history-empty-title">{{ __('messages.no_bookings') }}</h2><small>{{ __('messages.no_bookings_desc') }}</small><a href="{{ route('tiket.index') }}">{{ __('messages.book_now_from_history') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></section>
+                <section class="bj-history-empty bj-reveal" aria-labelledby="history-empty-title"><span class="material-symbols-outlined" aria-hidden="true">water_drop</span><p>{{ $isEnglish ? 'Plan your next visit.' : 'Rencanakan kunjungan Anda.' }}</p><h2 id="history-empty-title">{{ __('messages.no_bookings') }}</h2><small>{{ __('messages.no_bookings_desc') }}</small><a href="{{ route('tiket.index') }}">{{ __('messages.book_now_from_history') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></section>
             @endif
         </div>
     </main>
@@ -89,3 +89,4 @@ function toggleHistoryDetails(id, trigger) {
 </script>
 @endpush
 @endsection
+

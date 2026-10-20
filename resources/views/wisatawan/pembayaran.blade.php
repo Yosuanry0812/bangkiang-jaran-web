@@ -5,43 +5,35 @@
 
 @section('content')
 {{-- ── Fixed top progress bar ───────────────────────── --}}
-<div class="fixed top-12 md:top-[68px] left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-    <div class="max-w-5xl mx-auto px-gutter py-2.5 sm:py-3 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 flex-1 min-w-0">
-            <span class="font-sans text-xs text-stone hidden sm:inline flex-shrink-0">{{ __('messages.booking_code') }}:</span>
-            <span class="font-sans text-xs font-semibold text-forest bg-forest/8 px-3 py-1 rounded-full truncate max-w-full">
-                {{ $pemesanan->kode_booking ?? '-' }}
-            </span>
-        </div>
-        <div class="flex items-center gap-1 sm:gap-2 text-xs flex-shrink-0">
-            <div class="flex items-center gap-1" id="step-1-indicator">
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-forest text-white flex items-center justify-center text-xs font-bold" id="step-1-circle">1</div>
-                <span class="font-sans font-semibold text-forest hidden sm:inline">{{ __('messages.step_method') }}</span>
-            </div>
-            <div class="w-4 sm:w-8 h-px bg-gray-200"></div>
-            <div class="flex items-center gap-1" id="step-2-indicator">
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold" id="step-2-circle">2</div>
-                <span class="font-sans text-gray-400 hidden sm:inline" id="step-2-label">{{ __('messages.step_upload') }}</span>
-            </div>
-            <div class="w-4 sm:w-8 h-px bg-gray-200"></div>
-            <div class="flex items-center gap-1">
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs font-bold">3</div>
-                <span class="font-sans text-gray-400 hidden sm:inline">{{ __('messages.step_done') }}</span>
+<div class="bj-payment-progress fixed top-12 md:top-[68px] left-0 right-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <div class="bj-payment-progress__inner max-w-6xl mx-auto px-gutter py-2.5 sm:py-3">
+        <div class="bj-payment-booking">
+            <span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span>
+            <div class="min-w-0">
+                <span class="bj-payment-booking__label">{{ __('messages.booking_code') }}</span>
+                <span class="bj-payment-booking__code" title="{{ $pemesanan->kode_booking ?? '-' }}">{{ $pemesanan->kode_booking ?? '-' }}</span>
             </div>
         </div>
+        <ol class="bj-payment-steps" aria-label="Progres pembayaran">
+            <li class="is-current" id="step-1-indicator"><span id="step-1-circle">1</span><strong>{{ __('messages.step_method') }}</strong></li>
+            <li class="bj-payment-steps__line" aria-hidden="true"></li>
+            <li id="step-2-indicator"><span id="step-2-circle">2</span><strong id="step-2-label">{{ __('messages.step_upload') }}</strong></li>
+            <li class="bj-payment-steps__line" aria-hidden="true"></li>
+            <li><span>3</span><strong>{{ __('messages.step_done') }}</strong></li>
+        </ol>
     </div>
 </div>
 
 {{-- ── Page body ─────────────────────────────────────── --}}
-<div class="min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page">
-    <div class="max-w-5xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+<div class="bj-payment-flow min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page">
+    <div class="bj-payment-shell max-w-5xl mx-auto">
+        <div class="bj-payment-layout grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
             {{-- ── LEFT: Steps ─────────────────────────── --}}
             <div class="lg:col-span-2 space-y-4">
 
                 {{-- Step 1: Pilih Metode --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="panel-step-1">
+                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" id="panel-step-1">
                     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100 bg-forest">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">1</div>
                         <h2 class="font-serif text-lg text-white">{{ __('messages.choose_payment_method') }}</h2>
@@ -69,12 +61,12 @@
 
                         {{-- Bank Transfer --}}
                         @if(collect($metodeBayar)->contains('type', 'bank'))
-                        <div>
+                        <div class="bj-payment-method-group">
                             <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.bank_transfer') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
                                 @if($m['type'] === 'bank')
-                                <div class="border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
+                                <div class="bj-payment-method border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
                                             data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
                                             onclick="pilihMetode(this.dataset.id, this.dataset.name)"
@@ -111,12 +103,12 @@
 
                         {{-- E-Wallet --}}
                         @if(collect($metodeBayar)->contains('type', 'ewallet'))
-                        <div>
+                        <div class="bj-payment-method-group">
                             <p class="font-sans text-[10px] font-semibold text-stone uppercase tracking-[0.15em] mb-3">{{ __('messages.e_wallet') }}</p>
                             <div class="space-y-2">
                                 @foreach($metodeBayar as $m)
                                 @if($m['type'] === 'ewallet')
-                                <div class="border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
+                                <div class="bj-payment-method border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
                                             data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
                                             onclick="pilihMetode(this.dataset.id, this.dataset.name)"
@@ -153,7 +145,7 @@
 
                         {{-- Continue button --}}
                         <button type="button" id="btn-lanjutkan" disabled
-                                class="w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl transition-all opacity-40 cursor-not-allowed">
+                                class="bj-payment-next w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl transition-all opacity-40 cursor-not-allowed">
                             <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             {{ __('messages.continue_to_upload') }}
                         </button>
@@ -162,7 +154,7 @@
                 </div>
 
                 {{-- Step 2: Upload --}}
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2">
+                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2">
                     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100" id="step-2-header" style="background:#6B6B6B;">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
                         <h2 class="font-serif text-lg text-white">{{ __('messages.upload_payment') }}</h2>
@@ -188,7 +180,7 @@
                             </div>
 
                             {{-- Drop zone --}}
-                            <div class="relative border-2 border-dashed border-gray-200 rounded-2xl hover:border-forest/40 transition-all duration-200 cursor-pointer min-h-[200px] sm:min-h-[280px] md:min-h-[340px] flex items-center justify-center overflow-hidden"
+                            <div class="bj-payment-upload relative border-2 border-dashed border-gray-200 rounded-2xl hover:border-forest/40 transition-all duration-200 cursor-pointer min-h-[200px] sm:min-h-[280px] md:min-h-[340px] flex items-center justify-center overflow-hidden"
                                  id="drop-zone">
                                 <input type="file" name="bukti_bayar" id="bukti_bayar"
                                        accept="image/jpeg,image/jpg,image/png,application/pdf" required
@@ -302,7 +294,7 @@
                             </div>
 
                             <button type="submit" id="submit-btn"
-                                    class="w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
+                                    class="bj-payment-submit w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                                 <span class="material-symbols-outlined text-sm">send</span>
                                 {{ __('messages.submit_payment_proof') }}
                             </button>
@@ -323,11 +315,11 @@
         </div>
 
             {{-- ── RIGHT: Summary sidebar ───────────────── --}}
-            <div class="lg:col-span-1">
+            <div class="bj-payment-aside lg:col-span-1">
                 <div class="sticky top-20 space-y-4">
 
                     {{-- Order summary card --}}
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="bj-payment-summary bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="bg-forest px-5 py-5">
                             <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40 mb-1">{{ __('messages.total_payment') }}</p>
                             <p class="font-serif text-3xl text-white">
@@ -369,7 +361,7 @@
                     </div>
 
                     {{-- Help card --}}
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-5">
+                    <div class="bj-payment-help bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-5">
                         <div class="flex items-center gap-2.5 mb-3">
                             <div class="w-8 h-8 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
                                 <span class="material-symbols-outlined text-forest text-sm">support_agent</span>
@@ -477,10 +469,14 @@
             if (!activeMetode) return;
             const panel2  = document.getElementById('panel-step-2');
             const header2 = document.getElementById('step-2-header');
+            const step1 = document.getElementById('step-1-indicator');
+            const step2 = document.getElementById('step-2-indicator');
             panel2.classList.remove('opacity-50', 'pointer-events-none');
             header2.style.background = '#1B3A2D';
             const c2 = document.getElementById('step-2-circle');
             const l2 = document.getElementById('step-2-label');
+            if (step1) { step1.classList.remove('is-current'); step1.classList.add('is-complete'); }
+            if (step2) step2.classList.add('is-current');
             if (c2) { c2.classList.remove('bg-gray-100', 'text-gray-400'); c2.classList.add('bg-forest', 'text-white'); }
             if (l2) { l2.classList.remove('text-gray-400'); l2.classList.add('font-semibold', 'text-forest'); }
             panel2.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -600,6 +596,7 @@
     }
     if (retryBtn) {
         retryBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
+    }
     // PDF action buttons
     if (changePdfBtn) {
         changePdfBtn.addEventListener('click', e => {
@@ -612,8 +609,6 @@
     if (removePdfBtn) {
         removePdfBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
     }
-    }
-
     if (fileInput) fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
     if (dropZone) {

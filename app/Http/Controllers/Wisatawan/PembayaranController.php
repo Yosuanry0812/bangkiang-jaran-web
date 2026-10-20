@@ -7,6 +7,7 @@ use App\Models\Pemesanan;
 use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -73,24 +74,36 @@ class PembayaranController extends Controller
             return back()->withErrors(['bukti_bayar' => 'Gagal menyimpan file. Coba lagi.'])->withInput();
         }
 
-        $oldPath = $pemesanan->pembayaran?->bukti_bayar;
-        $attributes = [
-            'total'        => $pemesanan->total_harga,
-            'metode'       => $request->metode,
-            'bukti_bayar'  => $path,
-            'status'       => 'pending',
-            'tgl_bayar'    => now()->toDateString(),
-        ];
-
+        $oldPath = null;
         try {
-            if ($pemesanan->pembayaran) {
-                $pemesanan->pembayaran->update($attributes);
-            } else {
-                Pembayaran::create(['id_pemesanan' => $pemesanan->id_pemesanan] + $attributes);
-            }
+            $saved = DB::transaction(function () use ($id_pemesanan, $request, $path, &$oldPath) {
+                $booking = Pemesanan::where('id_user', Auth::id())->whereKey($id_pemesanan)->lockForUpdate()->firstOrFail();
+                $payment = Pembayaran::where('id_pemesanan', $booking->id_pemesanan)->lockForUpdate()->first();
+                if ($booking->status !== 'pending' || ($payment && $payment->status !== 'ditolak')) {
+                    return false;
+                }
+                $oldPath = $payment?->bukti_bayar;
+                $attributes = [
+                    'total' => $booking->total_harga,
+                    'metode' => $request->metode,
+                    'bukti_bayar' => $path,
+                    'status' => 'pending',
+                    'tgl_bayar' => now()->toDateString(),
+                ];
+                if ($payment) {
+                    $payment->update($attributes);
+                } else {
+                    Pembayaran::create(['id_pemesanan' => $booking->id_pemesanan] + $attributes);
+                }
+                return true;
+            });
         } catch (\Throwable $e) {
             Storage::disk('public')->delete($path);
             throw $e;
+        }
+        if (!$saved) {
+            Storage::disk('public')->delete($path);
+            return back()->with('error', 'Pembayaran tidak dapat diajukan untuk status pemesanan ini.');
         }
 
         if ($oldPath && $oldPath !== $path) {

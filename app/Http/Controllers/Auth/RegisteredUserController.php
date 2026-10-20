@@ -35,7 +35,6 @@ class RegisteredUserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 'wisatawan',
-            'email_verified_at' => now(),
             'last_login_at' => now(),
             'last_login_method' => 'manual',
             'login_count' => 1,
@@ -44,6 +43,7 @@ class RegisteredUserController extends Controller
         ActivityLogger::log('Registrasi', 'Akun baru: ' . $user->email);
 
         Auth::login($user);
+        $request->session()->regenerate();
 
         return redirect()->route('redirect.after.login');
     }

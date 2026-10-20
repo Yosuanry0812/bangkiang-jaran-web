@@ -1,0 +1,55 @@
+﻿/* Transaction surfaces: quiet, legible and scoped to the existing booking flow. */
+.bj-booking, .bj-visitor, .bj-history, .bj-payment-flow { --tx-ink:#183b31; --tx-line:#d3ddd5; --tx-paper:#faf9f4; --tx-accent:#b88738; }
+.bj-booking-main, .bj-visitor-main, .bj-history-main, .bj-payment-flow { background:var(--tx-paper); }
+.bj-booking-main::before, .bj-booking-date::after, .bj-booking-summary::before { display:none; }
+.bj-booking-date, .bj-booking-ticket, .bj-visitor-manifest, .bj-visitor-entry, .bj-history-card, .bj-payment-panel, .bj-payment-summary { border-radius:8px !important; box-shadow:none !important; }
+.bj-booking-date { border-color:var(--tx-line); border-left:4px solid #286a55; background:#fff; }
+.bj-booking-date__icon, .bj-booking-ticket__icon { border-radius:6px; }
+.bj-booking-date__copy p, .bj-booking-ticket__copy > p { font-size:.875rem; color:#4f6259; line-height:1.55; }
+.bj-booking-date__copy small, .bj-booking-date__input, .bj-booking-section__head p { font-size:.72rem; color:#526b60; }
+.bj-booking-date__input input { min-height:50px; font-size:1rem; border-radius:6px; background:#fff; }
+.bj-booking-ticket { min-height:145px; border-color:var(--tx-line); background:#fff; }
+.bj-booking-ticket:hover { transform:none; box-shadow:none; border-color:#819e8e; }
+.bj-booking-ticket.is-selected { background:#f1f7f1; box-shadow:none; border-color:#277358; }
+.bj-booking-ticket.is-selected::before { background:#277358; }
+.bj-booking-ticket__title span { border:0; border-radius:0; padding:0; font-size:.7rem; color:#526b60; }
+.bj-booking-ticket__copy > strong small { font-size:.78rem; color:#53675d; }
+.bj-booking-stepper button { min-width:44px; min-height:44px; }
+.bj-booking-summary, .bj-visitor-summary { border-radius:8px !important; box-shadow:none !important; }
+.bj-booking-summary__meta dt, .bj-booking-summary__meta dd, .bj-booking-summary__items strong, .bj-booking-summary__items small, .bj-booking-summary__items > div > span, .bj-booking-summary__empty small, .bj-booking-summary__total span, .bj-booking-summary__note { font-size:.8rem; color:#d4e2d9; }
+.bj-booking-summary__total small, .bj-booking-summary__eyebrow { font-size:.72rem; }
+.bj-booking-summary__eyebrow small { color:#d4e2d9; }
+.bj-visitor-entry { background:#fff; border-color:var(--tx-line); }
+.bj-visitor-field label { font-size:.875rem; }
+.bj-visitor-field input, .bj-visitor-field select { min-height:50px; font-size:1rem; border-radius:6px; }
+.bj-visitor-field input[aria-invalid='true'], .bj-visitor-field select[aria-invalid='true'] { border-color:#b3261e; }
+.bj-visitor-field__error { font-size:.875rem; }
+.bj-payment-progress { box-shadow:none !important; border-color:var(--tx-line) !important; }
+.bj-payment-panel > :first-child { border-radius:0; }
+.bj-payment-method { border-radius:6px !important; border-color:var(--tx-line) !important; background:#fff; }
+.bj-payment-method > button { min-height:72px; }
+.bj-payment-method > button:focus-visible, .bj-history-card__toggle:focus-visible, .bj-booking-stepper button:focus-visible, .bj-visitor-field :is(input,select):focus-visible { outline:3px solid #bd8d38; outline-offset:2px; }
+.bj-payment-method [id^='detail-'] { background:#f2f7f2 !important; }
+.bj-payment-method [id^='detail-'] button { min-height:44px; }
+.bj-payment-upload { min-height:220px !important; border-radius:8px !important; background:#f7faf6 !important; }
+.bj-payment-upload:focus-within { outline:3px solid #bd8d38; outline-offset:3px; }
+.bj-history-overview { border-radius:8px !important; box-shadow:none !important; }
+.bj-history-card { border-color:var(--tx-line); background:#fff; }
+.bj-history-card__toggle { min-height:88px; }
+.bj-history-card__meta span, .bj-history-ticket-list code { overflow-wrap:anywhere; }
+.bj-history-card__detail { border-top:1px solid var(--tx-line); }
+.bj-history-empty { border-radius:8px !important; box-shadow:none !important; }
+@media (prefers-reduced-motion:no-preference) {
+  .bj-booking-ticket, .bj-payment-method, .bj-history-card { transition:border-color .2s ease, background-color .2s ease; }
+  .bj-booking-stepper button, .bj-payment-next, .bj-visitor-submit { transition:background-color .2s ease, color .2s ease, transform .2s ease; }
+  .bj-booking-stepper button:active:not(:disabled), .bj-payment-next:active:not(:disabled), .bj-visitor-submit:active:not(:disabled) { transform:scale(.98); }
+}
+@media (max-width:767px) {
+  .bj-booking-summary-wrap { position:static; }
+  .bj-booking-date, .bj-booking-ticket { padding:18px; }
+  .bj-booking-section__head { gap:12px; }
+  .bj-payment-method [id^='detail-'] > div { flex-wrap:wrap; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .bj-booking *, .bj-visitor *, .bj-payment-flow *, .bj-history * { scroll-behavior:auto !important; transition-duration:0.01ms !important; animation-duration:0.01ms !important; animation-iteration-count:1 !important; }
+}

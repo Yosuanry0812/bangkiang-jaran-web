@@ -38,8 +38,9 @@
     </style>
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/auth-refinement.css') }}">
 </head>
-<body class="bj-guest font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
+<body class="bj-guest {{ Route::is('login', 'register') ? 'bj-auth-page' : '' }} font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
 
     {{-- ── Subtle background texture ── --}}
     <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,100,70,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,80,60,0.05) 0%, transparent 55%);"></div>

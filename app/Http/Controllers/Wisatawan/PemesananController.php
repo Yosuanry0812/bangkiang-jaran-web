@@ -53,7 +53,9 @@ class PemesananController extends Controller
 
         foreach ($tickets as $id_tiket => $jumlah) {
             $tiket = Tiket::aktif()->find($id_tiket);
-            if (!$tiket) continue;
+            if (!$tiket) {
+                return back()->withErrors(['tickets' => 'Tiket yang dipilih tidak tersedia. Silakan pilih kembali.'])->withInput();
+            }
 
             $subtotal = $tiket->harga * $jumlah;
             $items = [];
@@ -208,7 +210,7 @@ class PemesananController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Pemesanan error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            return back()->withErrors(['error' => 'Terjadi kesalahan sistem: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['error' => 'Terjadi kesalahan sistem. Silakan coba lagi.'])->withInput();
         }
     }
 

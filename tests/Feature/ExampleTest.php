@@ -33,7 +33,7 @@ class ExampleTest extends TestCase
         $this->get('/galeri')->assertNotFound();
     }
 
-    public function test_homepage_uses_uploaded_photos_for_hero_and_horizontal_gallery(): void
+    public function test_homepage_uses_uploaded_photos_for_hero(): void
     {
         Galeri::create(['file' => 'wisata/foto-satu.webp', 'keterangan' => 'Aliran air', 'tipe' => 'wisata']);
         Galeri::create(['file' => 'wisata/foto-dua.webp', 'keterangan' => 'Jalur masuk', 'tipe' => 'wisata']);
@@ -41,7 +41,6 @@ class ExampleTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('data-bj-hero-next', false)
-            ->assertSee('data-bj-gallery-viewport', false)
             ->assertSee('Aliran air')
             ->assertSee('Jalur masuk');
     }

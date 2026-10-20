@@ -164,6 +164,10 @@
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive-refinement.css') . '?v=' . filemtime(public_path('css/responsive-refinement.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/transaction-refinement.css') }}">
+    @if (Route::is('landing'))<link rel="stylesheet" href="{{ asset('css/home-stitch.css') . '?v=' . filemtime(public_path('css/home-stitch.css')) }}">@endif
+    @if (Route::is('restoran'))<link rel="stylesheet" href="{{ asset('css/restaurant-stitch.css') . '?v=' . filemtime(public_path('css/restaurant-stitch.css')) }}">@endif
 </head>
 <body class="bj-public bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
     <a class="bj-skip-link" href="#main-content">{{ app()->getLocale() === 'id' ? 'Langsung ke konten' : 'Skip to content' }}</a>
@@ -620,7 +624,7 @@
         });
     }
     </script>
-    <script defer src="{{ asset('js/site.js') }}"></script>
+    <script defer src="{{ asset('js/site.js') . '?v=' . filemtime(public_path('js/site.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

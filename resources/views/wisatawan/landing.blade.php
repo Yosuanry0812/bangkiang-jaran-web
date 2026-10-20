@@ -72,9 +72,9 @@
                 <p class="bj-home-kicker bj-reveal">{{ $isEnglish ? 'Bakbakan Village · Gianyar, Bali' : 'Desa Bakbakan · Gianyar, Bali' }}</p>
                 <h1 id="home-hero-title" class="bj-home-title bj-reveal">
                     @if($isEnglish)
-                        Where the forest <em>falls</em> into light
+                        Where the forest <em>finds its light.</em>
                     @else
-                        Di mana rimba <em>jatuh</em> menjadi cahaya
+                        Ketika rimba <em>menemukan cahayanya.</em>
                     @endif
                 </h1>
                 <p class="bj-home-hero__lead bj-reveal">{{ $isEnglish ? 'Follow the sound of water into a greener, quieter side of Gianyar—welcomed and cared for by the people of Bakbakan.' : 'Ikuti suara air menuju sisi Gianyar yang lebih hijau dan tenang—disambut serta dirawat oleh masyarakat Bakbakan.' }}</p>
@@ -85,14 +85,8 @@
             </div>
 
             <div class="bj-home-hero__bottom bj-reveal">
-                <dl class="bj-home-stats">
-                    <div><dt><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span>{{ $isEnglish ? 'Location' : 'Lokasi' }}</span></dt><dd>Bakbakan, Gianyar</dd></div>
-                    <div><dt><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span>{{ $isEnglish ? 'Open daily' : 'Buka setiap hari' }}</span></dt><dd>07.00–18.00</dd></div>
-                    @if($hargaMulai !== null)<div><dt><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><span>{{ $isEnglish ? 'Tickets from' : 'Tiket mulai' }}</span></dt><dd>Rp {{ number_format($hargaMulai, 0, ',', '.') }}</dd></div>@endif
-                </dl>
-
                 @if($usableGallery->count() > 1)
-                    <div class="bj-home-hero__controls" aria-label="{{ $isEnglish ? 'Hero photos' : 'Foto pembuka' }}">
+                    <div class="bj-home-hero__controls ml-auto" aria-label="{{ $isEnglish ? 'Hero photos' : 'Foto pembuka' }}">
                         <span class="bj-home-hero__caption" data-bj-hero-caption>{{ $usableGallery->first()->keterangan ?: 'Air Terjun Bangkiang Jaran' }}</span>
                         <span class="bj-home-hero__count"><strong data-bj-hero-current>01</strong> / {{ str_pad(min($usableGallery->count(), 6), 2, '0', STR_PAD_LEFT) }}</span>
                         <span class="bj-home-hero__progress" aria-hidden="true"><i data-bj-hero-progress></i></span>
@@ -106,11 +100,20 @@
     </section>
 
     <main class="bj-home-paper">
+        <div class="bj-home-facts-band">
+            <div class="bj-home-wrap bj-home-facts bj-reveal">
+                <div><strong>5–10</strong><span>{{ $isEnglish ? 'minutes of relaxed walking' : 'menit berjalan santai' }}</span></div>
+                <div><strong>07.00</strong><span>{{ $isEnglish ? 'opening time every day' : 'mulai buka setiap hari' }}</span></div>
+                <div><strong data-bj-count="{{ $tiket->count() }}">{{ $tiket->count() }}</strong><span>{{ $isEnglish ? 'active ticket options' : 'pilihan tiket aktif' }}</span></div>
+                <div><strong>100%</strong><span>{{ $isEnglish ? 'digital booking flow' : 'alur pemesanan digital' }}</span></div>
+            </div>
+        </div>
+
         <section id="kisah" class="bj-home-intro" aria-labelledby="home-intro-title">
             <div class="bj-home-wrap bj-home-intro__grid">
                 <div class="bj-home-intro__copy bj-reveal">
                     <p class="bj-home-kicker">{{ $isEnglish ? 'Welcome to Bangkiang Jaran' : 'Selamat datang di Bangkiang Jaran' }}</p>
-                    <h2 id="home-intro-title">{{ $isEnglish ? 'Hidden in the calm of ' : 'Tersembunyi dalam tenangnya ' }}<em>Bakbakan</em></h2>
+                    <h2 id="home-intro-title">{{ $isEnglish ? 'More than a waterfall, ' : 'Bukan sekadar air terjun, ' }}<em>{{ $isEnglish ? 'a haven in the green.' : 'ruang hijau untuk kembali tenang.' }}</em></h2>
                     <p>{{ $isEnglish ? 'Bangkiang Jaran brings together falling water, a natural pool, and the everyday warmth of a Balinese village. The walk is short, but the atmosphere invites you to stay a little longer.' : 'Bangkiang Jaran mempertemukan aliran air, kolam alami, dan kehangatan keseharian desa Bali. Perjalanannya singkat, tetapi suasananya mengajak Anda tinggal sedikit lebih lama.' }}</p>
                     <a class="bj-home-text-link" href="#perjalanan">{{ $isEnglish ? 'Follow the journey' : 'Ikuti perjalanannya' }}<span class="material-symbols-outlined" aria-hidden="true">south_east</span></a>
                 </div>
@@ -121,11 +124,25 @@
                     @endfor
                 </div>
             </div>
-            <div class="bj-home-wrap bj-home-facts bj-reveal">
-                <div><strong>5–10</strong><span>{{ $isEnglish ? 'minutes of relaxed walking' : 'menit berjalan santai' }}</span></div>
-                <div><strong>07.00</strong><span>{{ $isEnglish ? 'opening time every day' : 'mulai buka setiap hari' }}</span></div>
-                <div><strong>{{ $tiket->count() }}</strong><span>{{ $isEnglish ? 'active ticket options' : 'pilihan tiket aktif' }}</span></div>
-                <div><strong>100%</strong><span>{{ $isEnglish ? 'digital booking flow' : 'alur pemesanan digital' }}</span></div>
+        </section>
+
+        <section class="bj-home-ticket bj-stitch-tickets" aria-labelledby="home-ticket-title">
+            <div class="bj-home-wrap">
+                <div class="bj-home-section-head bj-reveal"><div><p class="bj-home-kicker">{{ $isEnglish ? 'Plan your visit' : 'Rencanakan kunjungan' }}</p><h2 id="home-ticket-title">{{ $isEnglish ? 'Choose your experience' : 'Pilih pengalaman kunjungan Anda' }}</h2></div><p>{{ $isEnglish ? 'Explore the available tickets and plan a quiet day in Bakbakan.' : 'Temukan pilihan tiket yang tersedia dan rencanakan hari yang tenang di Bakbakan.' }}</p></div>
+                <div class="bj-stitch-ticket-grid">
+                    @forelse($tiket->take(3) as $index => $ticket)
+                        <article class="bj-stitch-ticket bj-reveal">
+                            <p class="bj-home-kicker">{{ $isEnglish ? 'Official ticket' : 'Tiket resmi' }} - {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</p>
+                            <h3>{{ $ticket->nama_tiket }}</h3>
+                            <p class="bj-stitch-ticket__description">{{ $isEnglish ? 'Discover Bangkiang Jaran and enjoy the natural surroundings of Bakbakan.' : 'Nikmati suasana alami Bangkiang Jaran dan kesejukan Desa Bakbakan.' }}</p>
+                            <p class="bj-stitch-ticket__price">Rp {{ number_format($ticket->harga, 0, ',', '.') }}</p>
+                            <p class="bj-stitch-ticket__note">{{ $isEnglish ? 'See ticket details and availability before booking.' : 'Lihat rincian tiket dan ketersediaan sebelum memesan.' }}</p>
+                            <a class="bj-home-button {{ $index === 1 ? 'bj-home-button--gold' : 'bj-home-button--forest' }}" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'View ticket' : 'Lihat tiket' }} <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+                        </article>
+                    @empty
+                        <p>{{ $isEnglish ? 'Ticket information will be available soon.' : 'Informasi tiket akan segera tersedia.' }}</p>
+                    @endforelse
+                </div>
             </div>
         </section>
 
@@ -145,57 +162,14 @@
             </div>
         </section>
 
-        <section class="bj-home-ticket" aria-labelledby="home-ticket-title">
-            <div class="bj-home-wrap">
-                <div class="bj-home-section-head bj-home-section-head--dark bj-reveal">
-                    <div><p class="bj-home-kicker">{{ $isEnglish ? 'Tickets & visit' : 'Tiket & kunjungan' }}</p><h2 id="home-ticket-title">{{ $isEnglish ? 'Pick your ticket, ' : 'Pilih tiket, ' }}<em>{{ $isEnglish ? 'plan your day' : 'rencanakan hari' }}</em></h2></div>
-                    <p>{{ $isEnglish ? 'Choose from the active ticket options, then continue to the secure booking flow.' : 'Pilih dari tiket yang sedang aktif, lalu lanjutkan ke alur pemesanan yang aman.' }}</p>
-                </div>
-                <div class="bj-home-ticket__layout">
-                    <div class="bj-home-ticket__choices">
-                        @forelse($tiket->take(3) as $index => $ticket)
-                            @php($photo = $photoAt($index + 7))
-                            <article class="bj-home-ticket-card bj-reveal"><img src="{{ $photo['url'] }}" alt="" loading="lazy"><div><small>{{ $isEnglish ? 'Ticket' : 'Tiket' }} {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</small><h3>{{ $ticket->nama_tiket }}</h3><p>Rp {{ number_format($ticket->harga, 0, ',', '.') }} <span>/ {{ $isEnglish ? 'person' : 'orang' }}</span></p></div><a href="{{ route('tiket.index') }}" aria-label="{{ $isEnglish ? 'Choose' : 'Pilih' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></article>
-                        @empty
-                            <p class="bj-home-ticket__empty">{{ $isEnglish ? 'Ticket information will be available soon.' : 'Informasi tiket akan segera tersedia.' }}</p>
-                        @endforelse
-                    </div>
-                    <aside class="bj-home-ticket__summary bj-reveal">
-                        <p class="bj-home-kicker">{{ $isEnglish ? 'Your visit' : 'Kunjungan Anda' }}</p><h3>{{ $isEnglish ? 'Ready when you are' : 'Siap saat Anda siap' }}</h3>
-                        <ul><li><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>{{ $isEnglish ? 'Choose your date online' : 'Pilih tanggal secara online' }}</li><li><span class="material-symbols-outlined" aria-hidden="true">verified</span>{{ $isEnglish ? 'Payment verified by the manager' : 'Pembayaran diverifikasi pengelola' }}</li><li><span class="material-symbols-outlined" aria-hidden="true">qr_code_2</span>{{ $isEnglish ? 'Show the active e-ticket on arrival' : 'Tunjukkan e-tiket aktif saat tiba' }}</li></ul>
-                        @if($hargaMulai !== null)<div class="bj-home-ticket__price"><span>{{ $isEnglish ? 'Tickets from' : 'Tiket mulai' }}</span><strong>Rp {{ number_format($hargaMulai, 0, ',', '.') }}</strong></div>@endif
-                        <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Start booking' : 'Mulai pesan' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
-                    </aside>
-                </div>
-            </div>
-        </section>
-
         <section class="bj-home-facilities" aria-labelledby="facilities-title">
             <div class="bj-home-wrap">
-                <div class="bj-home-section-head bj-reveal"><div><p class="bj-home-kicker">{{ $isEnglish ? 'Facilities' : 'Fasilitas' }}</p><h2 id="facilities-title">{{ $isEnglish ? 'Everything you need, ' : 'Semua yang dibutuhkan, ' }}<em>{{ $isEnglish ? 'close at hand' : 'tetap dekat' }}</em></h2></div><p>{{ $isEnglish ? 'Simple facilities help make the visit more comfortable from arrival to the walk back.' : 'Fasilitas sederhana membantu membuat kunjungan lebih nyaman sejak tiba hingga perjalanan pulang.' }}</p></div>
+                <div class="bj-home-section-head bj-reveal"><div><p class="bj-home-kicker">{{ $isEnglish ? 'Facilities' : 'Fasilitas' }}</p><h2 id="facilities-title">{{ $isEnglish ? 'Everything you need, ' : 'Semua yang dibutuhkan, ' }}<em>{{ $isEnglish ? 'close at hand' : 'tetap dekat' }}</em></h2></div></div>
                 <div class="bj-home-facilities__layout">
                     @php($facilityPhoto = $photoAt(10))
                     <figure class="bj-home-facilities__photo bj-reveal" data-bj-parallax><img src="{{ $facilityPhoto['url'] }}" alt="{{ $facilityPhoto['caption'] }}" loading="lazy"><figcaption>{{ $isEnglish ? 'Your visit begins in Bakbakan village' : 'Perjalanan Anda dimulai dari Desa Bakbakan' }}</figcaption></figure>
                     <div class="bj-home-facilities__grid">@foreach($facilities as [$icon, $title, $copy])<article class="bj-home-facility bj-reveal"><span class="material-symbols-outlined" aria-hidden="true">{{ $icon }}</span><h3>{{ $title }}</h3><p>{{ $copy }}</p></article>@endforeach</div>
                 </div>
-            </div>
-        </section>
-
-        <section id="galeri" class="bj-home-scroll-gallery" data-bj-scroll-gallery aria-labelledby="moments-title">
-            <div class="bj-home-scroll-gallery__stage">
-                <div class="bj-home-scroll-gallery__heading bj-reveal"><p class="bj-home-kicker">{{ $isEnglish ? 'Gallery' : 'Galeri' }}</p><h2 id="moments-title">{{ $isEnglish ? 'Moments from ' : 'Momen dari ' }}<em>{{ $isEnglish ? 'the valley' : 'lembah' }}</em></h2><p>{{ $isEnglish ? 'Move through a collection of water, light, and quiet green.' : 'Bergeraklah melalui kumpulan momen air, cahaya, dan hijaunya suasana.' }}</p></div>
-                <div class="bj-home-scroll-gallery__viewport" data-bj-gallery data-bj-gallery-viewport>
-                    <div class="bj-home-scroll-gallery__track" data-bj-gallery-track data-direction="left">
-                        @for($i = 0; $i < 12; $i++)
-                            @php($photo = $photoAt(11 + $i))
-                            <button type="button" class="bj-home-scroll-gallery__photo bj-home-scroll-gallery__photo--{{ ($i % 6) + 1 }}" data-gallery-open data-gallery-src="{{ $photo['url'] }}" data-gallery-caption="{{ $photo['caption'] }}" aria-label="{{ $isEnglish ? 'Enlarge photo' : 'Perbesar foto' }}: {{ $photo['caption'] }}">
-                                <img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" loading="lazy">
-                                <span>{{ $photo['caption'] }}</span>
-                            </button>
-                        @endfor
-                    </div>
-                </div>
-                <div class="bj-home-scroll-gallery__progress" aria-hidden="true"><span data-bj-scroll-gallery-progress></span></div>
             </div>
         </section>
 
@@ -214,6 +188,29 @@
                 <div class="bj-home-faq__items">@for($i = 1; $i <= 4; $i++)<details class="bj-reveal" {{ $i === 1 ? 'open' : '' }}><summary>{{ __('messages.promo_faq_q' . $i) }}<span class="material-symbols-outlined" aria-hidden="true">add</span></summary><p>{{ __('messages.promo_faq_a' . $i) }}</p></details>@endfor</div>
             </div>
         </section>
+
+        <section id="lokasi" class="bj-home-route" data-bj-route-planner aria-labelledby="route-title">
+            <div class="bj-home-wrap">
+                <header class="bj-home-route__head bj-reveal">
+                    <div><p class="bj-home-kicker">{{ $isEnglish ? 'Route planner' : 'Perencana rute' }}</p><h2 id="route-title">{{ $isEnglish ? 'Where are you ' : 'Anda berangkat ' }}<em>{{ $isEnglish ? 'starting from?' : 'dari mana?' }}</em></h2></div>
+                    <p>{{ $isEnglish ? 'Choose a starting point and open the clearest route to Bangkiang Jaran Waterfall in Google Maps.' : 'Pilih titik awal perjalanan dan buka rute paling jelas menuju Air Terjun Bangkiang Jaran di Google Maps.' }}</p>
+                </header>
+                <div class="bj-home-route__layout">
+                    <div class="bj-home-route__origins" role="group" aria-label="{{ $isEnglish ? 'Choose starting point' : 'Pilih titik awal' }}">
+                        <button type="button" class="is-active" data-route-origin="My location" data-route-label="{{ $isEnglish ? 'My location' : 'Lokasi saya' }}" data-route-subtitle="{{ $isEnglish ? 'Use your current location' : 'Gunakan lokasi Anda saat ini' }}" data-route-current aria-pressed="true"><span class="material-symbols-outlined" aria-hidden="true">my_location</span><span><strong>{{ $isEnglish ? 'My location' : 'Lokasi saya' }}</strong><small>{{ $isEnglish ? 'Use your current location' : 'Gunakan lokasi Anda saat ini' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">check</i></button>
+                        <button type="button" data-route-origin="Denpasar, Bali" data-route-label="Denpasar" data-route-subtitle="{{ $isEnglish ? 'From Denpasar City' : 'Dari Kota Denpasar' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">location_city</span><span><strong>Denpasar</strong><small>{{ $isEnglish ? 'From Denpasar City' : 'Dari Kota Denpasar' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
+                        <button type="button" data-route-origin="Tabanan, Bali" data-route-label="Tabanan" data-route-subtitle="{{ $isEnglish ? 'From Tabanan' : 'Dari Tabanan' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">directions_car</span><span><strong>Tabanan</strong><small>{{ $isEnglish ? 'From Tabanan' : 'Dari Tabanan' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
+                        <button type="button" data-route-origin="I Gusti Ngurah Rai International Airport, Bali" data-route-label="Ngurah Rai Airport" data-route-subtitle="{{ $isEnglish ? 'From I Gusti Ngurah Rai Airport' : 'Dari Bandara I Gusti Ngurah Rai' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">flight</span><span><strong>{{ $isEnglish ? 'Ngurah Rai Airport' : 'Bandara Ngurah Rai' }}</strong><small>{{ $isEnglish ? 'From I Gusti Ngurah Rai Airport' : 'Dari Bandara I Gusti Ngurah Rai' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
+                        <button type="button" data-route-origin="Ubud, Gianyar, Bali" data-route-label="Ubud" data-route-subtitle="{{ $isEnglish ? 'From Ubud, Gianyar' : 'Dari Ubud, Gianyar' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">spa</span><span><strong>Ubud</strong><small>{{ $isEnglish ? 'From Ubud, Gianyar' : 'Dari Ubud, Gianyar' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
+                        <button type="button" data-route-origin="Canggu, Bali" data-route-label="Canggu" data-route-subtitle="{{ $isEnglish ? 'From Canggu' : 'Dari Canggu' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">surfing</span><span><strong>Canggu</strong><small>{{ $isEnglish ? 'From Canggu' : 'Dari Canggu' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
+                    </div>
+                    <div class="bj-home-route__map bj-reveal">
+                        <div class="bj-home-route__map-frame"><iframe title="{{ $isEnglish ? 'Route to Bangkiang Jaran Waterfall' : 'Rute menuju Air Terjun Bangkiang Jaran' }}" data-bj-route-map loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=-8.511979,115.328486&amp;output=embed&amp;z=14"></iframe><div class="bj-home-route__destination"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><small>{{ $isEnglish ? 'Destination' : 'Tujuan' }}</small><strong>Bangkiang Jaran Waterfall</strong></span></div></div>
+                        <div class="bj-home-route__map-foot"><p><span>{{ $isEnglish ? 'Route from' : 'Rute dari' }}</span><strong data-route-selection>{{ $isEnglish ? 'My location' : 'Lokasi saya' }}</strong></p><a data-route-open href="https://www.google.com/maps/dir/?api=1&amp;destination=-8.511979%2C115.328486" target="_blank" rel="noopener noreferrer">{{ $isEnglish ? 'Open in Google Maps' : 'Buka di Google Maps' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <section class="bj-home-cta" aria-labelledby="home-cta-title">
@@ -221,6 +218,4 @@
         <div class="bj-home-ribbons" aria-hidden="true">@foreach(['left', 'right'] as $row => $direction)<div class="bj-home-ribbon" data-bj-marquee data-direction="{{ $direction }}">@for($copy = 0; $copy < 2; $copy++)<div class="bj-home-ribbon__set">@for($i = 0; $i < 6; $i++)@php($photo = $photoAt($i + 2 + ($row * 5)))<img src="{{ $photo['url'] }}" alt="" loading="lazy">@endfor</div>@endfor</div>@endforeach</div>
     </section>
 </div>
-
-<dialog id="bj-gallery-dialog" class="bj-gallery-dialog" aria-label="{{ $isEnglish ? 'Photo gallery' : 'Galeri foto' }}"><button type="button" data-gallery-close aria-label="{{ $isEnglish ? 'Close gallery' : 'Tutup galeri' }}">×</button><img src="" alt=""><p></p></dialog>
 @endsection

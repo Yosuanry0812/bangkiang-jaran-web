@@ -11,7 +11,10 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['DM Sans', ...defaultTheme.fontFamily.sans],
+                serif: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+                display: ['Playfair Display', ...defaultTheme.fontFamily.serif],
+                editorial: ['Cormorant Garamond', ...defaultTheme.fontFamily.serif],
             },
         },
     },

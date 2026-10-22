@@ -340,8 +340,9 @@ Sumber rujukan: `docs/DESIGN.md`. Tema: **Tropical Elegance** — atmosfer resor
 
 ### Tipografi
 
-- **Heading**: `Playfair Display` / `Fraunces` — editorial, eksklusif (display-lg 64px/700, headline-md 32px/600)
-- **Body/UI**: `Plus Jakarta Sans` / `Manrope` — apertur terbuka, legibilitas tinggi (body-lg 18px/400, label-md 14px/600 uppercase tracked)
+- **Heading**: `Playfair Display` — editorial, elegan (display-lg 64px/700, headline-md 32px/600)
+- **Body/UI**: `DM Sans` — navbar, paragraf, tombol, form, harga, dan data teknis yang mudah dibaca.
+- **Editorial accent**: `Cormorant Garamond` — kutipan dan aksen italic terpilih, bukan untuk data transaksi.
 - Negatif tracking di display desktop, label uppercase + `letterSpacing 0.05em`.
 
 ### Layout, Spacing & Elevation
@@ -355,11 +356,12 @@ Sumber rujukan: `docs/DESIGN.md`. Tema: **Tropical Elegance** — atmosfer resor
 
 ### Arsitektur Layering CSS
 
-Untuk menjaga stabilitas styling antara halaman legasi dan pembaruan terkini, CSS dibagi menjadi 4 layer berjenjang:
+Untuk menjaga stabilitas styling antara halaman legasi dan pembaruan terkini, CSS dibagi menjadi 5 layer berjenjang:
 1. `resources/css/app.css` — Tailwind directives, scrollbar custom, print styles (dikompilasi Vite ke `public/build`).
 2. `public/css/site.css` — Gaya pondasi dasar aplikasi.
-3. `public/css/visual-refresh.css` — Layer presentasi editorial (ritme Sekumpul Waterfall, slider foto dinamis, tipografi Fraunces/Manrope).
+3. `public/css/visual-refresh.css` — Layer presentasi editorial dan komponen visual utama.
 4. `public/css/responsive-refinement.css` — **Lapisan adaptasi responsif menyeluruh** (safe wrapping string panjang, stacking grid mobile, touch target minimum 44px, mitigasi overflow 320px–1440px).
+5. `public/css/typography-motion.css` — Token tipografi Playfair Display/DM Sans/Cormorant Garamond dan integrasi motion GSAP, Swiper, serta Lenis.
 
 ### Standar Uji Responsif (Responsive Acceptance Bar)
 
@@ -844,7 +846,7 @@ php artisan schedule:run   # di cron tiap menit
 |-----------|------|
 | **Ganti warna/tema** | `docs/DESIGN.md` (token) + `tailwind.config.js` + `resources/css/app.css` |
 | **Perbaikan responsif (320px–1440px)** | `public/css/responsive-refinement.css` |
-| **Gaya editorial & hero slider** | `public/css/visual-refresh.css` + `public/js/site.js` |
+| **Tipografi & motion editorial** | `public/css/typography-motion.css` + `public/js/site.js` (GSAP/ScrollTrigger, Swiper, Lenis selektif) |
 | **Ganti font** | `tailwind.config.js` (`fontFamily`) + `resources/views/layouts/*.blade.php` (Google Fonts link) |
 | **Tambah tiket baru default** | `database/seeders/DatabaseSeeder.php` (`$tikets`) |
 | **Ubah harga/logic pajak** | `PemesananController` + `wisatawan/tiket.blade.php` (Alpine calc) — pajak 10% di ringkasan |

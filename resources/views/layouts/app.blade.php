@@ -9,14 +9,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="image" href="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" fetchpriority="high">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.3.0/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.27/dist/lenis.css">
     <script>
         tailwind.config = {
             theme: {
@@ -39,8 +39,8 @@
                         deep:     '#1B3A2D',
                     },
                     fontFamily: {
-                        serif: ['Fraunces', 'Georgia', 'serif'],
-                        sans: ['Manrope', 'system-ui', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        sans: ['DM Sans', 'system-ui', 'sans-serif'],
                     },
                     spacing: {
                         'gutter': '24px',
@@ -56,7 +56,7 @@
         html, body { overflow-x: clip; }
         @supports not (overflow: clip) { html, body { overflow-x: hidden; } }
         ::selection { background: #1B3A2D; color: #F7F3EE; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
         [x-cloak] { display: none !important; }
 
@@ -168,8 +168,9 @@
     <link rel="stylesheet" href="{{ asset('css/transaction-refinement.css') }}">
     @if (Route::is('landing'))<link rel="stylesheet" href="{{ asset('css/home-stitch.css') . '?v=' . filemtime(public_path('css/home-stitch.css')) }}">@endif
     @if (Route::is('restoran'))<link rel="stylesheet" href="{{ asset('css/restaurant-stitch.css') . '?v=' . filemtime(public_path('css/restaurant-stitch.css')) }}">@endif
+    <link rel="stylesheet" href="{{ asset('css/typography-motion.css') . '?v=' . filemtime(public_path('css/typography-motion.css')) }}">
 </head>
-<body class="bj-public bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
+<body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-public bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
     <a class="bj-skip-link" href="#main-content">{{ app()->getLocale() === 'id' ? 'Langsung ke konten' : 'Skip to content' }}</a>
 
     {{-- Navigation --}}
@@ -440,6 +441,7 @@
 
         /* ── Apply visual tokens ── */
         function applyTokens(tokens) {
+            if (activeTokens === tokens) return;
             if (logo)     logo.style.color = tokens.logoColor;
             if (divider)  divider.style.backgroundColor = tokens.dividerColor;
             if (menuBtn)  menuBtn.style.color = tokens.menuBtnColor;
@@ -461,6 +463,7 @@
                     ? 'none'
                     : '1px solid ' + tokens.registerBorder;
             }
+            activeTokens = tokens;
         }
 
         /* ── Navbar state machine ── */
@@ -472,6 +475,8 @@
         let hidden       = false;
         let menuOpen     = false;
         let ticking      = false;
+        let activeNavClass = '';
+        let activeTokens = null;
 
         function clearNavClasses() {
             nav.classList.remove(
@@ -482,8 +487,10 @@
         }
 
         function setNav(cls) {
+            if (activeNavClass === cls) return;
             clearNavClasses();
             nav.classList.add(cls);
+            activeNavClass = cls;
         }
 
         function update() {
@@ -608,22 +615,10 @@
 
     })();
 
-    /* ── AOS + GSAP ── */
-    if (window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
-    if (window.AOS) AOS.init({ duration: 800, easing: 'ease-out', once: true, offset: 80 });
-    if ('IntersectionObserver' in window) {
-        const _observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('show'); });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
-            _observer.observe(el);
-        });
-    } else {
-        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(function(el) {
-            el.classList.add('show');
-        });
-    }
+    /* Motion runtime is initialized centrally in public/js/site.js. */
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@14.3.0/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.3.27/dist/lenis.min.js"></script>
     <script defer src="{{ asset('js/site.js') . '?v=' . filemtime(public_path('js/site.js')) }}"></script>
     @stack('scripts')
 </body>

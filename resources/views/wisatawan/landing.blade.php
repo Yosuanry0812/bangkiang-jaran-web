@@ -55,22 +55,24 @@
 
 <div class="bj-home bj-home--journey">
     <section id="hero-section" class="bj-home-hero" data-bj-hero aria-labelledby="home-hero-title">
-        <div class="bj-home-hero__media" aria-hidden="true">
+        <div class="bj-home-hero__media swiper" data-bj-hero-swiper aria-hidden="true">
+            <div class="swiper-wrapper">
             @if($usableGallery->isEmpty())
-                <div class="bj-home-hero__slide is-active" data-bj-hero-slide data-caption="Air Terjun Bangkiang Jaran"><img src="{{ $fallbackPhoto }}" alt="" fetchpriority="high"></div>
+                <div class="bj-home-hero__slide swiper-slide is-active" data-bj-hero-slide data-caption="Air Terjun Bangkiang Jaran"><img src="{{ $fallbackPhoto }}" alt="" fetchpriority="high"></div>
             @else
                 @foreach($usableGallery->take(6) as $index => $media)
-                    <div class="bj-home-hero__slide {{ $index === 0 ? 'is-active' : '' }}" data-bj-hero-slide data-caption="{{ $media->keterangan ?: 'Air Terjun Bangkiang Jaran' }}">
+                    <div class="bj-home-hero__slide swiper-slide {{ $index === 0 ? 'is-active' : '' }}" data-bj-hero-slide data-caption="{{ $media->keterangan ?: 'Air Terjun Bangkiang Jaran' }}">
                         <img src="{{ asset('storage/' . ltrim((string) $media->file, '/')) }}" alt="" {{ $index === 0 ? 'fetchpriority=high' : 'loading=lazy' }}>
                     </div>
                 @endforeach
             @endif
+            </div>
         </div>
         <div class="bj-home-hero__shade" aria-hidden="true"></div>
         <div class="bj-home-wrap bj-home-hero__content">
             <div class="bj-home-hero__copy">
                 <p class="bj-home-kicker bj-reveal">{{ $isEnglish ? 'Bakbakan Village · Gianyar, Bali' : 'Desa Bakbakan · Gianyar, Bali' }}</p>
-                <h1 id="home-hero-title" class="bj-home-title bj-reveal">
+                <h1 id="home-hero-title" class="bj-home-title bj-reveal" data-bj-split>
                     @if($isEnglish)
                         Where the forest <em>finds its light.</em>
                     @else

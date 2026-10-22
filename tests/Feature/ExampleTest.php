@@ -45,6 +45,19 @@ class ExampleTest extends TestCase
             ->assertSee('Jalur masuk');
     }
 
+    public function test_public_layout_loads_the_typography_and_motion_system(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('typography-motion.css', false)
+            ->assertSee('swiper@14.3.0', false)
+            ->assertSee('lenis@1.3.27', false)
+            ->assertSee('data-bj-hero-swiper', false)
+            ->assertSee('Playfair+Display', false)
+            ->assertSee('DM+Sans', false)
+            ->assertSee('Cormorant+Garamond', false);
+    }
+
     public function test_restaurant_page_uses_uploaded_photos_in_editorial_layout(): void
     {
         Galeri::create(['file' => 'restoran/ruang-makan.webp', 'keterangan' => 'Ruang makan', 'tipe' => 'restoran']);

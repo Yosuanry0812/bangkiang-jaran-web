@@ -71,23 +71,23 @@ typography:
     fontWeight: '600'
     lineHeight: '1.4'
   body-lg:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: DM Sans
     fontSize: 18px
     fontWeight: '400'
     lineHeight: '1.6'
   body-md:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: DM Sans
     fontSize: 16px
     fontWeight: '400'
     lineHeight: '1.6'
   label-md:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: DM Sans
     fontSize: 14px
     fontWeight: '600'
     lineHeight: '1.2'
     letterSpacing: 0.05em
   caption:
-    fontFamily: Plus Jakarta Sans
+    fontFamily: DM Sans
     fontSize: 12px
     fontWeight: '500'
     lineHeight: '1.4'
@@ -120,7 +120,7 @@ The palette is rooted in the Balinese landscape. The **Primary Emerald (#006D5B)
 The **Background (#F9F7F2)** is an off-white cream that reduces eye strain and provides a warmer, more organic feel than pure white. **Deep Charcoal (#2C2C2C)** ensures high legibility for all text elements while maintaining a softer contrast than pitch black.
 
 ## Typography
-This design system employs a sophisticated typographic pairing to balance heritage and modern utility. **Playfair Display** is used for all headings to provide a timeless, editorial feel that suggests exclusivity and adventure. **Plus Jakarta Sans** is the primary typeface for body copy and interface elements, chosen for its friendly, open apertures and excellent legibility across all screen sizes.
+This design system employs a three-font system to balance heritage and modern utility. **Playfair Display** is used for primary headings, **DM Sans** for body copy, navigation, forms, prices, and technical information, while **Cormorant Garamond** is reserved for selected quotations and italic editorial accents.
 
 For large display headers on desktop, use a slight negative letter-spacing to create a tighter, more "designed" look. Labels should consistently use uppercase with increased tracking to distinguish them from standard body text.
 
@@ -171,4 +171,4 @@ Used for categories like "Adventure," "Family-Friendly," or "Guided." These are 
 Use **Minimalist Outline Icons** with a 1.5px stroke weight. Icons should be monochrome (Deep Charcoal) to avoid competing with the lush photography.
 
 ### Navigation
-The desktop navigation is transparent on hero images, transitioning to a blurred "glass" white on scroll. Links use Plus Jakarta Sans Bold in 14px uppercase.
+The desktop navigation is transparent on hero images, transitioning to a blurred "glass" white on scroll. Links use DM Sans Bold in 14px uppercase.

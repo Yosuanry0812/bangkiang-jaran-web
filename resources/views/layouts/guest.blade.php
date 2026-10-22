@@ -7,7 +7,7 @@
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
@@ -19,7 +19,7 @@
                 },
                 borderRadius: { "2xl": "1.5rem" },
                 spacing: { "xl": "80px", "container-max": "1280px", "lg": "48px", "md": "24px", "sm": "12px", "base": "8px", "xs": "4px", "gutter": "24px" },
-                fontFamily: { "display": ["Fraunces", "serif"], "body": ["Manrope", "sans-serif"] },
+                fontFamily: { "display": ["Playfair Display", "serif"], "body": ["DM Sans", "sans-serif"] },
                 fontSize: {
                     "display-mobile": ["40px", { lineHeight: "1.2", fontWeight: "700" }],
                     "headline-md": ["32px", { lineHeight: "1.3", fontWeight: "600" }],
@@ -33,14 +33,15 @@
         }
     </script>
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .card-shadow { box-shadow: 0px 4px 20px rgba(0, 50, 40, 0.04); }
     </style>
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
     <link rel="stylesheet" href="{{ asset('css/auth-refinement.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/typography-motion.css') . '?v=' . filemtime(public_path('css/typography-motion.css')) }}">
 </head>
-<body class="bj-guest {{ Route::is('login', 'register') ? 'bj-auth-page' : '' }} font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
+<body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-guest {{ Route::is('login', 'register') ? 'bj-auth-page' : '' }} font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
 
     {{-- ── Subtle background texture ── --}}
     <div class="fixed inset-0 pointer-events-none" style="background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0,100,70,0.06) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,80,60,0.05) 0%, transparent 55%);"></div>
@@ -72,7 +73,9 @@
         </div>
     </main>
 
-    <script defer src="{{ asset('js/site.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script defer src="{{ asset('js/site.js') . '?v=' . filemtime(public_path('js/site.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

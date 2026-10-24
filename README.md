@@ -702,12 +702,14 @@ Pengelola juga punya polling `GET /pengelola/notifikasi` (JSON count pending) �
 ### Urutan Kode
 
 1. `PemesananController@create` — tampilkan tiket aktif + datepicker.
-2. `PemesananController@store` — validasi `tgl_kunjungan >= today`, `jumlah 1..10`, `throttle:10,1`, hit `total_harga`, `DB::transaction` + `lockForUpdate` (cegah overbooking jika kuota diaktifkan lagi), generate `kode_booking` unik (cek collision), insert `pemesanan` + loop `detail_pemesanan` (satu row per orang, `kode_tiket` unik incremental/random), kirim `PemesananBerhasil`.
+2. `PemesananController@store` — validasi tanggal dan jumlah tiket bilangan bulat nonnegatif, minimal satu tiket dipilih. Tidak ada kuota 10/100 per jenis. Simpan pilihan ke session untuk tahap data pengunjung; harga dihitung server dari tiket aktif.
 3. `PemesananController@dataDiri` / `storeDataDiri` — isi `nama_pengunjung`, `jenis_kelamin`, `plat_kendaraan` per `kode_tiket`.
-4. `PembayaranController@create` — tampilkan total, bank BCA, QRIS.
+4. `PembayaranController@create` — tampilkan total dan bank/e-wallet dari `config/payment.php`. Pada `APP_ENV=local/testing`, `PAYMENT_TRIAL_MODE` aktif secara default: metode tanpa rekening menerima bukti contoh tanpa transfer. Set `PAYMENT_TRIAL_MODE=false` untuk mematikannya. Produksi hanya mengaktifkan metode yang memiliki nomor dan nama penerima.
 5. `PembayaranController@store` — validasi `metode`, `bukti_bayar` (`mimetypes:jpeg,png,jpg,pdf`, `max 5120`), simpan `storage/app/public/bukti`, `pembayaran.status=pending`.
 6. `VerifikasiController@validasi` — pengelola pilih `valid`/`ditolak` (+ alasan), `DB::transaction`, update `pembayaran` + `pemesanan.status` (`selesai`/`dibatalkan`) + `detail_pemesanan.status_tiket` (`aktif`/`kadaluarsa`), kirim `PembayaranValid`/`PembayaranDitolak`, `ActivityLogger::log()`.
 7. Wisatawan lihat `pemesanan-detail.blade.php` — tiap `kode_tiket` render QR (pakai library JS QR atau `qrcode` package), tombol **Cetak/Download PDF** (DomPDF).
+
+Label berhasil memerlukan pesanan `selesai` dan pembayaran `valid`. Upload bukti tetap pending sampai pengelola menyetujui. Pembayaran, detail, dan riwayat memeriksa status milik pengguna setiap 6 detik saat tab aktif; endpoint tidak di-cache. Mode percobaan tetap membutuhkan persetujuan pengelola dan validasi file yang sama.
 
 ### File Upload
 

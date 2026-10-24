@@ -1,16 +1,16 @@
 @extends('layouts.app')
 @section('nav-mode', 'light')
-@section('title', __('messages.my_bookings') . ' — Bangkiang Jaran')
+@section('title', __('messages.my_bookings') . ' | Bangkiang Jaran')
 
 @section('content')
 @php
     $isEnglish = app()->getLocale() === 'en';
 @endphp
-<div class="bj-history">
+<div class="bj-history" data-bookings-watch="{{ route('wisatawan.pemesanan.statuses') }}" data-status-tokens='@json($pemesanan->mapWithKeys(fn ($booking) => [$booking->id_pemesanan => $booking->statusToken()])->all())'>
     @php
         $total = isset($pemesanan) ? $pemesanan->count() : 0;
-        $pending = isset($pemesanan) ? $pemesanan->where('status', 'pending')->count() : 0;
-        $selesai = isset($pemesanan) ? $pemesanan->where('status', 'selesai')->count() : 0;
+        $pending = $pemesanan->filter(fn ($booking) => !$booking->isApproved() && $booking->status !== 'dibatalkan')->count();
+        $selesai = $pemesanan->filter(fn ($booking) => $booking->isApproved())->count();
         $dibatalkan = isset($pemesanan) ? $pemesanan->where('status', 'dibatalkan')->count() : 0;
     @endphp
 
@@ -18,37 +18,37 @@
         <div class="bj-history-wrap bj-history-intro__inner">
             <div class="bj-history-intro__copy">
                 <p class="bj-history-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Your visits' : 'Kunjungan Anda' }}</p>
-                <h1 id="history-title" class="bj-reveal" data-bj-split>{{ $isEnglish ? 'A record of days by the waterfall.' : 'Arsip hari-hari di tepi air terjun.' }}</h1>
-                <p class="bj-history-intro__lead bj-reveal">{{ __('messages.my_bookings_desc') }}</p>
+                <h1 id="history-title" class="bj-reveal">{{ $isEnglish ? 'Your visits, all in one place.' : 'Kunjunganmu, dalam satu tempat.' }}</h1>
+                <p class="bj-history-intro__lead bj-reveal">{{ $isEnglish ? 'Check payment status, visitor details, and e-tickets for each booking.' : 'Lihat status pembayaran, detail pengunjung, dan e-ticket untuk setiap pesanan.' }}</p>
             </div>
             <div class="bj-history-intro__count bj-reveal"><span>{{ $isEnglish ? 'Total reservations' : 'Total reservasi' }}</span><strong>{{ str_pad($total, 2, '0', STR_PAD_LEFT) }}</strong><small>{{ $isEnglish ? 'kept in your account' : 'tersimpan di akun Anda' }}</small></div>
         </div>
     </header>
 
-    <main class="bj-history-main">
+    <div class="bj-history-main">
         <div class="bj-history-wrap">
             @if($total > 0)
-                <div class="bj-history-overview bj-reveal" aria-label="{{ __('messages.status_summary') }}">
-                    <div><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span><p><small>{{ $isEnglish ? 'All reservations' : 'Semua reservasi' }}</small><strong>{{ $total }}</strong></p></div>
-                    <div class="is-complete"><span class="material-symbols-outlined" aria-hidden="true">verified</span><p><small>{{ __('messages.completed') }}</small><strong>{{ $selesai }}</strong></p></div>
-                    <div class="is-pending"><span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span><p><small>{{ __('messages.pending') }}</small><strong>{{ $pending }}</strong></p></div>
-                    <div class="is-cancelled"><span class="material-symbols-outlined" aria-hidden="true">do_not_disturb_on</span><p><small>{{ __('messages.cancelled') }}</small><strong>{{ $dibatalkan }}</strong></p></div>
+                <div class="bj-history-filters" role="group" aria-label="{{ $isEnglish ? 'Filter bookings' : 'Filter pemesanan' }}">
+                    <button type="button" data-history-filter="all" aria-pressed="true">{{ $isEnglish ? 'All' : 'Semua' }}<span>{{ $total }}</span></button>
+                    <button type="button" data-history-filter="pending" aria-pressed="false">{{ __('messages.pending') }}<span>{{ $pending }}</span></button>
+                    <button type="button" data-history-filter="selesai" aria-pressed="false">{{ __('messages.completed') }}<span>{{ $selesai }}</span></button>
+                    <button type="button" data-history-filter="dibatalkan" aria-pressed="false">{{ __('messages.cancelled') }}<span>{{ $dibatalkan }}</span></button>
                 </div>
 
                 <section class="bj-history-list" aria-labelledby="history-list-title">
-                    <header class="bj-history-list__head bj-reveal"><div><p>{{ $isEnglish ? 'Reservation archive' : 'Arsip reservasi' }}</p><h2 id="history-list-title">{{ $isEnglish ? 'Your bookings' : 'Daftar pemesanan' }}</h2></div><span>{{ $total }} {{ $isEnglish ? 'records' : 'catatan' }}</span></header>
+                    <header class="bj-history-list__head bj-reveal"><div><h2 id="history-list-title">{{ $isEnglish ? 'Your bookings' : 'Daftar pemesanan' }}</h2></div><span role="status"><span data-history-count>{{ $total }}</span> {{ $isEnglish ? 'records' : 'catatan' }}</span></header>
+                    <p class="bj-history-filter-empty" data-history-filter-empty hidden>{{ $isEnglish ? 'No bookings with this status yet.' : 'Belum ada pemesanan dengan status ini.' }}</p>
 
                     @foreach($pemesanan as $i => $item)
                         @php
-                            $isPending = $item->status === 'pending';
-                            $isCompleted = $item->status === 'selesai';
+                            $isCompleted = $item->isApproved();
                             $isCancelled = $item->status === 'dibatalkan';
                             $isRejected = $item->pembayaran?->status === 'ditolak';
                             $ticketSummary = $item->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->nama_tiket)->implode(', ');
                             $statusClass = $isCompleted ? 'is-complete' : ($isCancelled ? 'is-cancelled' : 'is-pending');
                             $statusLabel = $isCompleted ? __('messages.completed') : ($isCancelled ? __('messages.cancelled') : ($isRejected ? ($isEnglish ? 'Payment proof declined' : 'Bukti bayar ditolak') : ($item->pembayaran ? __('messages.waiting_verification') : __('messages.pending'))));
                         @endphp
-                        <article class="bj-history-card bj-reveal {{ $statusClass }}" style="--history-order: {{ min($i, 6) }};">
+                        <article class="bj-history-card bj-reveal {{ $statusClass }}" data-history-status="{{ $isCompleted ? 'selesai' : ($isCancelled ? 'dibatalkan' : 'pending') }}" style="--history-order: {{ min($i, 6) }};">
                             <button type="button" class="bj-history-card__toggle" aria-expanded="false" aria-controls="history-detail-{{ $item->id_pemesanan }}" onclick="toggleHistoryDetails({{ $item->id_pemesanan }}, this)">
                                 <div class="bj-history-card__date"><span>{{ \Carbon\Carbon::parse($item->tgl_kunjungan)->format('d') }}</span><small>{{ \Carbon\Carbon::parse($item->tgl_kunjungan)->isoFormat('MMM') }}</small></div>
                                 <div class="bj-history-card__main">
@@ -73,7 +73,7 @@
                 <section class="bj-history-empty bj-reveal" aria-labelledby="history-empty-title"><span class="material-symbols-outlined" aria-hidden="true">water_drop</span><p>{{ $isEnglish ? 'Plan your next visit.' : 'Rencanakan kunjungan Anda.' }}</p><h2 id="history-empty-title">{{ __('messages.no_bookings') }}</h2><small>{{ __('messages.no_bookings_desc') }}</small><a href="{{ route('tiket.index') }}">{{ __('messages.book_now_from_history') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></section>
             @endif
         </div>
-    </main>
+    </div>
 </div>
 
 @push('scripts')

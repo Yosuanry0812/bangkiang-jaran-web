@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Http\Middleware\EnsureExplicitLogin;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Socialite\Facades\Socialite;
@@ -34,6 +35,7 @@ class GoogleLoginTest extends TestCase
         $this->assertSame('wisatawan', $user->role);
         $this->assertAuthenticatedAs($user);
         $this->assertSame(1, $user->login_count);
+        $this->assertSame((string) $user->id, session(EnsureExplicitLogin::SESSION_KEY));
 
         $this->googleUser('google@example.com');
         $this->get('/auth/google/callback')->assertRedirect();
@@ -47,6 +49,18 @@ class GoogleLoginTest extends TestCase
         $this->get('/auth/google/callback')->assertRedirect('/login')->assertSessionHas('error');
         $this->assertDatabaseCount('users', 0);
         $this->assertGuest();
+    }
+
+    public function test_google_login_returns_to_booking_after_role_redirect(): void
+    {
+        $bookingUrl = route('wisatawan.pemesanan.create', ['id_tiket' => 1]);
+        $this->googleUser('booking@example.com');
+        $this->withSession(['url.intended' => $bookingUrl])->get('/auth/google/callback')
+            ->assertRedirect(route('redirect.after.login'));
+
+        \Illuminate\Support\Facades\Auth::forgetGuards();
+        $this->get('/redirect-after-login')->assertRedirect($bookingUrl);
+        $this->assertAuthenticated();
     }
 
     public function test_existing_manual_account_is_not_automatically_linked(): void

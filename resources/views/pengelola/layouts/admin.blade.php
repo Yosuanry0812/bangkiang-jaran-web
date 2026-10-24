@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,200&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,8 +16,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        serif: ['Fraunces', 'Georgia', 'serif'],
-                        sans:  ['Manrope', 'system-ui', 'sans-serif'],
+                        serif: ['DM Sans', 'system-ui', 'sans-serif'],
+                        sans:  ['DM Sans', 'system-ui', 'sans-serif'],
                     },
                 }
             }
@@ -58,34 +58,38 @@
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin-workspace.css') . '?v=' . filemtime(public_path('css/admin-workspace.css')) }}">
 </head>
 
 <body class="bj-admin font-sans antialiased bg-slate-50 text-slate-800 min-h-screen overflow-x-clip">
-<div x-data="{ sidebarOpen: false }"
+<a class="admin-skip" href="#admin-content">Lewati ke konten</a>
+<div x-data="{ sidebarOpen: false, isDesktop: window.innerWidth >= 1024 }"
      x-effect="document.body.style.overflow = sidebarOpen ? 'hidden' : ''"
-     @keydown.escape.window="sidebarOpen = false"
-     @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false"
+     @keydown.escape.window="if (sidebarOpen) { sidebarOpen = false; $nextTick(() => $refs.sidebarToggle.focus()); }"
+     @keydown.tab.window="if (sidebarOpen) { const links = [...document.querySelectorAll('#sidebar a, #sidebar button')].filter(el => el.getClientRects().length); const first = links[0]; const last = links[links.length - 1]; if ($event.shiftKey && document.activeElement === first) { $event.preventDefault(); last.focus(); } else if (!$event.shiftKey && document.activeElement === last) { $event.preventDefault(); first.focus(); } }"
+     @resize.window="isDesktop = window.innerWidth >= 1024; if (isDesktop) sidebarOpen = false"
      class="flex min-h-screen">
 
     {{-- ── SIDEBAR ── --}}
-    <aside id="sidebar"
+    <aside id="sidebar" :inert="!isDesktop && !sidebarOpen" :aria-hidden="!isDesktop && !sidebarOpen" aria-label="Menu pengelola"
            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
            class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col lg:translate-x-0 lg:static lg:inset-auto">
 
         {{-- Logo --}}
-        <div class="flex items-center justify-between h-[60px] px-5 flex-shrink-0"
+        <div class="admin-brand flex items-center justify-between flex-shrink-0"
              style="border-bottom: 1px solid rgba(255,255,255,.06)">
             <a href="{{ route('pengelola.dashboard') }}" class="flex items-center gap-2.5">
-                <span class="font-serif text-[17px] text-white tracking-tight leading-none">Bangkiang Jaran</span>
+                <span class="admin-brand-mark material-symbols-outlined" aria-hidden="true">landscape</span>
+                <span><span class="admin-brand-name">Bangkiang Jaran</span><span class="admin-brand-sub">Ruang pengelola</span></span>
             </a>
-            <button @click="sidebarOpen = false"
-                    class="lg:hidden text-white/40 hover:text-white/80 transition-colors">
+            <button x-ref="sidebarClose" @click="sidebarOpen = false; $nextTick(() => $refs.sidebarToggle.focus())" aria-label="Tutup navigasi"
+                    class="lg:hidden text-white/80 hover:text-white transition-colors min-w-[44px] min-h-[44px]">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
 
         {{-- Nav --}}
-        <nav class="flex-1 overflow-y-auto overscroll-contain py-5 px-3 space-y-0.5">
+        <nav aria-label="Navigasi pengelola" class="flex-1 overflow-y-auto overscroll-contain py-5 px-3 space-y-0.5">
 
             <p class="px-3 mb-2 font-sans text-[9px] font-semibold uppercase tracking-[.18em] text-white/20">Utama</p>
 
@@ -149,7 +153,7 @@
                     <p class="font-sans text-[10px] text-white/30 truncate">Pengelola</p>
                 </div>
             </div>
-            <a href="{{ route('profile.edit') }}" class="nav-link text-xs">
+            <a href="{{ route('profile.edit') }}" class="nav-link text-xs {{ Route::is('profile.*') ? 'active' : '' }}">
                 <span class="material-symbols-outlined">manage_accounts</span>
                 Profil Saya
             </a>
@@ -167,20 +171,18 @@
          class="fixed inset-0 bg-black/50 z-30 lg:hidden backdrop-blur-sm"></div>
 
     {{-- ── MAIN ── --}}
-    <div class="flex-1 flex flex-col min-w-0">
+    <div :inert="sidebarOpen && !isDesktop" class="admin-workspace flex-1 flex flex-col min-w-0">
 
         {{-- Topbar --}}
-        <header class="bg-white/95 backdrop-blur-sm border-b border-slate-100/80 h-[60px] flex items-center px-4 sm:px-6 gap-4 sticky top-0 z-20 flex-shrink-0" style="box-shadow: 0 1px 0 rgba(15,26,23,.04)">
-            <button @click="sidebarOpen = true"
+        <header class="admin-topbar flex items-center sticky top-0 z-20 flex-shrink-0">
+            <button x-ref="sidebarToggle" @click="sidebarOpen = true; $nextTick(() => $refs.sidebarClose.focus())" :aria-expanded="sidebarOpen" aria-controls="sidebar" aria-label="Buka navigasi"
                     class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
                 <span class="material-symbols-outlined">menu</span>
             </button>
 
             {{-- Page title (injected per page) --}}
             <div class="flex-1 min-w-0">
-                <p class="font-sans text-sm font-semibold text-slate-700 truncate hidden sm:block">
-                    @yield('page_title', 'Dashboard')
-                </p>
+                <p class="admin-breadcrumb"><span>Pengelola</span><span aria-hidden="true">/</span><strong>@yield('page_title', View::getSection('title') ?: 'Dashboard')</strong></p>
             </div>
 
             {{-- Actions --}}
@@ -193,76 +195,48 @@
                     {{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}
                 </a>
 
-                {{-- Notifikasi (polling 20s) --}}
-                <div class="relative" x-data="notifikasi()" x-init="init()">
-                    <button @click="open = !open"
-                            class="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                            :title="count + ' notifikasi'">
-                        <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
-                        <span x-show="count > 0" x-cloak
-                              class="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center"
-                              x-text="count"></span>
+                {{-- Notifikasi: polling dan status berasal dari server --}}
+                <div class="relative" x-data="notifikasi()" @keydown.escape.stop="open = false; $refs.notificationToggle.focus()">
+                    <button x-ref="notificationToggle" @click="open = !open" :aria-expanded="open" aria-controls="admin-notifications" :aria-label="'Notifikasi, ' + count + ' pemberitahuan'" class="relative p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+                        <span x-show="count > 0" x-cloak class="absolute top-0 right-0 min-w-[17px] h-[17px] px-1 rounded-full bg-[#a96829] text-white text-[10px] font-semibold flex items-center justify-center" x-text="count"></span>
                     </button>
-
-                    <div x-show="open" @click.away="open = false" x-cloak
-                         class="absolute right-0 mt-1.5 w-80 max-h-[70vh] bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-y-auto">
-                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white">
-                            <p class="text-xs font-semibold text-slate-700">Notifikasi</p>
-                            <a href="{{ route('pengelola.verifikasi.index') }}" class="text-[11px] font-medium text-emerald-600 hover:text-emerald-800 transition-colors">Lihat Semua</a>
-                        </div>
-
+                    <section id="admin-notifications" aria-label="Notifikasi" x-show="open" @click.outside="open = false" x-cloak
+                        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2"
+                        class="admin-notification-panel absolute right-0 mt-3 z-50">
+                        <div class="admin-notification-head"><div><strong>Notifikasi</strong><p x-text="loading ? 'Memuat pemberitahuan…' : count + ' pemberitahuan operasional'"></p></div><a href="{{ route('pengelola.verifikasi.index') }}">Lihat semua</a></div>
+                        <div x-show="failed" class="px-5 py-4" role="status"><p class="admin-note">Pemberitahuan belum dapat dimuat.</p><button type="button" @click="load()" class="admin-text-action">Coba lagi</button></div>
                         <template x-if="verifikasi.length">
-                            <div>
-                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">Menunggu Verifikasi</p>
+                            <div class="admin-notification-group"><p class="admin-notification-label"><span class="material-symbols-outlined" aria-hidden="true">pending_actions</span>Menunggu verifikasi <span class="admin-count" x-text="verifikasi.length"></span></p>
                                 <template x-for="v in verifikasi" :key="'v-' + v.id_pemesanan">
-                                    <a :href="'/pengelola/verifikasi/' + v.id_pemesanan"
-                                       class="flex items-start gap-2.5 px-4 py-2.5 hover:bg-slate-50 transition-colors border-b border-slate-50">
-                                        <span class="w-1.5 h-1.5 mt-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-xs font-medium text-slate-700 truncate" x-text="v.nama_user"></p>
-                                            <p class="text-[11px] text-slate-400 truncate"><span x-text="v.kode_booking"></span> &middot; <span x-text="v.metode"></span></p>
-                                        </div>
-                                        <div class="text-right flex-shrink-0">
-                                            <p class="text-[11px] font-semibold text-slate-700" x-text="rp(v.total)"></p>
-                                            <p class="text-[10px] text-slate-400" x-text="v.waktu"></p>
-                                        </div>
+                                    <a :href="detailUrl(v.id_pemesanan)" class="admin-notification-item">
+                                        <span class="admin-notification-icon material-symbols-outlined" aria-hidden="true">receipt_long</span>
+                                        <div><strong x-text="v.nama_user"></strong><small x-text="v.kode_booking"></small><small x-text="v.metode"></small></div>
+                                        <div class="admin-notification-amount"><strong x-text="rp(v.total)"></strong><small x-text="v.waktu"></small></div>
                                     </a>
                                 </template>
                             </div>
                         </template>
-
                         <template x-if="pesananBaru.length">
-                            <div>
-                                <p class="px-4 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Pesanan Baru</p>
+                            <div class="admin-notification-group"><p class="admin-notification-label"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span>Pesanan baru <span class="admin-count" x-text="pesananBaru.length"></span></p>
                                 <template x-for="p in pesananBaru" :key="'p-' + p.id_pemesanan">
-                                    <a href="{{ route('pengelola.verifikasi.index') }}"
-                                       class="flex items-start gap-2.5 px-4 py-2.5 hover:bg-slate-50 transition-colors border-b border-slate-50">
-                                        <span class="w-1.5 h-1.5 mt-1.5 rounded-full bg-sky-400 flex-shrink-0"></span>
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-xs font-medium text-slate-700 truncate" x-text="p.nama_user"></p>
-                                            <p class="text-[11px] text-slate-400 truncate" x-text="p.kode_booking"></p>
-                                        </div>
-                                        <div class="text-right flex-shrink-0">
-                                            <p class="text-[11px] font-semibold text-slate-700" x-text="rp(p.total)"></p>
-                                            <p class="text-[10px] text-slate-400" x-text="p.waktu"></p>
-                                        </div>
+                                    <a href="{{ route('pengelola.verifikasi.index') }}" class="admin-notification-item">
+                                        <span class="admin-notification-icon admin-notification-icon--order material-symbols-outlined" aria-hidden="true">confirmation_number</span>
+                                        <div><strong x-text="p.nama_user"></strong><small x-text="p.kode_booking"></small></div>
+                                        <div class="admin-notification-amount"><strong x-text="rp(p.total)"></strong><small x-text="p.waktu"></small></div>
                                     </a>
                                 </template>
                             </div>
                         </template>
-
-                        <template x-if="count === 0">
-                            <div class="px-4 py-8 text-center">
-                                <span class="material-symbols-outlined text-slate-200 mb-2" style="font-size:28px">notifications_none</span>
-                                <p class="text-xs text-slate-400">Tidak ada notifikasi baru.</p>
-                            </div>
-                        </template>
-                    </div>
+                        <div x-show="!loading && !failed && count === 0" class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">notifications_none</span><h3>Semua sudah terpantau</h3><p>Pemberitahuan baru akan muncul di sini.</p></div>
+                        <p class="admin-notification-footer">Diperbarui otomatis setiap 20 detik.</p>
+                    </section>
                 </div>
 
                 {{-- Profile dropdown --}}
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open"
+                <div class="relative" x-data="{ open: false }" @keydown.escape.stop="open = false; $refs.profileToggle.focus()">
+                    <button x-ref="profileToggle" @click="open = !open" :aria-expanded="open" aria-controls="admin-profile-menu" aria-label="Menu akun"
                             class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
                         <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
                             <span class="font-sans text-[10px] font-semibold text-slate-600">
@@ -272,7 +246,7 @@
                         <span class="hidden sm:block font-sans text-xs font-medium text-slate-600 max-w-[120px] truncate">{{ Auth::user()->name ?? 'Pengelola' }}</span>
                         <span class="material-symbols-outlined text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" style="font-size:14px">expand_more</span>
                     </button>
-                    <div x-show="open" @click.away="open = false" x-cloak
+                    <div id="admin-profile-menu" x-show="open" @click.away="open = false" x-cloak
                          class="absolute right-0 mt-1.5 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50">
                         <a href="{{ route('profile.edit') }}"
                            class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
@@ -291,7 +265,8 @@
         </header>
 
         {{-- Content --}}
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-50/60">
+        <main id="admin-content" tabindex="-1" class="admin-content flex-1">
+            @if(session('success'))<div class="admin-alert" role="status">{{ session('success') }}</div>@endif
             @yield('content')
         </main>
 
@@ -304,6 +279,8 @@
 function notifikasi() {
     return {
         open: false,
+        loading: true,
+        failed: false,
         count: 0,
         verifikasi: [],
         pesananBaru: [],
@@ -313,22 +290,26 @@ function notifikasi() {
             this.load();
             this.timer = setInterval(() => this.load(), 20000);
         },
+        destroy() { clearInterval(this.timer); },
+        detailUrl(id) { return @js(route('pengelola.verifikasi.show', '__id__')).replace('__id__', encodeURIComponent(id)); },
         async load() {
             try {
                 const r = await fetch('{{ route('pengelola.notifikasi') }}', {
-                    headers: { 'Accept': 'application/json' }
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
-                if (!r.ok) return;
+                if (!r.ok) throw new Error('Notification request failed');
                 const d = await r.json();
                 // Popup otomatis hanya saat ADA data BARU (bukan saat pertama buka halaman)
                 if (this.prevCount !== null && d.count > this.prevCount) {
-                    this.open = true;
+                    this.$refs.notificationToggle.animate([{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }], { duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240 });
                 }
                 this.count = d.count;
                 this.verifikasi = d.verifikasi;
                 this.pesananBaru = d.pesanan_baru;
                 this.prevCount = d.count;
-            } catch (e) { /* halaman belum dibuka / koneksi putus — coba lagi interval berikutnya */ }
+                this.failed = false;
+            } catch (e) { this.failed = true; }
+            finally { this.loading = false; }
         },
         rp(n) {
             return 'Rp ' + Number(n || 0).toLocaleString('id-ID');

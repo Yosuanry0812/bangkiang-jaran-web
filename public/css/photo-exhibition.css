@@ -1,0 +1,172 @@
+/* A photo exhibition: perspective separates the prints, while paper edges and
+   contact shadows anchor them. No continuous animation or duplicate photographs. */
+.bj-exhibition {
+    --print-width: clamp(210px, 31vw, 350px);
+    --print-height: clamp(310px, 40vw, 455px);
+    --print-spread: 72%;
+    min-width: 0;
+    color: var(--nature-ink);
+}
+.bj-exhibition__viewport {
+    padding: 30px 6px 12px;
+    overflow: clip;
+}
+.bj-exhibition__scene {
+    position: relative;
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    padding: 16px 10px 38px;
+    scroll-snap-type: x mandatory;
+    perspective: 1400px;
+    perspective-origin: 50% 38%;
+    touch-action: auto;
+}
+.bj-exhibition__print, .bj-exhibition__mount {
+    width: var(--print-width);
+    height: var(--print-height);
+    flex-shrink: 0;
+    margin: 0;
+    border: 1px solid #c0d5cd;
+    border-radius: 8px;
+    background: #fbfdfb;
+    box-shadow: 2px 3px 0 #c2d4cc, 6px 7px 0 -2px #dbe8e2, 0 24px 32px -22px #174d4366;
+}
+.bj-exhibition__print {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 9px 9px 0;
+    scroll-snap-align: center;
+    transform-origin: 50% 75%;
+    backface-visibility: hidden;
+    user-select: none;
+}
+.bj-exhibition__image {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--nature-mint);
+}
+.bj-exhibition__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    pointer-events: none;
+}
+.bj-exhibition__print figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 4px;
+    font-size: .875rem;
+    line-height: 1.4;
+}
+.bj-exhibition__print figcaption > :first-child {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.bj-exhibition__print figcaption > :last-child { color: var(--nature-muted); font-variant-numeric: tabular-nums; }
+.bj-exhibition__select { display: none; }
+.bj-exhibition__mount { display: none; }
+.bj-exhibition.is-ready .bj-exhibition__scene, .bj-exhibition--still .bj-exhibition__scene {
+    display: block;
+    height: calc(var(--print-height) + 94px);
+    overflow: visible;
+    padding: 0;
+    transform-style: preserve-3d;
+}
+.bj-exhibition.is-ready .bj-exhibition__scene { cursor: grab; touch-action: pan-y pinch-zoom; }
+.bj-exhibition.is-ready .bj-exhibition__scene:active { cursor: grabbing; }
+.bj-exhibition.is-ready .bj-exhibition__print, .bj-exhibition--still .bj-exhibition__print, .bj-exhibition__mount {
+    position: absolute;
+    top: 12px;
+    left: calc(50% - var(--print-width) / 2);
+    transform: translate3d(calc(var(--print-offset, 0) * var(--print-spread)), calc(var(--print-distance, 0) * 14px), calc(var(--print-distance, 0) * -125px)) rotateY(calc(var(--print-offset, 0) * -24deg)) rotateZ(calc(var(--print-offset, 0) * 5deg)) rotateX(-5deg);
+    transition: transform 650ms cubic-bezier(.22, 1, .36, 1);
+}
+.bj-exhibition.is-ready .bj-exhibition__print:not(.is-current) .bj-exhibition__image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #174d4326;
+    pointer-events: none;
+}
+.bj-exhibition.is-ready .bj-exhibition__print[data-distant] { visibility: hidden; pointer-events: none; }
+.bj-exhibition.is-ready .bj-exhibition__select { display: block; position: absolute; inset: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.bj-exhibition.is-ready .bj-exhibition__print.is-current .bj-exhibition__select { display: none; }
+.bj-exhibition__mount { background: #cbe6df; border: 9px solid #eef7f2; box-shadow: 2px 3px 0 #afcbbf, 0 20px 25px -23px #174d4366; }
+.bj-exhibition.is-ready .bj-exhibition__mount, .bj-exhibition--still .bj-exhibition__mount { display: block; }
+.bj-exhibition__mount--left { --print-offset: -1; --print-distance: 1; }
+.bj-exhibition__mount--right { --print-offset: 1; --print-distance: 1; background: #b8d6cb; }
+.bj-exhibition--still .bj-exhibition__print { transform: rotateY(-10deg) rotateZ(-3deg) rotateX(-5deg); }
+.bj-exhibition--still .bj-exhibition__mount--left { transform: translate3d(-24%, 16px, -65px) rotateY(-18deg) rotateZ(-10deg); }
+.bj-exhibition--still .bj-exhibition__mount--right { transform: translate3d(24%, 6px, -95px) rotateY(18deg) rotateZ(9deg); }
+.bj-exhibition__scene::after {
+    content: "";
+    position: absolute;
+    width: 62%;
+    height: 16px;
+    left: 19%;
+    bottom: 18px;
+    border-radius: 50%;
+    background: #174d430a;
+    box-shadow: 0 0 24px 9px #174d430a;
+    transform: rotateX(55deg) translateZ(-180px);
+    pointer-events: none;
+}
+.bj-exhibition:not(.is-ready):not(.bj-exhibition--still) .bj-exhibition__scene::after { display: none; }
+.bj-exhibition__navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 8px 4px 18px;
+    border-bottom: 1px solid var(--nature-line);
+}
+.bj-exhibition [hidden] { display: none !important; }
+.bj-exhibition__position { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; }
+.bj-exhibition__position > span { font-size: .9rem; font-variant-numeric: tabular-nums; }
+.bj-exhibition__position p { margin: 0; font-size: .875rem; color: var(--nature-muted); }
+.bj-exhibition__arrows { display: flex; gap: 8px; flex-shrink: 0; }
+.bj-exhibition__arrows button { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #a7c4b8; border-radius: 50%; background: transparent; color: var(--nature-ink); transition: background-color .18s; }
+.bj-exhibition__arrows button:hover { background: var(--nature-leaf); }
+.bj-exhibition__arrows button:active { background: #b8d6cb; }
+.bj-exhibition__thumbnails { display: flex; gap: 10px; max-width: 720px; margin: 18px auto 0; padding: 6px; overflow-x: auto; scrollbar-width: thin; }
+.bj-exhibition__thumbnails button { flex: 0 0 52px; height: 56px; padding: 3px; border: 1px solid transparent; border-radius: 5px; background: transparent; }
+.bj-exhibition__thumbnails img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; opacity: .65; }
+.bj-exhibition__thumbnails button:hover img, .bj-exhibition__thumbnails [aria-pressed="true"] img { opacity: 1; }
+.bj-exhibition__thumbnails [aria-pressed="true"] { border-color: var(--nature-ink); }
+.bj-exhibition__thumbnails .has-error { background: var(--nature-mint); }
+.bj-exhibition__thumbnails .has-error::after { content: attr(data-photo-number); color: var(--nature-ink); font-size: .875rem; }
+.bj-exhibition__waiting { justify-content: space-between; padding: 26px; background: #eef7f2; }
+.bj-exhibition.bj-exhibition--empty { --print-width: clamp(236px, 32vw, 350px); }
+.bj-exhibition--empty .bj-exhibition__scene { height: auto; min-height: calc(var(--print-height) + 94px); padding-bottom: 74px; }
+.bj-exhibition--empty .bj-exhibition__waiting { position: relative; left: auto; height: auto; min-height: var(--print-height); margin-inline: auto; }
+.bj-exhibition__waiting > div { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 18px; }
+.bj-exhibition__waiting h3 { font-size: clamp(1.3rem, 2.6vw, 2rem); max-width: 240px; }
+.bj-exhibition__waiting p { margin: 0; font-size: .875rem; color: var(--nature-muted); }
+.bj-exhibition__waiting > p { padding-top: 20px; border-top: 1px solid #c0d5cd; }
+.bj-exhibition__unavailable { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--nature-ink); background: var(--nature-mint); font-size: .9rem; }
+
+@media (max-width: 767px) {
+    .bj-exhibition { --print-width: clamp(190px, 49vw, 290px); --print-height: clamp(290px, 66vw, 400px); --print-spread: 68%; }
+    .bj-exhibition__viewport { padding-top: 16px; }
+    .bj-exhibition__waiting { padding: 18px; }
+    .bj-exhibition__position { display: block; }
+    .bj-exhibition__position p { margin-top: 4px; }
+    .bj-exhibition__navigation { gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bj-exhibition *, .bj-exhibition *::after { transition: none !important; }
+}

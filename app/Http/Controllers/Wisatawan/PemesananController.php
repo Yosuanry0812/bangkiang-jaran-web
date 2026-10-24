@@ -31,7 +31,7 @@ class PemesananController extends Controller
         $request->validate([
             'tgl_kunjungan' => ['required', 'date', 'after_or_equal:today'],
             'tickets'       => ['required', 'array', 'min:1'],
-            'tickets.*'     => ['integer', 'min:0', 'max:100'],
+            'tickets.*'     => ['integer', 'min:0'],
         ], [
             'tgl_kunjungan.required'       => 'Tanggal kunjungan wajib diisi.',
             'tgl_kunjungan.after_or_equal' => 'Tanggal kunjungan tidak boleh sebelum hari ini.',
@@ -229,6 +229,25 @@ class PemesananController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         return view('wisatawan.riwayat', compact('pemesanan'));
+    }
+
+    public function status($id)
+    {
+        $booking = Pemesanan::with('pembayaran')->where('id_user', Auth::id())->findOrFail($id);
+
+        return response()->json([
+            'token' => $booking->statusToken(),
+            'approved' => $booking->isApproved(),
+        ])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function statuses()
+    {
+        $bookings = Pemesanan::with('pembayaran')->where('id_user', Auth::id())->get();
+
+        return response()->json($bookings->mapWithKeys(fn ($booking) => [
+            $booking->id_pemesanan => $booking->statusToken(),
+        ])->all())->header('Cache-Control', 'no-store, private');
     }
 
     public function detailPemesanan($id)

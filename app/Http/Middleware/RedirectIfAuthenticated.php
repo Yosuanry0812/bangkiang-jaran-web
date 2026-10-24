@@ -22,7 +22,7 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect('/');
+                return redirect()->route(Auth::guard($guard)->user()->role === 'pengelola' ? 'pengelola.dashboard' : 'landing');
             }
         }
 

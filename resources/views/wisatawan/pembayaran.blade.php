@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('nav-mode', 'light')
 
-@section('title', __('messages.step_payment') . ' — Bangkiang Jaran')
+@section('title', __('messages.step_payment') . ' | Bangkiang Jaran')
 
 @section('content')
 {{-- ── Fixed top progress bar ───────────────────────── --}}
@@ -25,8 +25,9 @@
 </div>
 
 {{-- ── Page body ─────────────────────────────────────── --}}
-<div class="bj-payment-flow min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page">
+<div class="bj-payment-flow min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page" data-booking-watch="{{ route('wisatawan.pemesanan.status', $pemesanan->id_pemesanan) }}" data-status-token="{{ $pemesanan->statusToken() }}" data-booking-destination="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}">
     <div class="bj-payment-shell max-w-5xl mx-auto">
+        <header class="bj-payment-intro"><h1>{{ app()->getLocale() === 'en' ? 'One step closer to the waterfall.' : 'Selangkah lagi menuju air terjun.' }}</h1><p>{{ app()->getLocale() === 'en' ? 'Choose a payment method, then upload your receipt. The team will verify your payment before issuing your e-ticket.' : 'Pilih metode pembayaran, lalu unggah buktinya. Pengelola akan memverifikasi pembayaran sebelum e-ticket diterbitkan.' }}</p></header>
         <div class="bj-payment-layout grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
             {{-- ── LEFT: Steps ─────────────────────────── --}}
@@ -49,15 +50,12 @@
                         </div>
                         @endif
                         @if($metodeBayar === [])
-                        <div class="bj-payment-unavailable">
-                            <span class="material-symbols-outlined" aria-hidden="true">info</span>
-                            <div>
-                                <h3>Detail pembayaran sedang disiapkan</h3>
-                                <p>Belum ada rekening resmi yang dipublikasikan. Jangan mentransfer dana ke nomor dari sumber lain. Pesanan Anda tetap tersimpan; kembali lagi setelah pengelola mengaktifkan metode pembayaran.</p>
-                                <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" class="bj-text-link">Lihat pesanan</a>
-                            </div>
-                        </div>
+                        <div class="bj-payment-catalog" aria-label="{{ app()->getLocale() === 'en' ? 'Payment methods' : 'Pilihan metode pembayaran' }}">@foreach(config('payment.catalog', []) as $method)<div class="bj-payment-catalog__method" aria-disabled="true"><img src="{{ asset('images/payments/' . $method['logo']) }}" alt="" width="48" height="36"><span><strong>{{ $method['name'] }}</strong><small>{{ app()->getLocale() === 'en' ? 'Not activated yet' : 'Belum diaktifkan' }}</small></span></div>@endforeach</div>
+                        <p role="status">{{ app()->getLocale() === 'en' ? 'Payment methods are not available yet.' : 'Metode pembayaran belum tersedia.' }}</p>
                         @else
+                        @if(collect($metodeBayar)->contains(fn ($method) => $method['is_trial'] ?? false))
+                        <p class="bj-payment-trial-note">{{ app()->getLocale() === 'en' ? 'Trial mode: choose a method and upload a sample receipt. No transfer is needed.' : 'Mode uji coba: pilih metode dan unggah bukti contoh. Tidak perlu melakukan transfer.' }}</p>
+                        @endif
 
                         {{-- Bank Transfer --}}
                         @if(collect($metodeBayar)->contains('type', 'bank'))
@@ -68,7 +66,7 @@
                                 @if($m['type'] === 'bank')
                                 <div class="bj-payment-method border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
-                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
+                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}" aria-expanded="false" aria-controls="detail-{{ $m['id'] }}"
                                             onclick="pilihMetode(this.dataset.id, this.dataset.name)"
                                             class="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left">
                                         <div class="flex items-center gap-3">
@@ -81,17 +79,7 @@
                                     </button>
                                     <div class="hidden px-4 pb-4 pt-0 bg-gray-50 border-t border-gray-100" id="detail-{{ $m['id'] }}">
                                         <div class="pt-4 flex items-center justify-between">
-                                            <div>
-                                                <p class="font-sans text-xs text-stone mb-1">{{ __('messages.account_number') }}</p>
-                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['number'] }}</p>
-                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['account_name'] }}</p>
-                                            </div>
-                                            <button type="button"
-                                                    data-number="{{ $m['number'] }}" onclick="salin(this.dataset.number, 'salin-{{ $m['id'] }}')"
-                                                    class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
-                                                <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
-                                                {{ __('messages.copy') }}
-                                            </button>
+                                            @include('partials.payment-recipient', ['method' => $m])
                                         </div>
                                     </div>
                                 </div>
@@ -110,7 +98,7 @@
                                 @if($m['type'] === 'ewallet')
                                 <div class="bj-payment-method border border-gray-100 rounded-xl overflow-hidden transition-all duration-200" id="card-{{ $m['id'] }}">
                                     <button type="button"
-                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}"
+                                            data-id="{{ $m['id'] }}" data-name="{{ $m['name'] }}" aria-expanded="false" aria-controls="detail-{{ $m['id'] }}"
                                             onclick="pilihMetode(this.dataset.id, this.dataset.name)"
                                             class="w-full flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left">
                                         <div class="flex items-center gap-3">
@@ -123,17 +111,7 @@
                                     </button>
                                     <div class="hidden px-4 pb-4 pt-0 bg-gray-50 border-t border-gray-100" id="detail-{{ $m['id'] }}">
                                         <div class="pt-4 flex items-center justify-between">
-                                            <div>
-                                                <p class="font-sans text-xs text-stone mb-1">{{ __('messages.number') }}</p>
-                                                <p class="font-sans text-xl font-semibold text-forest tracking-widest">{{ $m['number'] }}</p>
-                                                <p class="font-sans text-xs text-stone mt-0.5">a.n. {{ $m['account_name'] }}</p>
-                                            </div>
-                                            <button type="button"
-                                                    data-number="{{ $m['number'] }}" onclick="salin(this.dataset.number, 'salin-{{ $m['id'] }}')"
-                                                    class="flex items-center gap-1.5 text-forest border border-forest/25 hover:bg-forest hover:text-white hover:border-forest transition-colors px-3 py-2 rounded-lg text-xs font-medium">
-                                                <span class="material-symbols-outlined text-sm" id="salin-{{ $m['id'] }}">content_copy</span>
-                                                {{ __('messages.copy') }}
-                                            </button>
+                                            @include('partials.payment-recipient', ['method' => $m])
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +132,7 @@
                 </div>
 
                 {{-- Step 2: Upload --}}
-                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2">
+                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2" inert>
                     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100" id="step-2-header" style="background:#6B6B6B;">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
                         <h2 class="font-serif text-lg text-white">{{ __('messages.upload_payment') }}</h2>
@@ -179,50 +157,35 @@
                                 </div>
                             </div>
 
-                            {{-- Drop zone --}}
-                            <div class="bj-payment-upload relative border-2 border-dashed border-gray-200 rounded-2xl hover:border-forest/40 transition-all duration-200 cursor-pointer min-h-[200px] sm:min-h-[280px] md:min-h-[340px] flex items-center justify-center overflow-hidden"
-                                 id="drop-zone">
-                                <input type="file" name="bukti_bayar" id="bukti_bayar"
+                            <div class="bj-payment-file-field">
+                                <label for="bukti_bayar">{{ app()->getLocale() === 'en' ? 'Choose payment proof' : 'Pilih bukti pembayaran' }}</label>
+                                <input type="file" name="bukti_bayar" id="bukti_bayar" aria-describedby="payment-file-help"
                                        accept="image/jpeg,image/jpg,image/png,application/pdf" required
-                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                
-                                {{-- Upload prompt --}}
-                                <div class="flex flex-col items-center text-center p-6 md:p-8 pointer-events-none" id="upload-prompt">
-                                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-forest/10 to-forest/5 flex items-center justify-center mb-4 transition-transform duration-300 hover:scale-105">
-                                        <span class="material-symbols-outlined text-forest text-3xl">cloud_upload</span>
-                                    </div>
-                                    <p class="font-sans text-sm font-semibold text-ink mb-1">{{ __('messages.drag_drop_file') }}</p>
-                                    <p class="font-sans text-xs text-stone mb-4">{!! __('messages.or_click_browse') !!}</p>
-                                    <div class="flex flex-wrap items-center justify-center gap-2">
-                                        <span class="font-sans text-xs text-pebble bg-white border border-gray-200 px-3 py-1.5 rounded-full">
-                                            <span class="material-symbols-outlined text-xs align-middle mr-0.5">image</span>
-                                            JPG, PNG
-                                        </span>
-                                        <span class="font-sans text-xs text-pebble bg-white border border-gray-200 px-3 py-1.5 rounded-full">
-                                            <span class="material-symbols-outlined text-xs align-middle mr-0.5">picture_as_pdf</span>
-                                            PDF
-                                        </span>
-                                        <span class="font-sans text-xs text-pebble bg-white border border-gray-200 px-3 py-1.5 rounded-full">
-                                            <span class="material-symbols-outlined text-xs align-middle mr-0.5">data_usage</span>
-                                            {{ __('messages.max_size') }}
-                                        </span>
-                                    </div>
+                                       class="font-sans">
+                                <p id="payment-file-help">{{ app()->getLocale() === 'en' ? 'Select a JPG, PNG, or PDF from your device. Maximum size: 5 MB.' : 'Pilih JPG, PNG, atau PDF dari perangkat Anda. Ukuran maksimal: 5 MB.' }}</p>
+                            </div>
+
+                            <div class="bj-payment-upload relative border border-gray-200 rounded-2xl flex items-center justify-center overflow-hidden">
+                                <div class="flex flex-col items-center text-center p-6 md:p-8" id="upload-prompt">
+                                    <span class="material-symbols-outlined text-forest text-3xl mb-3" aria-hidden="true">description</span>
+                                    <p class="font-sans text-sm font-semibold text-ink mb-1">{{ app()->getLocale() === 'en' ? 'No payment proof selected' : 'Bukti pembayaran belum dipilih' }}</p>
+                                    <p class="font-sans text-sm text-stone">{{ app()->getLocale() === 'en' ? 'Your selected file will appear here.' : 'Pratinjau file yang Anda pilih akan tampil di sini.' }}</p>
                                 </div>
 
                                 {{-- Loading state --}}
-                                <div class="hidden absolute inset-0 w-full h-full bg-white z-20 flex flex-col items-center justify-center p-6" id="upload-loading">
+                                <div class="hidden absolute inset-0 w-full h-full bg-white z-20 flex flex-col items-center justify-center p-6" id="upload-loading" role="status">
                                     <div class="w-16 h-16 rounded-full border-4 border-gray-100 border-t-forest animate-spin mb-4"></div>
                                     <p class="font-sans text-sm font-medium text-ink">{{ __('messages.processing_file') }}</p>
                                     <p class="font-sans text-xs text-stone mt-1">{{ __('messages.please_wait') }}</p>
                                 </div>
 
                                 {{-- Preview container --}}
-                                <div class="hidden absolute inset-0 w-full h-full bg-gray-50 z-20 rounded-2xl overflow-hidden" id="upload-preview-container">
+                                <div class="hidden absolute inset-0 w-full h-full bg-gray-50 z-20 rounded-2xl overflow-hidden" id="upload-preview-container" aria-live="polite">
                                     {{-- Image preview (contain — full image visible) --}}
                                     <div class="relative w-full h-full flex items-center justify-center bg-gray-50" id="image-preview-wrapper" style="display:none;">
                                         <img alt="Preview"
                                              class="max-w-full max-h-full w-auto h-auto object-contain"
-                                             id="upload-preview" src="">
+                                             id="upload-preview">
 
                                         {{-- Tombol action di pojok kanan atas --}}
                                         <div class="absolute top-3 right-3 flex items-center gap-2 z-30">
@@ -279,7 +242,7 @@
                                 </div>
 
                                 {{-- Error state --}}
-                                <div class="hidden absolute inset-0 w-full h-full bg-red-50 z-20 flex flex-col items-center justify-center p-6 text-center" id="upload-error">
+                                <div class="hidden absolute inset-0 w-full h-full bg-red-50 z-20 flex flex-col items-center justify-center p-6 text-center" id="upload-error" role="alert">
                                     <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
                                         <span class="material-symbols-outlined text-red-500 text-3xl">error</span>
                                     </div>
@@ -312,7 +275,6 @@
                 </div>
 
             </div>
-        </div>
 
             {{-- ── RIGHT: Summary sidebar ───────────────── --}}
             <div class="bj-payment-aside lg:col-span-1">
@@ -353,9 +315,7 @@
                             </div>
                             <div class="flex items-start justify-between gap-3">
                                 <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.th_status') }}</span>
-                                <span class="font-sans text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                                    {{ ucfirst($pemesanan->status ?? '-') }}
-                                </span>
+                                @include('partials.booking-status', ['booking' => $pemesanan])
                             </div>
                         </div>
                     </div>
@@ -400,13 +360,10 @@
 
 @push('scripts')
 <script>
-    /* Navbar auto-hide (scroll down) would fight the fixed progress bar —
-       keep the navbar pinned on this page. */
-    document.body.classList.add('no-nav-hide');
-
     let activeMetode = null;
 
     function pilihMetode(id, nama, nomor, atasNama) {
+        document.querySelectorAll('.bj-payment-method > button').forEach(button => button.setAttribute('aria-expanded', 'false'));
         document.querySelectorAll('[id^="detail-"]').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('[id^="card-"]').forEach(el => {
             el.classList.remove('border-forest', 'border-2', 'bg-forest/3');
@@ -416,11 +373,16 @@
 
         if (activeMetode === id) {
             activeMetode = null;
+            const uploadPanel = document.getElementById('panel-step-2');
+            uploadPanel?.setAttribute('inert', '');
+            uploadPanel?.classList.add('opacity-50', 'pointer-events-none');
+            document.getElementById('input-metode').value = '';
             updateLanjutkanBtn();
             return;
         }
 
         activeMetode = id;
+        document.querySelector('#card-' + id + ' > button')?.setAttribute('aria-expanded', 'true');
         const detail = document.getElementById('detail-' + id);
         const card   = document.getElementById('card-' + id);
         const icon   = document.getElementById('icon-' + id);
@@ -472,6 +434,7 @@
             const step1 = document.getElementById('step-1-indicator');
             const step2 = document.getElementById('step-2-indicator');
             panel2.classList.remove('opacity-50', 'pointer-events-none');
+            panel2.removeAttribute('inert');
             header2.style.background = '#1B3A2D';
             const c2 = document.getElementById('step-2-circle');
             const l2 = document.getElementById('step-2-label');
@@ -479,12 +442,12 @@
             if (step2) step2.classList.add('is-current');
             if (c2) { c2.classList.remove('bg-gray-100', 'text-gray-400'); c2.classList.add('bg-forest', 'text-white'); }
             if (l2) { l2.classList.remove('text-gray-400'); l2.classList.add('font-semibold', 'text-forest'); }
-            panel2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            panel2.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+            document.getElementById('bukti_bayar')?.focus({ preventScroll: true });
         });
     }
 
     // ── Upload zone elements ───────────────────────────────────────────────────
-    const dropZone      = document.getElementById('drop-zone');
     const fileInput     = document.getElementById('bukti_bayar');
     const promptEl      = document.getElementById('upload-prompt');
     const loadingEl     = document.getElementById('upload-loading');
@@ -523,13 +486,13 @@
 
     function resetUpload() {
         fileInput.value = '';
-        fileInput.classList.remove('hidden');
-        if (previewImg) previewImg.src = '';
+        if (previewImg) previewImg.removeAttribute('src');
         if (imgWrapper) imgWrapper.style.display = 'none';
         if (pdfWrapper) { pdfWrapper.classList.add('hidden'); pdfWrapper.classList.remove('flex'); }
         if (pdfFileNameEl) pdfFileNameEl.textContent = '';
         if (pdfFileSizeEl) pdfFileSizeEl.textContent = '';
         showState('prompt');
+        fileInput.focus({ preventScroll: true });
     }
 
     function showError(title, message) {
@@ -540,7 +503,7 @@
     }
 
     function handleFiles(files) {
-        if (!files || files.length === 0) return;
+        if (!files || files.length === 0) { resetUpload(); return; }
         const file = files[0];
 
         // Validate type
@@ -558,6 +521,7 @@
 
         const reader = new FileReader();
         reader.onload = (e) => {
+            if (fileInput.files[0] !== file) return;
             // Populate meta
             if (fileNameEl) fileNameEl.textContent = file.name;
             if (fileSizeEl) fileSizeEl.textContent  = formatFileSize(file.size);
@@ -576,9 +540,11 @@
             }
 
             // Small delay to let the browser render
-            setTimeout(() => showState('preview'), 120);
+            showState('preview');
         };
-        reader.onerror = () => showError('{{ __('messages.err_read') }}', '{{ __('messages.err_read_desc') }}');
+        reader.onerror = () => {
+            if (fileInput.files[0] === file) showError('{{ __('messages.err_read') }}', '{{ __('messages.err_read_desc') }}');
+        };
         reader.readAsDataURL(file);
     }
 
@@ -586,8 +552,6 @@
     if (changeBtn) {
         changeBtn.addEventListener('click', e => {
             e.stopPropagation();
-            fileInput.classList.remove('hidden');
-            resetUpload();
             fileInput.click();
         });
     }
@@ -595,14 +559,12 @@
         removeBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
     }
     if (retryBtn) {
-        retryBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
+        retryBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
     }
     // PDF action buttons
     if (changePdfBtn) {
         changePdfBtn.addEventListener('click', e => {
             e.stopPropagation();
-            fileInput.classList.remove('hidden');
-            resetUpload();
             fileInput.click();
         });
     }
@@ -611,24 +573,6 @@
     }
     if (fileInput) fileInput.addEventListener('change', e => handleFiles(e.target.files));
 
-    if (dropZone) {
-        ['dragenter','dragover','dragleave','drop'].forEach(ev =>
-            dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); })
-        );
-        ['dragenter','dragover'].forEach(ev =>
-            dropZone.addEventListener(ev, () => {
-                dropZone.classList.add('border-forest', 'bg-forest/3');
-                dropZone.classList.remove('border-gray-200');
-            })
-        );
-        ['dragleave','drop'].forEach(ev =>
-            dropZone.addEventListener(ev, () => {
-                dropZone.classList.remove('border-forest', 'bg-forest/3');
-                dropZone.classList.add('border-gray-200');
-            })
-        );
-        dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
-    }
 </script>
 @endpush
 @endsection

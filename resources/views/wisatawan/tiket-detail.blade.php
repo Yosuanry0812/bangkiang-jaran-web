@@ -1,200 +1,31 @@
 @extends('layouts.app')
 @section('nav-mode', 'light')
-
-@section('title', ($tiket->nama_tiket ?? __('messages.breadcrumb_detail')) . ' — Bangkiang Jaran')
-
+@section('title', $tiket->nama_tiket . ' | Bangkiang Jaran')
 @section('content')
-<div class="min-h-screen bj-transaction-page">
-
-    {{-- ── Breadcrumb ──────────────────────────────────────── --}}
-    <div class="pt-20 sm:pt-28 pb-0 px-gutter">
-        <div class="max-w-5xl mx-auto">
-            <nav class="flex flex-wrap items-center gap-2 font-sans text-xs text-stone" aria-label="Breadcrumb">
-                <a href="{{ url('/') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_home') }}</a>
-                <span class="text-gray-300">/</span>
-                <a href="{{ route('tiket.index') }}" class="hover:text-forest transition-colors">{{ __('messages.breadcrumb_tickets') }}</a>
-                <span class="text-gray-300">/</span>
-                <span class="text-forest">{{ __('messages.breadcrumb_detail') }}</span>
-            </nav>
-        </div>
+@php($isEnglish = app()->getLocale() === 'en')
+<div class="bj-ticket-detail bj-nature-wrap">
+    <div class="bj-detail-layout">
+        <article class="bj-detail-story">
+            <figure class="bj-detail-photo"><img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" alt="{{ $isEnglish ? 'Bangkiang Jaran Waterfall, Bakbakan' : 'Air Terjun Bangkiang Jaran, Bakbakan' }}" width="706" height="1020" fetchpriority="high"><figcaption>Bangkiang Jaran · Gianyar, Bali</figcaption></figure>
+            <div class="bj-detail-description"><h2>{{ $isEnglish ? 'Your visit, at a glance.' : 'Tentang kunjunganmu.' }}</h2><p>{{ $tiket->deskripsi ?: ($isEnglish ? 'Spend a day at Bangkiang Jaran Waterfall in Bakbakan, Gianyar. Select your visit date and complete each visitor’s details during booking.' : 'Nikmati satu hari di Air Terjun Bangkiang Jaran, Bakbakan, Gianyar. Pilih tanggal kunjungan dan lengkapi data setiap pengunjung saat memesan.') }}</p><ul><li>{{ __('messages.facility_access_entry') }}</li><li>{{ __('messages.facility_valid_date') }}</li><li>{{ __('messages.facility_free_access') }}</li></ul></div>
+        </article>
+        <aside class="bj-detail-reservation" aria-labelledby="ticket-detail-title"><p class="bj-nature-label">{{ $isEnglish ? 'Your pass to the waterfall' : 'Akses menuju air terjun' }}</p><h1 id="ticket-detail-title">{{ $tiket->nama_tiket }}</h1><p class="bj-detail-price">Rp {{ number_format($tiket->harga, 0, ',', '.') }}<small>/ {{ $tiket->kategori === 'kendaraan' ? ($isEnglish ? 'vehicle' : 'kendaraan') : ($isEnglish ? 'person' : 'orang') }}</small></p><dl><div><dt>{{ __('messages.operating_hours_label') }}</dt><dd>{{ __('messages.operating_hours') }}</dd></div><div><dt>{{ __('messages.location') }}</dt><dd>{{ __('messages.address') }}</dd></div><div><dt>{{ $isEnglish ? 'Valid for' : 'Berlaku untuk' }}</dt><dd>{{ $isEnglish ? 'Your selected visit date' : 'Tanggal kunjungan pilihan' }}</dd></div></dl>
+            @if($tiket->status === 'aktif')
+                @auth
+                    @if(Auth::user()->role === 'wisatawan')
+                    <a class="bj-nature-button" href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $tiket->id_tiket]) }}">{{ __('messages.book_now_btn') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+                    @else
+                    <a class="bj-nature-button" href="{{ route('pengelola.dashboard') }}">{{ $isEnglish ? 'Open dashboard' : 'Buka dashboard pengelola' }}</a>
+                    @endif
+                @else
+                <a class="bj-nature-button" href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $tiket->id_tiket]) }}">{{ __('messages.login_to_book') }}</a>
+                @endauth
+            @else
+            <button type="button" class="bj-nature-button" disabled>{{ __('messages.ticket_unavailable') }}</button>
+            @endif
+            <p class="bj-detail-note">{{ $isEnglish ? 'E-tickets become available after the team verifies your payment.' : 'E-ticket tersedia setelah pembayaran diverifikasi oleh pengelola.' }}</p>
+            <a class="bj-detail-back" href="{{ route('tiket.index') }}">{{ __('messages.view_other_tickets') }}</a>
+        </aside>
     </div>
-
-    {{-- ── Main Content ────────────────────────────────────── --}}
-    <section class="py-12 px-gutter">
-        <div class="max-w-5xl mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-                {{-- ── Left: Ticket Card ─────────────────── --}}
-                <div class="lg:col-span-7" data-aos="fade-right">
-                    {{-- Ticket UI --}}
-                    <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100">
-                        {{-- Header band --}}
-                        <div class="bg-forest px-6 sm:px-8 py-8 relative overflow-hidden">
-                            <div class="absolute right-0 top-0 bottom-0 w-40 opacity-5">
-                                <span class="material-symbols-outlined text-white" style="font-size:200px; line-height:1; transform:rotate(-15deg); display:block; margin-top:-30px; margin-right:-30px;">confirmation_number</span>
-                            </div>
-                            <p class="font-sans text-[10px] tracking-[0.2em] uppercase text-white/40 mb-3">Bangkiang Jaran Waterfall</p>
-                            <h1 class="font-serif text-3xl text-white mb-1">{{ $tiket->nama_tiket }}</h1>
-                            <p class="font-sans text-sm text-white/50">{{ __('messages.ticket_entry_one_day') }}</p>
-                        </div>
-
-                        {{-- Perforation --}}
-                        <div class="relative flex items-center px-0 bg-white">
-                            <div class="w-6 h-6 rounded-full -ml-3 flex-shrink-0" style="background:#F8F7F5;"></div>
-                            <div class="flex-1 border-t-2 border-dashed border-gray-150 mx-2"></div>
-                            <div class="w-6 h-6 rounded-full -mr-3 flex-shrink-0" style="background:#F8F7F5;"></div>
-                        </div>
-
-                        {{-- Body --}}
-                        <div class="px-6 sm:px-8 py-7 bg-white">
-                            {{-- Price & Status --}}
-                            <div class="flex flex-wrap items-center justify-between gap-3 mb-8">
-                                <div>
-                                    <p class="font-sans text-xs text-stone uppercase tracking-widest mb-1">{{ __('messages.th_price') }}</p>
-                                    <div class="flex items-baseline gap-1">
-                                        <span class="font-sans text-sm text-stone">Rp</span>
-                                        <span class="font-serif text-4xl text-forest">{{ number_format($tiket->harga, 0, ',', '.') }}</span>
-                                    </div>
-                                    <p class="font-sans text-xs text-pebble mt-0.5">{{ __('messages.per_person_unit') }}</p>
-                                </div>
-                                @if($tiket->status == 'aktif')
-                                <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-sans text-xs font-medium px-3.5 py-1.5 rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    {{ __('messages.ticket_available') }}
-                                </span>
-                                @else
-                                <span class="inline-flex items-center gap-1.5 bg-red-50 text-red-700 border border-red-200 font-sans text-xs font-medium px-3.5 py-1.5 rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                                    {{ __('messages.ticket_unavailable') }}
-                                </span>
-                                @endif
-                            </div>
-
-                            {{-- Divider --}}
-                            <div class="h-px bg-gray-100 mb-7"></div>
-
-                            {{-- Facilities --}}
-                            <div class="mb-8">
-                                <p class="font-sans text-xs text-stone uppercase tracking-widest mb-4">{{ __('messages.facilities_title') }}</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-center gap-3">
-                                        <div class="w-7 h-7 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
-                                            <span class="material-symbols-outlined text-forest text-base icon-fill">check_circle</span>
-                                        </div>
-                                        <span class="font-sans text-sm text-ink">{{ __('messages.facility_access_entry') }}</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <div class="w-7 h-7 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
-                                            <span class="material-symbols-outlined text-forest text-base icon-fill">check_circle</span>
-                                        </div>
-                                        <span class="font-sans text-sm text-ink">{{ __('messages.facility_valid_date') }}</span>
-                                    </li>
-                                    <li class="flex items-center gap-3">
-                                        <div class="w-7 h-7 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0">
-                                            <span class="material-symbols-outlined text-forest text-base icon-fill">check_circle</span>
-                                        </div>
-                                        <span class="font-sans text-sm text-ink">{{ __('messages.facility_free_access') }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Back link --}}
-                    <div class="mt-5">
-                        <a href="{{ route('tiket.index') }}"
-                           class="inline-flex items-center gap-1.5 font-sans text-sm text-stone hover:text-forest transition-colors">
-                            <span class="material-symbols-outlined text-sm">arrow_back</span>
-                            {{ __('messages.back_to_tickets') }}
-                        </a>
-                    </div>
-                </div>
-
-                {{-- ── Right: Order Panel ─────────────────── --}}
-                <div class="lg:col-span-5 lg:sticky lg:top-28" data-aos="fade-left" data-aos-delay="80">
-                    <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div class="px-7 pt-7 pb-6 border-b border-gray-100">
-                            <h3 class="font-serif text-xl text-forest mb-0.5">{{ __('messages.book_this_ticket') }}</h3>
-                            <p class="font-sans text-xs text-stone">{{ __('messages.instant_confirmation_email') }}</p>
-                        </div>
-
-                        <div class="px-7 py-6">
-                            {{-- Summary row --}}
-                            <div class="flex items-start justify-between gap-3 py-3 border-b border-gray-100">
-                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ $tiket->nama_tiket }}</span>
-                                <span class="font-sans text-sm text-forest font-semibold text-right">Rp{{ number_format($tiket->harga, 0, ',', '.') }}</span>
-                            </div>
-                            <div class="flex items-start justify-between gap-3 py-3 border-b border-gray-100">
-                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ __('messages.operating_hours_label') }}</span>
-                                <span class="font-sans text-sm text-ink text-right">{{ __('messages.operating_hours') }}</span>
-                            </div>
-                            <div class="flex items-start justify-between gap-3 py-3">
-                                <span class="font-sans text-sm text-stone flex-shrink-0">{{ __('messages.location') }}</span>
-                                <span class="font-sans text-sm text-ink text-right">{{ __('messages.address') }}</span>
-                            </div>
-
-                            {{-- CTA --}}
-                            <div class="mt-6 space-y-2.5">
-                                @if($tiket->status == 'aktif')
-                                @auth
-                                @if(Auth::user()->role === 'wisatawan')
-                                <a href="{{ route('wisatawan.pemesanan.create', ['id_tiket' => $tiket->id_tiket]) }}"
-                                   class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
-                                    <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                                    {{ __('messages.book_now_btn') }}
-                                </a>
-                                @else
-                                <a href="{{ route('pengelola.dashboard') }}"
-                                   class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
-                                    Buka dashboard pengelola
-                                </a>
-                                @endif
-                                @else
-                                <a href="{{ route('login') }}"
-                                   class="flex items-center justify-center gap-2 w-full bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
-                                    <span class="material-symbols-outlined text-sm">login</span>
-                                    {{ __('messages.login_to_book') }}
-                                </a>
-                                @endauth
-                                @else
-                                <button disabled
-                                        class="flex items-center justify-center gap-2 w-full bg-gray-100 text-gray-400 font-sans text-sm font-semibold py-3.5 rounded-xl cursor-not-allowed">
-                                    {{ __('messages.ticket_unavailable') }}
-                                </button>
-                                @endif
-                                <a href="{{ route('tiket.index') }}"
-                                   class="flex items-center justify-center w-full border border-gray-200 text-stone font-sans text-sm py-3.5 rounded-xl hover:border-gray-400 hover:text-ink transition-colors">
-                                    {{ __('messages.view_other_tickets') }}
-                                </a>
-                            </div>
-
-                            {{-- Note --}}
-                            <p class="font-sans text-xs text-center text-pebble mt-4">
-                                <span class="material-symbols-outlined text-xs align-middle mr-0.5">lock</span>
-                                {{ __('messages.secure_encrypted_transaction') }}
-                            </p>
-                        </div>
-                    </div>
-
-                    {{-- Help card --}}
-                    <div class="mt-4 bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
-                        <div class="flex items-start gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-forest/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span class="material-symbols-outlined text-forest text-sm">support_agent</span>
-                            </div>
-                            <div>
-                                <p class="font-sans text-sm font-medium text-ink mb-0.5">{{ __('messages.need_help') }}</p>
-                                <p class="font-sans text-xs text-stone leading-relaxed">
-                                    {{ __('messages.contact_us_at') }}
-                                    <a href="mailto:info@bangkiangjaran.com" class="text-forest hover:underline">info@bangkiangjaran.com</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
 </div>
 @endsection

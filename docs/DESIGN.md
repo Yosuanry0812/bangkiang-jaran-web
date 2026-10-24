@@ -109,7 +109,36 @@ spacing:
   gutter: 24px
 ---
 
-## Brand & Style
+## Arah aktif publik, 2026-10-23
+
+Brief terbaru pengguna menggantikan warna dan tipografi Tropical Sanctuary pada halaman publik dan transaksi. Identitasnya wisata alam kontemporer: hijau muda, sejuk, ramah, dengan foto destinasi sebagai fokus. ENERGY 2 / RHYTHM 3 / MOTION 2.
+
+| Token aktif | Nilai | Peran |
+| --- | --- | --- |
+| `--nature-paper` | `#f6fbfa` | Latar halaman |
+| `--nature-mint` | `#e5f2ee` | Latar informasi |
+| `--nature-leaf` | `#cbe6df` | Permukaan hijau sejuk |
+| `--nature-ink` | `#174d43` | Teks utama dan tombol |
+| `--nature-muted` | `#4d6963` | Teks sekunder |
+| `--nature-sun` | `#c5ebe5` | Aksen aqua, menggantikan kuning sebelumnya |
+
+DM Sans digunakan untuk judul, isi, kontrol, dan angka. Judul memakai bobot 600 dengan ukuran fluid; tidak memakai aksen satu kata miring. Warna terang digunakan pada permukaan, dengan teks hijau gelap untuk kontras.
+
+Implementasi aktif: `nature-refresh.css` diikuti `waterfall-experience.css`; runtime `nature-refresh.js` dan `waterfall-experience.js`. Beranda/restoran memuat `home-flow.css`/`home-flow.js`: partial `photo-collage` untuk 1–3 foto tanpa tumpang tindih pada pengantar beranda, serta `photo-columns` untuk galeri masonry dengan kolom bergerak perlahan berlawanan arah pada kedua halaman. `photo-exhibition` tidak dimuat pada rute aktif. Nilai YAML di atas dan referensi Tropical Sanctuary di bawah merupakan sistem legacy, bukan sumber token publik yang aktif.
+
+Lapisan akhir `section-refinement.css`/JS menerapkan hero beranda/restoran penuh viewport, judul beranda bergerak kecil dengan tombol jeda, galeri/peta satu viewport dan FAQ/informasi restoran minimal satu viewport. Teks diperbesar boleh memperpanjang section. Ponsel memakai dua kolom foto serta pilihan asal rute horizontal. Breadcrumb dan fact strip setelah hero dihapus. Pembayaran tetap tenang dan mudah dibaca: tombol forest dengan teks putih, unggah bukti setelah metode dipilih, status berhasil memerlukan persetujuan pengelola. Mode percobaan local/testing tidak menampilkan rekening fiktif.
+
+Revisi berikutnya pada tanggal yang sama memakai hero layar penuh yang siap video, restoran dengan foto lanskap, footer terang bersama, dan form pengunjung minimal. Section penutup beranda/restoran/tiket serta tombol pesan di navbar dihapus sesuai gambar revisi terbaru. Navbar menghilang saat scroll turun dan muncul ketika naik pada seluruh route layout publik, termasuk pembayaran. Warna kuning diganti aqua; nama token `--nature-sun` dipertahankan untuk kompatibilitas CSS.
+
+Video: simpan MP4 di `public/videos/bangkiang-jaran.mp4`, atau tetapkan path relatif melalui `TOURISM_HERO_VIDEO`. Tanpa berkas valid, hero tetap memakai foto. Video tanpa suara, diputar otomatis hanya bila gerakan normal dan penghemat data tidak aktif; tersedia tombol jeda/putar. Tidak mengklaim ada video asli sebelum berkas diberikan.
+
+Revisi screenshot terbaru 2026-10-23: empat section beranda (pengantar, cerita, galeri, fasilitas) memakai native sticky overlap dan drift kecil mengikuti kecepatan scroll. ENERGY 2 / RHYTHM 3 / MOTION 3 khusus rangkaian ini. Teaser restoran beranda dihapus. Section tinggi diselesaikan pembacaannya sebelum menempel; fokus keyboard memakai flow normal. Reduced motion/penghemat data memakai tampilan statis; tanpa JS isi tetap terbaca.
+
+Galeri beranda memakai tiga kolom desktop/tablet, dua kolom ponsel, dengan laju sekitar 8–13 px/detik. Tombol jeda membuka koleksi statis yang bisa ditelusuri. Loop visual mengulang foto yang tersedia; clone diberi aria-hidden/inert dan tidak dihitung sebagai dokumentasi baru. Animasi berhenti di luar layar/tab tersembunyi; RAF respons scroll berhenti setelah stabil. Restoran mempertahankan panggung cetakan foto 3D, tombol/thumbnail/gesture, satu foto atau keterangan kosong, tanpa autoplay. Tiket memakai stub dan perforasi tanpa barcode palsu. Gradien hanya dipakai untuk keterbacaan caption di atas foto; bayangan membedakan lapisan foto/section yang memang bertumpuk.
+
+Kontrak route, nama input, struktur Alpine, dan proses verifikasi pembayaran dipertahankan. Pengujian visual transaksi memakai fixture SQLite memori; jangan memakai data QA sebagai data promosi.
+
+## Referensi legacy: Brand & Style
 The design system is crafted for a premium e-tourism experience, specifically tailored to the lush, majestic environment of Bangkiang Jaran Waterfall. The brand personality is "Tropical Elegance"—a blend of high-end hospitality and raw, adventurous nature. It aims to evoke a sense of serenity, discovery, and grounded luxury.
 
 The visual style utilizes **Minimalism** with **Tactile** influences. It prioritizes generous negative space to allow high-quality photography of Bali’s landscapes to breathe. While the layout is clean and modern, the use of organic textures and soft, layered depth prevents it from feeling sterile, creating a digital environment that feels as welcoming as a high-end jungle eco-resort.

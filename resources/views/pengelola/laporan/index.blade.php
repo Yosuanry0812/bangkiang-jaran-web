@@ -1,85 +1,24 @@
 @extends('pengelola.layouts.admin')
 @section('title', __('messages.reports_title'))
-
+@section('page_title', __('messages.reports_title'))
 @section('content')
-<div class="space-y-6">
-    <div>
-        <h1 class="font-heading text-2xl font-bold text-gray-500-800">{{ __('messages.reports_title') }}</h1>
-        <p class="text-sm text-gray-500-500 mt-0.5">{{ __('messages.reports_desc') }}</p>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-sm p-6">
-        <div class="flex items-center gap-2 mb-5">
-            <span class="material-symbols-outlined text-emerald-600">groups</span>
-            <h2 class="font-heading text-lg font-semibold text-gray-500-800">{{ __('messages.visit_report') }}</h2>
-        </div>
-        <form method="GET" action="{{ route('pengelola.laporan.kunjungan') }}" class="flex flex-wrap items-end gap-3">
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
-                <input type="date" name="periode_awal" value="{{ request('periode_awal') }}"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
-                <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
-                <select name="tipe"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-                    <option value="" {{ request('tipe') === null ? 'selected' : '' }}>{{ __('messages.all') }}</option>
-                    <option value="online" {{ request('tipe') === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
-                    <option value="offline" {{ request('tipe') === 'offline' ? 'selected' : '' }}>{{ __('messages.offline') }}</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">search</span>
-                {{ __('messages.filter') }}
-            </button>
-            <a href="{{ route('pengelola.laporan.kunjungan', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'tipe' => request('tipe'), 'export' => 'pdf']) }}"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">picture_as_pdf</span>
-                {{ __('messages.export_pdf') }}
-            </a>
+<header class="admin-page-head"><div><h1>Laporan operasional</h1><p>Tinjau kunjungan dan transaksi berdasarkan periode yang Anda pilih.</p></div></header>
+@if($errors->any())<div class="admin-alert admin-alert--error" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<div class="admin-report-grid">
+    @foreach([
+        'kunjungan' => ['title' => __('messages.visit_report'), 'icon' => 'groups', 'description' => 'Rekap jumlah pengunjung dan tiket untuk memantau kunjungan destinasi.'],
+        'transaksi' => ['title' => __('messages.transaction_report'), 'icon' => 'receipt_long', 'description' => 'Rincian pembayaran dan pendapatan dari pemesanan online maupun offline.'],
+    ] as $type => $report)
+    <section class="admin-panel">
+        <div class="admin-report-intro"><span class="material-symbols-outlined" aria-hidden="true">{{ $report['icon'] }}</span><h2>{{ $report['title'] }}</h2><p>{{ $report['description'] }}</p></div>
+        <form method="GET" action="{{ route('pengelola.laporan.' . $type) }}" class="admin-report-form">
+            <label class="admin-field" for="{{ $type }}-awal">{{ __('messages.start_period') }}<input id="{{ $type }}-awal" type="date" name="periode_awal" value="{{ request('periode_awal') ?: now()->startOfMonth()->toDateString() }}" required></label>
+            <label class="admin-field" for="{{ $type }}-akhir">{{ __('messages.end_period') }}<input id="{{ $type }}-akhir" type="date" name="periode_akhir" value="{{ request('periode_akhir') ?: now()->toDateString() }}" required></label>
+            <label class="admin-field" for="{{ $type }}-tipe">{{ __('messages.report_type') }}<select id="{{ $type }}-tipe" name="tipe"><option value="">{{ __('messages.all') }}</option><option value="online" @selected(request('tipe') === 'online')>{{ __('messages.online') }}</option><option value="offline" @selected(request('tipe') === 'offline')>{{ __('messages.offline') }}</option></select></label>
+            <div class="admin-report-actions"><button type="submit" class="admin-btn"><span class="material-symbols-outlined" aria-hidden="true">filter_alt</span>Lihat laporan</button><button type="submit" name="export" value="pdf" class="admin-btn admin-btn--quiet"><span class="material-symbols-outlined" aria-hidden="true">download</span>{{ __('messages.export_pdf') }}</button></div>
         </form>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-sm p-6">
-        <div class="flex items-center gap-2 mb-5">
-            <span class="material-symbols-outlined text-emerald-600">receipt_long</span>
-            <h2 class="font-heading text-lg font-semibold text-gray-500-800">{{ __('messages.transaction_report') }}</h2>
-        </div>
-        <form method="GET" action="{{ route('pengelola.laporan.transaksi') }}" class="flex flex-wrap items-end gap-3">
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
-                <input type="date" name="periode_awal" value="{{ request('periode_awal') }}"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
-                <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
-                <select name="tipe"
-                    class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-                    <option value="" {{ request('tipe') === null ? 'selected' : '' }}>{{ __('messages.all') }}</option>
-                    <option value="online" {{ request('tipe') === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
-                    <option value="offline" {{ request('tipe') === 'offline' ? 'selected' : '' }}>{{ __('messages.offline') }}</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">search</span>
-                {{ __('messages.filter') }}
-            </button>
-            <a href="{{ route('pengelola.laporan.transaksi', ['periode_awal' => request('periode_awal'), 'periode_akhir' => request('periode_akhir'), 'tipe' => request('tipe'), 'export' => 'pdf']) }}"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">picture_as_pdf</span>
-                {{ __('messages.export_pdf') }}
-            </a>
-        </form>
-    </div>
+    </section>
+    @endforeach
 </div>
+<p class="admin-note mt-6">Pilih tanggal awal dan akhir laporan. Ekspor PDF mengikuti periode dan jenis pemesanan yang dipilih.</p>
 @endsection

@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="image" href="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" fetchpriority="high">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -169,8 +169,18 @@
     @if (Route::is('landing'))<link rel="stylesheet" href="{{ asset('css/home-stitch.css') . '?v=' . filemtime(public_path('css/home-stitch.css')) }}">@endif
     @if (Route::is('restoran'))<link rel="stylesheet" href="{{ asset('css/restaurant-stitch.css') . '?v=' . filemtime(public_path('css/restaurant-stitch.css')) }}">@endif
     <link rel="stylesheet" href="{{ asset('css/typography-motion.css') . '?v=' . filemtime(public_path('css/typography-motion.css')) }}">
+    @if (Route::is('landing', 'restoran', 'tiket.index'))
+    <link rel="stylesheet" href="{{ asset('css/marketing-editorial.css') . '?v=' . filemtime(public_path('css/marketing-editorial.css')) }}">
+    @endif
+    <link rel="stylesheet" href="{{ asset('css/nature-refresh.css') . '?v=' . filemtime(public_path('css/nature-refresh.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/waterfall-experience.css') . '?v=' . filemtime(public_path('css/waterfall-experience.css')) }}">
+    @if (Route::is('landing', 'restoran'))
+    <link rel="stylesheet" href="{{ asset('css/home-flow.css') . '?v=' . filemtime(public_path('css/home-flow.css')) }}">
+    @endif
+    <link rel="stylesheet" href="{{ asset('css/section-refinement.css') . '?v=' . filemtime(public_path('css/section-refinement.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/page-transitions.css') . '?v=' . filemtime(public_path('css/page-transitions.css')) }}">
 </head>
-<body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-public bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
+<body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-public bj-nature {{ Route::is('landing', 'restoran', 'tiket.index') ? 'bj-marketing' : '' }} bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
     <a class="bj-skip-link" href="#main-content">{{ app()->getLocale() === 'id' ? 'Langsung ke konten' : 'Skip to content' }}</a>
 
     {{-- Navigation --}}
@@ -184,7 +194,7 @@
             <div class="flex items-center justify-between h-12 md:h-[68px]">
 
                 {{-- Logo --}}
-                <a href="{{ route('landing') }}" id="nav-logo" class="bj-site-brand flex-shrink-0 transition-colors duration-300" aria-label="Bangkiang Jaran — {{ __('messages.home') }}">
+                <a href="{{ route('landing') }}" id="nav-logo" class="bj-site-brand flex-shrink-0 transition-colors duration-300" aria-label="Bangkiang Jaran | {{ __('messages.home') }}">
                     <span class="bj-site-brand__copy"><strong>Bangkiang Jaran</strong><small>Waterfall · Gianyar</small></span>
                 </a>
 
@@ -249,10 +259,6 @@
                         <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 0;">translate</span>
                         <span class="font-semibold text-xs tracking-wide">{{ app()->getLocale() === 'id' ? 'EN' : 'ID' }}</span>
                     </a>
-                    <a href="{{ route('tiket.index') }}" id="nav-book" class="bj-nav-book">
-                        <span>{{ app()->getLocale() === 'en' ? 'Book now' : 'Pesan tiket' }}</span>
-                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                    </a>
                     </div>
                 </nav>
 
@@ -315,12 +321,12 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="text-cream/70" style="background-color: #0F1E14;">
+    <footer class="bj-water-footer">
         <div class="max-w-7xl mx-auto px-gutter pt-14 pb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
                 <div class="md:col-span-1">
-                    <span class="font-serif text-2xl" style="color: #C9A96E;">Bangkiang Jaran</span>
-                    <p class="font-sans text-sm mt-3 max-w-xs leading-relaxed" style="color: rgba(247,243,238,0.45);">{{ __('messages.footer_desc') }}</p>
+                    <a class="bj-water-footer__brand" href="{{ route('landing') }}">Bangkiang<br>Jaran.</a>
+                    <p class="font-sans text-sm mt-3 max-w-xs leading-relaxed">{{ app()->getLocale() === 'en' ? 'A waterfall in Bakbakan Village, Gianyar, Bali.' : 'Air terjun di Desa Bakbakan, Gianyar, Bali.' }}</p>
                     <div class="flex items-center gap-3 mt-6">
                         <a href="https://www.instagram.com/bangkiangjaranwaterfall?igsh=MWhnZzBvZXlpZ2h6bw==" target="_blank" rel="noopener"
                            class="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:-translate-y-0.5"
@@ -348,21 +354,12 @@
                 </div>
 
                 <div>
-                    <h4 class="font-sans text-xs uppercase tracking-[0.12em] mb-4" style="color:rgba(247,243,238,0.3);">{{ __('messages.contact_title') }}</h4>
-                    <ul class="space-y-2.5">
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">location_on</span>
-                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">{{ __('messages.address') }}</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">schedule</span>
-                            <span class="font-sans text-sm" style="color:rgba(247,243,238,0.55);">{{ __('messages.operating_hours') }}</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <span class="material-symbols-outlined text-base mt-0.5" style="color:rgba(201,169,110,0.7);">mail</span>
-                            <a href="{{ route('landing') }}#lokasi" class="font-sans text-sm transition-colors hover:text-white" style="color:rgba(247,243,238,0.55);">{{ __('messages.location') }}</a>
-                        </li>
-                    </ul>
+                    <h4 class="bj-footer-contact-title">{{ __('messages.contact_title') }}</h4>
+                    <address class="bj-footer-contact">
+                        <a href="{{ config('tourism.maps_url') }}" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><strong>Desa Bakbakan</strong><small>Gianyar, Bali</small></span></a>
+                        <div><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span><small>{{ app()->getLocale() === 'en' ? 'Visiting hours' : 'Jam kunjungan' }}</small><strong>{{ __('messages.operating_hours') }}</strong></span></div>
+                        <a class="bj-footer-contact-route" href="{{ route('landing') }}#lokasi">{{ app()->getLocale() === 'en' ? 'Plan your route' : 'Rencanakan rute kunjungan' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a>
+                    </address>
                 </div>
             </div>
 
@@ -467,16 +464,16 @@
         }
 
         /* ── Navbar state machine ── */
-        const TINTED_PX  = 50;
-        const SOLID_PX   = 130;
-        const DEAD_PX    = 2;
-        const HERO_HIDE_PX = 32;
         let lastY        = window.scrollY;
         let hidden       = false;
         let menuOpen     = false;
         let ticking      = false;
         let activeNavClass = '';
         let activeTokens = null;
+        let scrollTravel = 0;
+        let scrollDirection = 0;
+        let navHeight = nav.offsetHeight || 88;
+        let heroBoundary = document.getElementById('hero-section')?.offsetHeight || 0;
 
         function clearNavClasses() {
             nav.classList.remove(
@@ -494,86 +491,25 @@
         }
 
         function update() {
-            const curr  = window.scrollY;
+            const curr  = Math.max(0, Math.min(window.scrollY, document.documentElement.scrollHeight - innerHeight));
             const delta = curr - lastY;
-
-            if (menuOpen) {
-                hidden = false;
-                setNav(T.solid);
-                applyTokens(DARK);   // mobile menu always dark
-                lastY = curr;
-                ticking = false;
-                return;
+            if (menuOpen || curr <= navHeight) {
+                hidden = false; scrollTravel = 0;
+            } else if (Math.abs(delta) > .5) {
+                const nextDirection = Math.sign(delta);
+                if (nextDirection !== scrollDirection) scrollTravel = 0;
+                scrollDirection = nextDirection;
+                scrollTravel += Math.abs(delta);
+                if (nextDirection > 0 && scrollTravel >= 10) hidden = true;
+                if (nextDirection < 0 && scrollTravel >= 6) hidden = false;
             }
-
-            if (mode === 'hero') {
-                // Scroll down hides the bar. Scrolling back up reveals a
-                // transparent bar over the hero and a full light bar below it.
-                const heroEl   = document.getElementById('hero-section');
-                const heroEnd  = heroEl ? heroEl.offsetHeight - (window.innerWidth < 768 ? 48 : 68) : SOLID_PX;
-                const inHero   = curr <= heroEnd;
-
-                if (curr <= DEAD_PX) {
-                    hidden = false;
-                    setNav('nav-transparent');
-                    applyTokens(HERO);
-                } else if (curr > HERO_HIDE_PX && Math.abs(delta) > DEAD_PX && delta > 0) {
-                    hidden = true;
-                    setNav('nav-hidden');
-                } else if (Math.abs(delta) > DEAD_PX && delta < 0) {
-                    hidden = false;
-                    setNav(inHero ? 'nav-transparent' : T.solid);
-                    applyTokens(inHero ? HERO : LIGHT);
-                } else if (!hidden) {
-                    setNav(inHero ? 'nav-transparent' : T.solid);
-                    applyTokens(inHero ? HERO : LIGHT);
-                }
-            } else if (mode === 'light') {
-                // Pages with `no-nav-hide` (e.g. payment with fixed progress bar):
-                // navbar must stay put, never hide-on-scroll.
-                if (document.body.classList.contains('no-nav-hide')) {
-                    setNav(T.solid);
-                    applyTokens(T);
-                } else if (curr > SOLID_PX && Math.abs(delta) > DEAD_PX) {
-                    if (delta > 0 && !hidden) {
-                        hidden = true;
-                        setNav('nav-hidden');
-                    } else if (delta < 0 && hidden) {
-                        hidden = false;
-                        setNav(T.solid);
-                        applyTokens(T);
-                    }
-                } else if (!hidden) {
-                    setNav(T.solid);
-                    applyTokens(T);
-                }
-            } else {
-                // Dark mode (hero pages)
-                if (curr <= TINTED_PX) {
-                    hidden = false;
-                    setNav(T.clear);
-                    applyTokens(DARK);
-                } else if (curr <= SOLID_PX) {
-                    hidden = false;
-                    setNav(T.tinted);
-                    applyTokens(DARK);
-                } else {
-                    if (Math.abs(delta) > DEAD_PX) {
-                        if (delta > 0 && !hidden) {
-                            hidden = true;
-                            setNav('nav-hidden');
-                        } else if (delta < 0 && hidden) {
-                            hidden = false;
-                            setNav(T.solid);
-                            applyTokens(DARK);
-                        } else if (!hidden) {
-                            setNav(T.solid);
-                            applyTokens(DARK);
-                        }
-                    }
-                }
+            const overHero = mode === 'hero' && curr < heroBoundary - navHeight && !menuOpen;
+            const solidTokens = mode === 'hero' || menuOpen ? LIGHT : T;
+            if (hidden) setNav('nav-hidden');
+            else {
+                setNav(overHero ? 'nav-transparent' : solidTokens.solid);
+                applyTokens(overHero ? HERO : solidTokens);
             }
-
             lastY = curr;
             ticking = false;
         }
@@ -584,6 +520,19 @@
             window.addEventListener('scroll', function() {
                 if (!ticking) { requestAnimationFrame(update); ticking = true; }
             }, { passive: true });
+            const measureNav = () => {
+                navHeight = nav.offsetHeight || 88;
+                heroBoundary = document.getElementById('hero-section')?.offsetHeight || 0;
+                document.documentElement.style.setProperty('--bj-nav-height', navHeight + 'px');
+                update();
+            };
+            const navObserver = new ResizeObserver(measureNav);
+            navObserver.observe(nav);
+            const heroSection = document.getElementById('hero-section');
+            if (heroSection) navObserver.observe(heroSection);
+            window.addEventListener('resize', measureNav, { passive: true });
+            nav.addEventListener('focusin', () => { hidden = false; scrollTravel = 0; update(); });
+            measureNav();
         }
 
         /* ── Mobile menu ── */
@@ -592,8 +541,8 @@
             mobileMenu.classList.replace('menu-close','menu-open');
             menuIcon.textContent = 'close';
             menuBtn.setAttribute('aria-expanded','true');
-            setNav(T.solid);
-            applyTokens(DARK);
+            setNav(LIGHT.solid);
+            applyTokens(LIGHT);
             document.body.style.overflow = 'hidden';
         }
         function closeMenu() {
@@ -620,6 +569,12 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@14.3.0/swiper-bundle.min.js"></script>
     <script src="https://unpkg.com/lenis@1.3.27/dist/lenis.min.js"></script>
     <script defer src="{{ asset('js/site.js') . '?v=' . filemtime(public_path('js/site.js')) }}"></script>
+    <script defer src="{{ asset('js/nature-refresh.js') . '?v=' . filemtime(public_path('js/nature-refresh.js')) }}"></script>
+    <script defer src="{{ asset('js/waterfall-experience.js') . '?v=' . filemtime(public_path('js/waterfall-experience.js')) }}"></script>
+    @if (Route::is('landing', 'restoran'))
+    <script defer src="{{ asset('js/home-flow.js') . '?v=' . filemtime(public_path('js/home-flow.js')) }}"></script>
+    @endif
+    <script defer src="{{ asset('js/section-refinement.js') . '?v=' . filemtime(public_path('js/section-refinement.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

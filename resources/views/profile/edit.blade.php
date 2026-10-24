@@ -1,8 +1,12 @@
-@extends('layouts.app')
+@extends(Auth::user()->role === 'pengelola' ? 'pengelola.layouts.admin' : 'layouts.app')
+@section('page_title', 'Akun Saya')
 @section('nav-mode', 'light')
 @section('title', 'Profil — ' . config('app.name'))
 
 @section('content')
+@if(Auth::user()->role === 'pengelola')
+    @include('profile.partials.admin-account')
+@else
 <div class="min-h-screen bg-[#F5F4F1] pt-24 pb-16 px-gutter">
 <div class="max-w-5xl mx-auto">
 
@@ -237,6 +241,7 @@
 </div>{{-- end container --}}
 </div>{{-- end outer --}}
 
+@endif
 @push('scripts')
 <script>
 function togglePwd(inputId, iconId) {

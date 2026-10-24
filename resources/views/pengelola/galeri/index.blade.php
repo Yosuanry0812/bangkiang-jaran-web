@@ -1,72 +1,32 @@
 @extends('pengelola.layouts.admin')
 @section('title', __('messages.manage_gallery_title'))
-
+@section('page_title', __('messages.manage_gallery_title'))
 @section('content')
-<div class="space-y-6">
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="font-heading text-2xl font-bold text-gray-500-800">{{ __('messages.manage_gallery_title') }}</h1>
-            <p class="text-sm text-gray-500-500 mt-0.5">{{ __('messages.manage_gallery_desc') }}</p>
+<header class="admin-page-head"><div><h1>{{ __('messages.manage_gallery_title') }}</h1><p>Dokumentasi destinasi dan kuliner, dalam satu koleksi.</p></div><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}"><span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>{{ __('messages.add_media') }}</a></header>
+<nav class="admin-tabs" aria-label="Kategori galeri">
+    @foreach(['' => 'Semua media', 'wisata' => 'Wisata Bangkiang Jaran', 'restoran' => 'Restoran / Kuliner'] as $type => $label)
+    <a href="{{ route('pengelola.galeri.index', $type ? ['tipe' => $type] : []) }}" @if((request('tipe') ?? '') === $type) aria-current="page" @endif>{{ $label }}</a>
+    @endforeach
+</nav>
+<div class="admin-gallery">
+    @forelse($galeri as $g)
+    <article class="admin-media">
+        <div class="admin-media-image">
+            <span class="material-symbols-outlined" aria-hidden="true">image</span><small>Foto tidak tersedia</small>
+            <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" loading="lazy" decoding="async" onerror="this.remove()">
         </div>
-        <a href="{{ route('pengelola.galeri.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
-            <span class="material-symbols-outlined text-base">add_photo_alternate</span>
-            {{ __('messages.add_media') }}
-        </a>
-    </div>
-
-    {{-- Filter tabs --}}
-    <div class="flex items-center gap-2 border-b border-gray-200 pb-3">
-        <a href="{{ route('pengelola.galeri.index') }}"
-           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ !request('tipe') ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
-            Semua
-        </a>
-        <a href="{{ route('pengelola.galeri.index', ['tipe' => 'wisata']) }}"
-           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ request('tipe') === 'wisata' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
-            Wisata Bangkiang Jaran
-        </a>
-        <a href="{{ route('pengelola.galeri.index', ['tipe' => 'restoran']) }}"
-           class="px-4 py-1.5 rounded-full text-xs font-medium transition-colors {{ request('tipe') === 'restoran' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
-            Restoran / Kuliner
-        </a>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        @forelse ($galeri ?? [] as $g)
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden group">
-            <div class="relative overflow-hidden h-44 bg-[#e9e5da] flex items-center justify-center">
-                <span class="text-xs text-[#66736c]">Foto tidak tersedia</span>
-                <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                     onerror="this.remove()">
-                @if($g->tipe === 'restoran')
-                <span class="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">Restoran</span>
-                @endif
-            </div>
-            <div class="p-4">
-                <p class="text-sm text-gray-500-600 truncate">{{ $g->keterangan }}</p>
-                <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-300-100">
-                    <span class="text-xs text-gray-500-400">{{ $g->created_at ? \Carbon\Carbon::parse($g->created_at)->format('d/m/Y') : '' }}</span>
-                    <form method="POST" action="{{ route('pengelola.galeri.destroy', $g->id_galeri) }}" onsubmit="return confirm('{{ __('messages.delete_confirm_msg') }}')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-xs font-medium transition-colors">
-                            <span class="material-symbols-outlined text-sm">delete</span>
-                            {{ __('messages.delete') }}
-                        </button>
-                    </form>
-                </div>
+        <div class="admin-media-body">
+            <small>{{ $g->tipe === 'restoran' ? 'Restoran / Kuliner' : 'Wisata Bangkiang Jaran' }}</small>
+            <h2>{{ $g->keterangan ?: 'Dokumentasi Bangkiang Jaran' }}</h2>
+            <div class="admin-media-footer"><time>{{ $g->created_at ? $g->created_at->format('d M Y') : '' }}</time>
+                <form method="POST" action="{{ route('pengelola.galeri.destroy', $g->id_galeri) }}" onsubmit="return confirm(@js(__('messages.delete_confirm_msg')))">@csrf @method('DELETE')
+                <button type="submit" class="admin-text-action admin-text-action--danger"><span class="material-symbols-outlined" aria-hidden="true">delete</span>{{ __('messages.delete') }}<span class="sr-only"> {{ $g->keterangan }}</span></button></form>
             </div>
         </div>
-        @empty
-        <div class="col-span-full py-16 text-center">
-            <span class="material-symbols-outlined text-5xl text-gray-500-300 mb-3 block">photo_library</span>
-            <p class="text-gray-500-400">{{ __('messages.no_media') }}</p>
-        </div>
-        @endforelse
-    </div>
-    @if (method_exists($galeri, 'links'))
-    <div class="mt-4">
-        {{ $galeri->links() }}
-    </div>
-    @endif
+    </article>
+    @empty
+    <div class="admin-panel col-span-full"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">photo_library</span><h2>{{ __('messages.no_media') }}</h2><p>Unggah dokumentasi asli untuk melengkapi galeri destinasi atau restoran.</p><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}">{{ __('messages.add_media') }}</a></div></div>
+    @endforelse
 </div>
+@if(method_exists($galeri, 'links') && $galeri->hasPages())<div class="admin-pagination">{{ $galeri->links() }}</div>@endif
 @endsection

@@ -21,6 +21,26 @@ class ProfileTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_manager_profile_uses_management_navigation_and_keeps_update_fields(): void
+    {
+        $manager = User::factory()->create(['role' => 'pengelola']);
+
+        $this->actingAs($manager)->get('/profile')
+            ->assertOk()
+            ->assertSee('admin-profile-form', false)
+            ->assertSee('Navigasi pengelola')
+            ->assertSee('name="name"', false)
+            ->assertSee('name="username"', false)
+            ->assertSee('name="email"', false)
+            ->assertSee('name="phone"', false)
+            ->assertDontSee('id="main-nav"', false);
+
+        $this->actingAs(User::factory()->create(['role' => 'wisatawan']))->get('/profile')
+            ->assertOk()
+            ->assertSee('id="main-nav"', false)
+            ->assertDontSee('admin-profile-form', false);
+    }
+
     public function test_profile_information_can_be_updated(): void
     {
         $user = User::factory()->create();
@@ -41,6 +61,21 @@ class ProfileTest extends TestCase
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_manager_can_save_profile_without_optional_phone(): void
+    {
+        $manager = User::factory()->create(['role' => 'pengelola', 'phone' => null]);
+
+        $this->actingAs($manager)->patch('/profile', [
+            'name' => 'Pengelola QA',
+            'username' => $manager->username,
+            'email' => $manager->email,
+            'phone' => '',
+        ])->assertSessionHasNoErrors()->assertRedirect('/profile');
+
+        $this->assertSame('Pengelola QA', $manager->fresh()->name);
+        $this->assertNull($manager->fresh()->phone);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

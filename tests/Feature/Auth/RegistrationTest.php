@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Http\Middleware\EnsureExplicitLogin;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -36,6 +37,7 @@ class RegistrationTest extends TestCase
         $this->assertTrue(Hash::check('Password123', $user->password));
         $this->assertNull($user->email_verified_at);
         $this->assertAuthenticatedAs($user);
+        $this->assertSame((string) $user->id, session(EnsureExplicitLogin::SESSION_KEY));
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
     public function test_registration_rejects_mismatched_confirmation_and_duplicate_email(): void
@@ -47,5 +49,18 @@ class RegistrationTest extends TestCase
         ])->assertSessionHasErrors(['email', 'password']);
         $this->assertDatabaseCount('users', 1);
         $this->assertGuest();
+    }
+
+    public function test_registration_returns_to_booking_after_role_redirect(): void
+    {
+        $bookingUrl = route('wisatawan.pemesanan.create', ['id_tiket' => 1]);
+        $this->withSession(['url.intended' => $bookingUrl])->post('/register', [
+            'name' => 'Booking User', 'username' => 'bookinguser', 'email' => 'booking@example.com',
+            'password' => 'Password123', 'password_confirmation' => 'Password123',
+        ])->assertRedirect(route('redirect.after.login'));
+
+        \Illuminate\Support\Facades\Auth::forgetGuards();
+        $this->get('/redirect-after-login')->assertRedirect($bookingUrl);
+        $this->assertAuthenticated();
     }
 }

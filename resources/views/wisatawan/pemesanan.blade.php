@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', __('messages.book_ticket') . ' — Bangkiang Jaran')
-@section('nav-mode', 'hero')
+@section('title', __('messages.book_ticket') . ' | Bangkiang Jaran')
+@section('nav-mode', 'light')
 
 @section('content')
 @php
@@ -17,11 +17,6 @@
         <div class="bj-booking-hero__media" data-bj-hero-slide aria-hidden="true"><img src="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" alt="" fetchpriority="high"></div>
         <div class="bj-booking-hero__shade" aria-hidden="true"></div>
         <div class="bj-booking-wrap bj-booking-hero__content">
-            <nav class="bj-booking-breadcrumb bj-reveal" aria-label="Breadcrumb">
-                <a href="{{ route('landing') }}">{{ __('messages.breadcrumb_home') }}</a><span aria-hidden="true">/</span>
-                <a href="{{ route('tiket.index') }}">{{ __('messages.breadcrumb_tickets') }}</a><span aria-hidden="true">/</span>
-                <span aria-current="page">{{ __('messages.breadcrumb_booking') }}</span>
-            </nav>
             <div class="bj-booking-hero__grid">
                 <div class="bj-booking-hero__copy">
                     <p class="bj-booking-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Your visit begins here' : 'Perjalanan Anda dimulai di sini' }}</p>
@@ -63,24 +58,21 @@
                 <section class="bj-booking-section" aria-labelledby="booking-ticket-title">
                     <div class="bj-booking-section__head bj-reveal">
                         <div><span>02</span><div><p>{{ $isEnglish ? 'Choose your access' : 'Pilih akses kunjungan' }}</p><h2 id="booking-ticket-title">{{ __('messages.select_ticket') }}</h2></div></div>
-                        <small>{{ __('messages.max_per_type') }}</small>
                     </div>
                     <div class="bj-booking-tickets">
                         @forelse($tiketList as $index => $ticket)
                             @php($isVehicle = $ticket->kategori === 'kendaraan')
                             <article class="bj-booking-ticket bj-reveal" :class="qty({{ $ticket->id_tiket }}) > 0 ? 'is-selected' : ''">
-                                <div class="bj-booking-ticket__number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</div>
-                                <div class="bj-booking-ticket__icon"><span class="material-symbols-outlined" aria-hidden="true">{{ $isVehicle ? 'directions_car' : 'confirmation_number' }}</span></div>
+                                <div class="bj-booking-ticket__stub"><span class="material-symbols-outlined" aria-hidden="true">{{ $isVehicle ? 'directions_car' : 'confirmation_number' }}</span><small>Bangkiang<br>Jaran</small></div>
                                 <div class="bj-booking-ticket__copy">
                                     <div class="bj-booking-ticket__title"><h3>{{ $ticket->nama_tiket }}</h3><span>{{ $ticket->kategori ?? ($isEnglish ? 'Individual' : 'Perorangan') }}</span></div>
                                     <p>{{ $isVehicle ? ($isEnglish ? 'Official vehicle access for your selected visit date.' : 'Akses kendaraan resmi pada tanggal kunjungan terpilih.') : ($isEnglish ? 'Waterfall, natural pool, and public facility access included.' : 'Termasuk akses air terjun, kolam alami, dan fasilitas umum.') }}</p>
                                     <strong>Rp {{ number_format($ticket->harga, 0, ',', '.') }} <small>/ {{ $isVehicle ? ($isEnglish ? 'vehicle' : 'kendaraan') : ($isEnglish ? 'person' : 'orang') }}</small></strong>
                                 </div>
-                                <div class="bj-booking-stepper" aria-label="{{ $isEnglish ? 'Quantity for' : 'Jumlah untuk' }} {{ $ticket->nama_tiket }}">
+                                <div class="bj-booking-stepper" role="group" aria-label="{{ $isEnglish ? 'Quantity for' : 'Jumlah untuk' }} {{ $ticket->nama_tiket }}">
                                     <button type="button" @click="changeQuantity({{ $ticket->id_tiket }}, -1, $el)" :disabled="qty({{ $ticket->id_tiket }}) === 0" aria-label="{{ $isEnglish ? 'Reduce' : 'Kurangi' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">remove</span></button>
-                                    <output x-text="qty({{ $ticket->id_tiket }})" aria-live="polite">0</output>
-                                    <button type="button" @click="changeQuantity({{ $ticket->id_tiket }}, 1, $el)" :disabled="qty({{ $ticket->id_tiket }}) >= 10" aria-label="{{ $isEnglish ? 'Add' : 'Tambah' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">add</span></button>
-                                    <input type="hidden" name="tickets[{{ $ticket->id_tiket }}]" :value="qty({{ $ticket->id_tiket }})">
+                                    <input type="number" min="0" step="1" inputmode="numeric" name="tickets[{{ $ticket->id_tiket }}]" :value="qty({{ $ticket->id_tiket }})" @input="setQuantity({{ $ticket->id_tiket }}, $event.target.value)" aria-label="{{ $isEnglish ? 'Quantity for ' : 'Jumlah ' }}{{ $ticket->nama_tiket }}">
+                                    <button type="button" @click="changeQuantity({{ $ticket->id_tiket }}, 1, $el)" aria-label="{{ $isEnglish ? 'Add' : 'Tambah' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">add</span></button>
                                 </div>
                             </article>
                         @empty
@@ -89,17 +81,12 @@
                     </div>
                 </section>
 
-                <div class="bj-booking-assurance bj-reveal" aria-label="{{ $isEnglish ? 'Booking benefits' : 'Keuntungan pemesanan' }}">
-                    <div><span class="material-symbols-outlined" aria-hidden="true">mark_email_read</span><p><strong>{{ $isEnglish ? 'Instant confirmation' : 'Konfirmasi instan' }}</strong><small>{{ $isEnglish ? 'Sent to your email and account' : 'Dikirim ke email dan akun Anda' }}</small></p></div>
-                    <div><span class="material-symbols-outlined" aria-hidden="true">qr_code_scanner</span><p><strong>{{ $isEnglish ? 'Quick entry' : 'Masuk lebih cepat' }}</strong><small>{{ $isEnglish ? 'Scan the QR code at the entrance' : 'Pindai QR di pintu masuk' }}</small></p></div>
-                    <div><span class="material-symbols-outlined" aria-hidden="true">verified_user</span><p><strong>{{ $isEnglish ? 'Official ticket' : 'Tiket resmi' }}</strong><small>{{ $isEnglish ? 'Managed by the local team' : 'Dikelola langsung oleh tim lokal' }}</small></p></div>
-                </div>
             </div>
 
             <aside class="bj-booking-summary-wrap">
                 <div class="bj-booking-summary bj-reveal">
-                    <div class="bj-booking-summary__eyebrow"><span>{{ $isEnglish ? 'Your reservation' : 'Reservasi Anda' }}</span><small>{{ $isEnglish ? 'Step 1 of 3' : 'Langkah 1 dari 3' }}</small></div>
-                    <h2>{{ __('messages.booking_summary') }}</h2>
+                    <div class="bj-booking-summary__eyebrow"><span>{{ $isEnglish ? 'Your visit' : 'Kunjunganmu' }}</span><small>{{ $isEnglish ? 'Step 1 of 3' : 'Langkah 1 dari 3' }}</small></div>
+                    <h2>{{ $isEnglish ? 'Let’s make a plan.' : 'Rencana kunjunganmu.' }}</h2>
                     <dl class="bj-booking-summary__meta">
                         <div><dt><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ $isEnglish ? 'Location' : 'Lokasi' }}</dt><dd>Bangkiang Jaran, Gianyar</dd></div>
                         <div><dt><span class="material-symbols-outlined" aria-hidden="true">event</span>{{ $isEnglish ? 'Visit date' : 'Tanggal kunjungan' }}</dt><dd x-text="formattedDisplayDate()"></dd></div>
@@ -131,16 +118,17 @@ function ticketBooking(prices, names, initialDate, preSelectedId, initialTickets
     return {
         tglKunjungan: initialDate, tickets, prices, names, locale, submitting: false,
         qty(id) { return this.tickets[id] || 0; },
+        setQuantity(id, value) { this.tickets[id] = Math.max(0, Math.floor(Number(value) || 0)); },
         changeQuantity(id, delta, trigger) {
             const current = this.qty(id);
-            this.tickets[id] = Math.min(10, Math.max(0, current + delta));
+            this.setQuantity(id, current + delta);
             const stepper = trigger?.closest('.bj-booking-stepper');
             if (!stepper || this.tickets[id] === current) return;
             stepper.classList.remove('is-changing');
             requestAnimationFrame(() => stepper.classList.add('is-changing'));
             window.setTimeout(() => stepper.classList.remove('is-changing'), 240);
         },
-        selectedTickets() { return Object.entries(this.tickets).filter(([, quantity]) => quantity > 0).map(([id, quantity]) => ({ id: Number.parseInt(id, 10), nama: this.names[id] || 'Tiket', qty: quantity, harga: this.prices[id] || 0 })); },
+        selectedTickets() { return Object.entries(this.tickets).filter(([, quantity]) => quantity > 0).map(([id, quantity]) => ({ id: Number.parseInt(id, 10), nama: this.names[id] || 'Tiket', qty: quantity, harga: Number(this.prices[id]) || 0 })); },
         total() { return this.selectedTickets().reduce((sum, ticket) => sum + ticket.qty * ticket.harga, 0); },
         formattedDisplayDate() {
             if (!this.tglKunjungan) return '-';

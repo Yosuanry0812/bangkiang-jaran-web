@@ -115,12 +115,6 @@
                 @enderror
             </div>
 
-            {{-- Remember me --}}
-            <div class="bj-remember">
-                <input type="checkbox" id="remember_me" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                <label for="remember_me">Ingat saya</label>
-            </div>
-
             {{-- Submit --}}
             <button type="submit"
                     class="group w-full h-12 flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-body text-[14px] font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-800/25 hover:-translate-y-0.5 active:translate-y-0 mt-2">
@@ -128,6 +122,11 @@
                 <span class="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-0.5">arrow_forward</span>
             </button>
         </form>
+
+        <a href="{{ route('landing') }}"
+           class="mt-3 w-full min-h-[44px] flex items-center justify-center px-4 py-3 border border-emerald-800/20 rounded-2xl font-body text-sm text-emerald-800 hover:bg-emerald-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700">
+            {{ app()->getLocale() === 'en' ? 'Continue as guest' : 'Lanjutkan sebagai tamu' }}
+        </a>
 
         {{-- Divider --}}
         <div class="relative my-6">

@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const mainContent = document.getElementById('main-content');
+    document.querySelector('.bj-skip-link')?.addEventListener('click', event => {
+        if (!mainContent) return;
+        event.preventDefault();
+        mainContent.focus({ preventScroll: true });
+        mainContent.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+    if (location.hash === '#main-content') {
+        history.replaceState(history.state, '', location.pathname + location.search);
+    }
+
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
     const gsap = window.gsap;
     const ScrollTrigger = window.ScrollTrigger;
@@ -101,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (index === 0 && !reducedMotion.matches) heroVideo.play().catch(() => {});
                 else heroVideo.pause();
             }
-            if (gsap && slides[index]) {
+            if (gsap && slides[index] && !reducedMotion.matches) {
                 gsap.fromTo(slides[index].querySelector('img'),
                     { scale: 1.1, filter: 'brightness(.82) saturate(.9)' },
                     { scale: 1.035, filter: 'brightness(1) saturate(1)', duration: 1.1, ease: 'power2.out', overwrite: true });
@@ -167,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const motionRoot = document.querySelector('#main-content');
     if (motionRoot) {
-        const allowAutoMotion = ['high', 'medium'].includes(motionLevel);
+        const allowAutoMotion = ['high', 'medium'].includes(motionLevel) && !document.body.classList.contains('bj-marketing');
         if (allowAutoMotion) {
             motionRoot.querySelectorAll('h1, h2').forEach(heading => {
                 if (heading.closest('[data-no-motion], dialog')) return;
@@ -310,40 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reset();
     });
 
-    document.querySelectorAll('[data-bj-route-planner]').forEach(planner => {
-        const destination = '-8.511979,115.328486';
-        const map = planner.querySelector('[data-bj-route-map]');
-        const openMap = planner.querySelector('[data-route-open]');
-        const selection = planner.querySelector('[data-route-selection]');
-        const buttons = [...planner.querySelectorAll('[data-route-origin]')];
-        const updateRoute = (button, origin = button.dataset.routeOrigin) => {
-            buttons.forEach(item => {
-                const active = item === button;
-                item.classList.toggle('is-active', active);
-                item.setAttribute('aria-pressed', String(active));
-                const icon = item.querySelector('i');
-                if (icon) icon.textContent = active ? 'check' : 'radio_button_unchecked';
-            });
-            if (!origin) return;
-            if (selection) selection.textContent = button.dataset.routeLabel || origin;
-            if (map) map.src = `https://www.google.com/maps?saddr=${encodeURIComponent(origin)}&daddr=${destination}&output=embed`;
-            if (openMap) openMap.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${destination}`;
-        };
-        buttons.forEach(button => button.addEventListener('click', () => {
-            if (!button.hasAttribute('data-route-current')) {
-                updateRoute(button);
-                return;
-            }
-            if (!navigator.geolocation) return;
-            button.setAttribute('aria-busy', 'true');
-            navigator.geolocation.getCurrentPosition(position => {
-                button.removeAttribute('aria-busy');
-                updateRoute(button, `${position.coords.latitude},${position.coords.longitude}`);
-            }, () => {
-                button.removeAttribute('aria-busy');
-            }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
-        }));
-    });
+    // Route planning and permission states are handled in section-refinement.js.
 
     const galleryDialog = document.querySelector('#bj-gallery-dialog');
     if (galleryDialog && typeof galleryDialog.showModal === 'function') {
@@ -501,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const updateTicketEstimate = () => {
             const selected = choices.find(choice => choice.checked) || choices[0];
             if (!selected) return;
-            const quantity = Math.max(1, Math.min(30, Number.parseInt(quantityInput?.value || '1', 10) || 1));
+            const quantity = Math.max(1, Number.parseInt(quantityInput?.value || '1', 10) || 1);
             const price = Number.parseInt(selected.dataset.price || '0', 10) || 0;
             if (quantityInput && quantityInput.value !== String(quantity)) quantityInput.value = String(quantity);
             if (totalOutput) totalOutput.textContent = currency.format(price * quantity).replace(/\s/g, ' ');
@@ -529,7 +507,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const heroTitleWords = [...document.querySelectorAll('.bj-home-title .bj-word > span')];
     const heroTimeline = document.querySelector('.bj-home-hero__copy');
-    if (heroTimeline && motionLevel === 'high') {
+    if (heroTimeline && motionLevel === 'high' && document.body.classList.contains('bj-nature')) {
+        gsap.from(heroTimeline, { y: 14, duration: .5, ease: 'power2.out', clearProps: 'transform' });
+    }
+    if (heroTimeline && motionLevel === 'high' && !document.body.classList.contains('bj-nature')) {
         const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
         timeline
             .from('.bj-home-hero__copy .bj-home-kicker', { autoAlpha: 0, y: 16, duration: .65 })
@@ -541,7 +522,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 stagger: .085,
             }, '-=.34')
             .from('.bj-home-hero__lead', { autoAlpha: 0, y: 20, duration: .7 }, '-=.52')
-            .from('.bj-home-hero__actions > *', { autoAlpha: 0, y: 16, duration: .62, stagger: .1 }, '-=.4')
+            .from('.bj-home-hero__actions > *', {
+                autoAlpha: document.body.classList.contains('bj-marketing') ? 1 : 0,
+                y: document.body.classList.contains('bj-marketing') ? 0 : 16,
+                duration: .62,
+                stagger: .1,
+            }, '-=.4')
             .from('.bj-home-hero__bottom, .bj-home-hero__scroll', { autoAlpha: 0, duration: .55, stagger: .08 }, '-=.28');
     }
 

@@ -25,7 +25,7 @@ class PemesananOfflineController extends Controller
         $request->validate([
             'tgl_kunjungan' => ['required', 'date'],
             'tickets'       => ['required', 'array', 'min:1'],
-            'tickets.*'     => ['integer', 'min:0', 'max:100'],
+            'tickets.*'     => ['integer', 'min:0'],
         ], [
             'tgl_kunjungan.required' => 'Tanggal kunjungan wajib diisi.',
             'tickets.required'       => 'Pilih minimal satu tiket.',

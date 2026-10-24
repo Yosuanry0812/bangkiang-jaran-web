@@ -19,17 +19,9 @@
     }
 </style>
 
-<div class="min-h-screen pt-28 pb-16 px-gutter bg-[#F8F7F5]">
+<div class="min-h-screen pt-28 pb-16 px-gutter bg-[#F8F7F5]" data-booking-watch="{{ route('wisatawan.pemesanan.status', $pemesanan->id_pemesanan) }}" data-status-token="{{ $pemesanan->statusToken() }}">
     <div class="max-w-2xl mx-auto">
 
-        {{-- Breadcrumb --}}
-        <div class="mb-6 no-print" data-aos="fade-up">
-            <nav class="flex items-center gap-2 text-xs text-stone font-sans">
-                <a href="{{ route('wisatawan.pemesanan.riwayat') }}" class="hover:text-forest transition-colors">{{ __('messages.history') }}</a>
-                <span class="material-symbols-outlined text-sm text-pebble">chevron_right</span>
-                <span class="text-forest font-medium">E-Ticket</span>
-            </nav>
-        </div>
 
         {{-- Order info header --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6" data-aos="fade-up">
@@ -40,22 +32,7 @@
                 </div>
                 <div class="text-right">
                     <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">{{ __('messages.th_status') }}</p>
-                    @php
-                        $statusClass = match($pemesanan->status) {
-                            'selesai' => 'bg-green-500',
-                            'pending' => 'bg-amber-500',
-                            'dibatalkan' => 'bg-red-500',
-                            default => 'bg-gray-400',
-                        };
-                        $statusLabel = match($pemesanan->status) {
-                            'selesai' => __('messages.status_lunas'),
-                            'pending' => __('messages.status_pending'),
-                            'diproses' => __('messages.status_diproses'),
-                            'dibatalkan' => __('messages.status_dibatalkan'),
-                            default => ucfirst($pemesanan->status),
-                        };
-                    @endphp
-                    <span class="inline-block {{ $statusClass }} text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">{{ $statusLabel }}</span>
+                    @include('partials.booking-status', ['booking' => $pemesanan])
                 </div>
             </div>
             <div class="px-5 py-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-stone font-sans">

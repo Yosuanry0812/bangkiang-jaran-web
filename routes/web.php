@@ -13,6 +13,7 @@ use App\Http\Controllers\Pengelola\LaporanController;
 use App\Http\Controllers\Pengelola\UserController;
 use App\Http\Controllers\Pengelola\ScanController;
 use App\Http\Controllers\Pengelola\PemesananOfflineController;
+use App\Http\Middleware\RedirectPengelolaFromPublicPages;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,13 +22,15 @@ use App\Http\Controllers\Pengelola\PemesananOfflineController;
 */
 
 // ========== PUBLIC ROUTES ==========
-Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::get('/restoran', [LandingController::class, 'restoran'])->name('restoran');
-Route::get('/informasi', function () {
-    return redirect()->route('landing');
-})->name('informasi');
-Route::get('/tiket', [WisatawanTiketController::class, 'index'])->name('tiket.index');
-Route::get('/tiket/{id}', [WisatawanTiketController::class, 'detail'])->name('tiket.detail');
+Route::middleware(RedirectPengelolaFromPublicPages::class)->group(function () {
+    Route::get('/', [LandingController::class, 'index'])->name('landing');
+    Route::get('/restoran', [LandingController::class, 'restoran'])->name('restoran');
+    Route::get('/informasi', function () {
+        return redirect()->route('landing');
+    })->name('informasi');
+    Route::get('/tiket', [WisatawanTiketController::class, 'index'])->name('tiket.index');
+    Route::get('/tiket/{id}', [WisatawanTiketController::class, 'detail'])->name('tiket.detail');
+});
 Route::get('/tiket/verifikasi/{kode}', [WisatawanTiketController::class, 'verifikasi'])->name('tiket.verifikasi');
 
 use App\Http\Controllers\AuthController;
@@ -45,6 +48,8 @@ Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisata
     Route::post('/pemesanan/data-diri', [PemesananController::class, 'storeDataDiri'])->name('pemesanan.store-data-diri');
     Route::get('/pemesanan/sukses/{id}', [PemesananController::class, 'sukses'])->name('pemesanan.sukses');
     Route::get('/pemesanan/riwayat', [PemesananController::class, 'riwayat'])->name('pemesanan.riwayat');
+    Route::get('/pemesanan/status', [PemesananController::class, 'statuses'])->name('pemesanan.statuses');
+    Route::get('/pemesanan/{id}/status', [PemesananController::class, 'status'])->name('pemesanan.status');
     Route::get('/pemesanan/{id}', [PemesananController::class, 'detailPemesanan'])->name('pemesanan.detail');
 
     // Pembayaran
@@ -132,5 +137,5 @@ Route::middleware('auth')->get('/redirect-after-login', function () {
     if (auth()->user()->role === 'pengelola') {
         return redirect()->route('pengelola.dashboard');
     }
-    return redirect()->route('landing');
+    return redirect()->intended(route('landing'));
 })->name('redirect.after.login');

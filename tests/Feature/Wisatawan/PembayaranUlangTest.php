@@ -80,7 +80,7 @@ class PembayaranUlangTest extends TestCase
         $this->actingAs($user)
             ->get(route('wisatawan.pembayaran.create', $booking->id_pemesanan))
             ->assertOk()
-            ->assertSee('Belum ada rekening resmi yang dipublikasikan');
+            ->assertSee('Metode pembayaran belum tersedia.');
 
         $this->actingAs($user)
             ->post(route('wisatawan.pembayaran.store', $booking->id_pemesanan), [

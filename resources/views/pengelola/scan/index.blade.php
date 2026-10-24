@@ -1,14 +1,15 @@
 @extends('pengelola.layouts.admin')
 @section('title', 'Scan Tiket')
+@section('page_title', 'Scan Tiket')
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <header class="admin-page-head">
         <div>
             <h1 class="font-heading text-2xl font-bold text-gray-800">Scan Tiket</h1>
-            <p class="text-sm text-gray-500 mt-0.5">Scan atau masukkan kode tiket pengunjung</p>
+            <p>Validasi tiket, catat pengunjung masuk, dan konfirmasi kepulangan.</p>
         </div>
-    </div>
+    </header>
 
     {{-- Alerts — ditampilkan via SweetAlert2 popup di JS --}}
     @if(session('success'))
@@ -19,11 +20,11 @@
     @endif
 
     {{-- Search form --}}
-    <div class="bg-white rounded-2xl shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
-            <p class="font-sans text-sm font-medium text-gray-800">Masukkan Kode Tiket</p>
+    <section class="admin-panel admin-scanner">
+        <div class="admin-scanner-intro">
+            <h2>Periksa tiket pengunjung</h2>
             <button type="button" id="toggle-camera"
-                    class="text-xs text-emerald-600 hover:text-emerald-700 font-medium inline-flex items-center gap-1.5 transition-colors">
+                    class="admin-btn admin-btn--quiet">
                 <span class="material-symbols-outlined text-sm">videocam</span>
                 <span id="toggle-label">Scan via Kamera</span>
             </button>
@@ -31,8 +32,9 @@
 
         {{-- Manual input --}}
         <div id="manual-input">
-            <form method="POST" action="{{ route('pengelola.scan.cari') }}" id="form-scan" autocomplete="off">
+            <form method="POST" action="{{ route('pengelola.scan.cari') }}" id="form-scan" class="admin-scan-form" autocomplete="off">
                 @csrf
+                <label for="input-kode">Kode tiket</label>
                 <div class="flex items-center gap-3">
                     <div class="relative flex-1">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -43,13 +45,15 @@
                                id="input-kode"
                                value="{{ old('kode', $detail->kode_tiket ?? '') }}"
                                placeholder="Scan atau ketik kode tiket..."
-                               autofocus
+                               required
+                               spellcheck="false"
+                               autocapitalize="characters"
                                class="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-sm font-mono font-bold tracking-wider text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-white">
                     </div>
                     <button type="submit"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all whitespace-nowrap">
+                            class="admin-btn">
                         <span class="material-symbols-outlined text-base">search</span>
-                        Cari
+                        Periksa tiket
                     </button>
                 </div>
                 <p class="font-sans text-xs text-gray-400 mt-2">Gunakan scanner barcode fisik atau ketik manual kode tiket</p>
@@ -65,7 +69,7 @@
                 <p class="font-mono text-sm font-bold text-emerald-800 tracking-wider" id="qr-result-code"></p>
             </div>
         </div>
-    </div>
+    </section>
 
     {{-- Result --}}
     @if(isset($detail))
@@ -74,7 +78,7 @@
         <div class="lg:col-span-2">
             <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
                 {{-- Header status --}}
-                <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <div class="admin-scan-result-head px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center
                             @if($bukanHariIni || $belumLunas || $pemesananDibatalkan) bg-red-100 text-red-600
@@ -242,12 +246,9 @@
     </div>
     @else
     {{-- Empty state --}}
-    <div class="bg-white rounded-2xl shadow-sm p-12 text-center" data-aos="fade-up">
-        <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gray-50 flex items-center justify-center">
-            <span class="material-symbols-outlined text-gray-300" style="font-size:48px;">qr_code_scanner</span>
-        </div>
-        <h3 class="font-sans text-base font-semibold text-gray-700 mb-1">Belum ada scan</h3>
-        <p class="font-sans text-sm text-gray-400 max-w-xs mx-auto">Scan QR code pada tiket pengunjung atau masukkan kode tiket manual untuk verifikasi.</p>
+    <div class="admin-scan-guide">
+        <span class="material-symbols-outlined" aria-hidden="true">qr_code_scanner</span>
+        <div><h3>Siap menerima pengunjung</h3><p>Pindai QR dengan kamera atau scanner fisik, atau ketik kode tiket di atas. Periksa hasil validasi sebelum mengonfirmasi masuk.</p><p>Tiket harus sesuai tanggal kunjungan dan pembayarannya sudah diverifikasi.</p></div>
     </div>
     @endif
 
@@ -390,7 +391,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById('input-kode');
-        if (input) input.focus();
+        if (input && matchMedia('(min-width: 1024px) and (pointer: fine)').matches) input.focus({ preventScroll: true });
 
         @if(isset($detail))
         if (input) input.select();

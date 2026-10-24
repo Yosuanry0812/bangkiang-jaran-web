@@ -43,6 +43,16 @@ class Pemesanan extends Model
         return $this->hasOne(Pembayaran::class, 'id_pemesanan');
     }
 
+    public function isApproved(): bool
+    {
+        return $this->status === 'selesai' && $this->pembayaran?->status === 'valid';
+    }
+
+    public function statusToken(): string
+    {
+        return $this->status . '|' . ($this->pembayaran?->status ?? 'none');
+    }
+
     public function detailPemesanan()
     {
         return $this->hasMany(DetailPemesanan::class, 'id_pemesanan', 'id_pemesanan');

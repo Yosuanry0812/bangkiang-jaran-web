@@ -42,7 +42,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('pengelola.dashboard');
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->route('redirect.after.login');
     }
 
     public function destroy(Request $request): RedirectResponse

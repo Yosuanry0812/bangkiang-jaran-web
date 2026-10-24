@@ -562,7 +562,7 @@ VITE_PUSHER_*                  # optional
 
 ```bash
 # 1. Clone
-git clone https://github.com/anomali0812/bangkiang-jaran-web.git
+git clone https://github.com/Yosuanry0812/bangkiang-jaran-web.git
 cd bangkiang-jaran-web
 
 # 2. Dependencies

@@ -132,8 +132,8 @@
                 </div>
 
                 {{-- Step 2: Upload --}}
-                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden opacity-50 pointer-events-none transition-all" id="panel-step-2" inert>
-                    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100" id="step-2-header" style="background:#6B6B6B;">
+                <div class="bj-payment-panel bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all" id="panel-step-2">
+                    <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-100" id="step-2-header" style="background:#1B3A2D;">
                         <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
                         <h2 class="font-serif text-lg text-white">{{ __('messages.upload_payment') }}</h2>
                     </div>
@@ -159,9 +159,13 @@
 
                             <div class="bj-payment-file-field">
                                 <label for="bukti_bayar">{{ app()->getLocale() === 'en' ? 'Choose payment proof' : 'Pilih bukti pembayaran' }}</label>
-                                <input type="file" name="bukti_bayar" id="bukti_bayar" aria-describedby="payment-file-help"
-                                       accept="image/jpeg,image/jpg,image/png,application/pdf" required
-                                       class="font-sans">
+                                <div class="bj-payment-file-picker">
+                                    <span class="bj-payment-file-picker__button" aria-hidden="true">{{ app()->getLocale() === 'en' ? 'Choose File' : 'Pilih File' }}</span>
+                                    <span id="payment-selected-file" class="bj-payment-file-picker__name" aria-hidden="true">{{ app()->getLocale() === 'en' ? 'No file selected' : 'Belum ada file dipilih' }}</span>
+                                    <input type="file" name="bukti_bayar" id="bukti_bayar" aria-describedby="payment-file-help"
+                                           accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" required
+                                           class="font-sans bj-payment-file-input">
+                                </div>
                                 <p id="payment-file-help">{{ app()->getLocale() === 'en' ? 'Select a JPG, PNG, or PDF from your device. Maximum size: 5 MB.' : 'Pilih JPG, PNG, atau PDF dari perangkat Anda. Ukuran maksimal: 5 MB.' }}</p>
                             </div>
 
@@ -256,7 +260,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" id="submit-btn"
+                            <button type="submit" id="submit-btn" disabled
                                     class="bj-payment-submit w-full flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                                 <span class="material-symbols-outlined text-sm">send</span>
                                 {{ __('messages.submit_payment_proof') }}
@@ -373,9 +377,8 @@
 
         if (activeMetode === id) {
             activeMetode = null;
-            const uploadPanel = document.getElementById('panel-step-2');
-            uploadPanel?.setAttribute('inert', '');
-            uploadPanel?.classList.add('opacity-50', 'pointer-events-none');
+            document.getElementById('selected-method-badge')?.classList.add('hidden');
+            document.getElementById('selected-method-badge')?.classList.remove('flex');
             document.getElementById('input-metode').value = '';
             updateLanjutkanBtn();
             return;
@@ -414,6 +417,8 @@
     }
 
     function updateLanjutkanBtn() {
+        const submitBtn = document.getElementById('submit-btn');
+        if (submitBtn) submitBtn.disabled = !activeMetode;
         const btn = document.getElementById('btn-lanjutkan');
         if (!btn) return;
         if (activeMetode) {
@@ -433,8 +438,6 @@
             const header2 = document.getElementById('step-2-header');
             const step1 = document.getElementById('step-1-indicator');
             const step2 = document.getElementById('step-2-indicator');
-            panel2.classList.remove('opacity-50', 'pointer-events-none');
-            panel2.removeAttribute('inert');
             header2.style.background = '#1B3A2D';
             const c2 = document.getElementById('step-2-circle');
             const l2 = document.getElementById('step-2-label');
@@ -471,6 +474,14 @@
     const MAX_SIZE_MB   = 5;
     const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
 
+    const selectedFileLabel = document.getElementById('payment-selected-file');
+    const emptyFileLabel = selectedFileLabel?.textContent;
+
+    // The primary picker receives native clicks directly, without interception.
+    function changePaymentFile() {
+        fileInput?.click();
+    }
+
     function formatFileSize(bytes) {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -486,6 +497,7 @@
 
     function resetUpload() {
         fileInput.value = '';
+        if (selectedFileLabel) selectedFileLabel.textContent = emptyFileLabel;
         if (previewImg) previewImg.removeAttribute('src');
         if (imgWrapper) imgWrapper.style.display = 'none';
         if (pdfWrapper) { pdfWrapper.classList.add('hidden'); pdfWrapper.classList.remove('flex'); }
@@ -500,14 +512,18 @@
         if (errorMsg)   errorMsg.textContent   = message;
         showState('error');
         fileInput.value = '';
+        if (selectedFileLabel) selectedFileLabel.textContent = emptyFileLabel;
     }
 
     function handleFiles(files) {
         if (!files || files.length === 0) { resetUpload(); return; }
         const file = files[0];
 
-        // Validate type
-        if (!ALLOWED_TYPES.includes(file.type)) {
+        // Some device file providers return an empty MIME type.
+        const fileType = file.type || (/\.jpe?g$/i.test(file.name) ? 'image/jpeg'
+            : /\.png$/i.test(file.name) ? 'image/png'
+            : /\.pdf$/i.test(file.name) ? 'application/pdf' : '');
+        if (!ALLOWED_TYPES.includes(fileType)) {
             showError('{{ __('messages.err_format') }}', '{{ __('messages.err_format_desc') }}');
             return;
         }
@@ -518,6 +534,7 @@
         }
 
         showState('loading');
+        if (selectedFileLabel) selectedFileLabel.textContent = file.name;
 
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -526,7 +543,7 @@
             if (fileNameEl) fileNameEl.textContent = file.name;
             if (fileSizeEl) fileSizeEl.textContent  = formatFileSize(file.size);
 
-            if (file.type.startsWith('image/')) {
+            if (fileType.startsWith('image/')) {
                 // Image preview — full-bleed
                 previewImg.src = e.target.result;
                 if (imgWrapper) imgWrapper.style.display = '';
@@ -552,20 +569,20 @@
     if (changeBtn) {
         changeBtn.addEventListener('click', e => {
             e.stopPropagation();
-            fileInput.click();
+            changePaymentFile();
         });
     }
     if (removeBtn) {
         removeBtn.addEventListener('click', e => { e.stopPropagation(); resetUpload(); });
     }
     if (retryBtn) {
-        retryBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+        retryBtn.addEventListener('click', e => { e.stopPropagation(); changePaymentFile(); });
     }
     // PDF action buttons
     if (changePdfBtn) {
         changePdfBtn.addEventListener('click', e => {
             e.stopPropagation();
-            fileInput.click();
+            changePaymentFile();
         });
     }
     if (removePdfBtn) {

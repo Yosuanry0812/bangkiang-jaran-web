@@ -64,6 +64,9 @@ graphify-out/
 /doc/
 /docs/REDESIGN_HANDOFF.md
 /docs/antislop.md
+/docs/redesign/
+/composer.phar
+/check_users.php
 
 # Local databases, exports, and temporary/test artifacts.
 *.sql

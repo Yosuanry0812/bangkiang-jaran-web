@@ -33,6 +33,9 @@ class GoogleLoginTest extends TestCase
         $this->assertNull($user->password);
         $this->assertNotNull($user->email_verified_at);
         $this->assertSame('wisatawan', $user->role);
+        $this->assertSame('google', $user->registration_method);
+        $this->assertSame('google', $user->email_verification_method);
+        $this->assertStringStartsWith('pengunjung_', $user->username);
         $this->assertAuthenticatedAs($user);
         $this->assertSame(1, $user->login_count);
         $this->assertSame((string) $user->id, session(EnsureExplicitLogin::SESSION_KEY));
@@ -56,7 +59,10 @@ class GoogleLoginTest extends TestCase
         $bookingUrl = route('wisatawan.pemesanan.create', ['id_tiket' => 1]);
         $this->googleUser('booking@example.com');
         $this->withSession(['url.intended' => $bookingUrl])->get('/auth/google/callback')
-            ->assertRedirect(route('redirect.after.login'));
+            ->assertRedirect(route('profile.edit'));
+
+        $this->patch('/profile', ['username' => 'liburan_bali'])->assertSessionHasNoErrors();
+        $this->assertSame('liburan_bali', User::firstOrFail()->username);
 
         \Illuminate\Support\Facades\Auth::forgetGuards();
         $this->get('/redirect-after-login')->assertRedirect($bookingUrl);
@@ -70,6 +76,18 @@ class GoogleLoginTest extends TestCase
         $this->get('/auth/google/callback')->assertRedirect('/login')->assertSessionHas('error');
         $this->assertNull($user->fresh()->google_id);
         $this->assertGuest();
+    }
+
+    public function test_custom_username_survives_subsequent_google_login(): void
+    {
+        $this->googleUser('google@example.com');
+        $this->get('/auth/google/callback')->assertRedirect('/profile');
+        $this->patch('/profile', ['username' => 'air_terjun.bali'])->assertSessionHasNoErrors();
+        $this->post('/logout');
+        \Illuminate\Support\Facades\Auth::forgetGuards();
+        $this->googleUser('google@example.com');
+        $this->get('/auth/google/callback')->assertRedirect(route('redirect.after.login'));
+        $this->assertSame('air_terjun.bali', User::firstOrFail()->username);
     }
 
     public function test_callback_without_oauth_state_is_rejected(): void

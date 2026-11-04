@@ -70,6 +70,7 @@ graphify-out/
 
 # Local databases, exports, and temporary/test artifacts.
 *.sql
+!database/bangkiang_jaran.sql
 *.sqlite
 *.sqlite-*
 *.sqlite3

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ActivityLogger;
 use App\Models\User;
+use App\Services\RegistrationOtp;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -26,7 +28,7 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (\Exception $e) {
-            Log::warning('Google login gagal: ' . $e->getMessage());
+            Log::warning('Google login gagal.', ['exception_type' => get_class($e)]);
 
             return redirect()->route('login')
                 ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
@@ -49,6 +51,7 @@ class AuthController extends Controller
                 ->with('error', 'Email ini sudah terdaftar atau berubah. Silakan masuk dengan akun yang sudah ada atau hubungi admin.');
         }
 
+        $isNewUser = !$user;
         if ($user) {
             $user->update([
                 'last_login_at' => now(),
@@ -58,7 +61,7 @@ class AuthController extends Controller
         } else {
             $user = User::create([
                 'name' => $googleUser->getName() ?: $email,
-                'username' => $this->uniqueUsername($email),
+                'username' => $this->uniqueUsername(),
                 'email' => $email,
                 'google_id' => $googleId,
                 'role' => 'wisatawan',
@@ -66,24 +69,30 @@ class AuthController extends Controller
                 'last_login_method' => 'google',
                 'login_count' => 1,
             ]);
-            $user->forceFill(['email_verified_at' => now()])->save();
         }
+
+        $user->forceFill([
+            'registration_method' => 'google',
+            'email_verified_at' => $user->email_verified_at ?? now(),
+            'email_verification_method' => 'google',
+        ])->save();
+        app(RegistrationOtp::class)->cancel($request);
 
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('redirect.after.login');
+        ActivityLogger::log('Login sukses', 'Login via Google sebagai ' . $user->email, $user->id);
+
+        return $isNewUser
+            ? redirect()->route('profile.edit')->with('status', 'google-registered')
+            : redirect()->route('redirect.after.login');
     }
 
-    private function uniqueUsername(string $email): string
+    private function uniqueUsername(): string
     {
-        $base = substr(preg_replace('/[^a-zA-Z0-9_.-]/', '', Str::before($email, '@')), 0, 40) ?: 'pengunjung';
-        $username = $base;
-        $suffix = 1;
-        while (User::where('username', $username)->exists()) {
-            $username = substr($base, 0, 50 - strlen((string) $suffix)) . $suffix;
-            $suffix++;
-        }
+        do {
+            $username = 'pengunjung_'.Str::lower(Str::random(10));
+        } while (User::where('username', $username)->exists());
 
         return $username;
     }

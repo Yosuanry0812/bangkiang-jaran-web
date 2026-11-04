@@ -131,4 +131,50 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+    public function test_google_username_is_editable_but_must_be_unique_and_valid(): void
+    {
+        $user = User::factory()->create(['google_id' => 'google-profile', 'registration_method' => 'google', 'email_verification_method' => 'google']);
+        $other = User::factory()->create(['username' => 'taken']);
+        $this->actingAs($user)->patch('/profile', ['username' => 'pilihan_baru'])
+            ->assertSessionHasNoErrors()->assertRedirect('/profile');
+        $this->assertSame('pilihan_baru', $user->fresh()->username);
+        foreach (['taken', 'invalid name', 'invalid@name', '', str_repeat('a', 51)] as $username) {
+            $this->patch('/profile', ['username' => $username])->assertSessionHasErrors('username');
+        }
+        $this->assertSame('google', $user->fresh()->registration_method);
+        $this->assertSame('google-profile', $user->google_id);
+    }
+
+    public function test_google_and_otp_verified_emails_cannot_be_replaced_without_verification(): void
+    {
+        foreach (['google', 'otp'] as $method) {
+            $user = User::factory()->create([
+                'google_id' => $method === 'google' ? 'google-email' : null,
+                'email_verification_method' => $method,
+            ]);
+            $this->actingAs($user)->patch('/profile', ['email' => 'replacement@example.com'])
+                ->assertSessionHasErrors('email');
+            $this->assertSame($method, $user->fresh()->email_verification_method);
+            $this->assertNotNull($user->email_verified_at);
+        }
+    }
+
+    public function test_google_account_origin_does_not_change_after_password_login(): void
+    {
+        $user = User::factory()->create([
+            'google_id' => 'google-password', 'registration_method' => 'google', 'email_verification_method' => 'google',
+        ]);
+        $this->actingAs($user)->post('/profile/set-password', [
+            'password' => 'MyNewPassword123', 'password_confirmation' => 'MyNewPassword123',
+        ])->assertSessionHasNoErrors();
+        $this->post('/logout');
+        \Illuminate\Support\Facades\Auth::forgetGuards();
+        $this->post('/login', ['login' => $user->username, 'password' => 'MyNewPassword123'])->assertSessionHasNoErrors();
+        $this->assertAuthenticatedAs($user);
+        $user->refresh();
+        $this->assertSame('google', $user->registration_method);
+        $this->assertSame('manual', $user->last_login_method);
+        $this->assertSame('google', $user->email_verification_method);
+    }
 }

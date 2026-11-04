@@ -13,18 +13,20 @@
     <div class="admin-table-wrap">
     <table class="admin-table admin-table--responsive">
         <caption class="sr-only">Daftar akun wisatawan</caption>
-        <thead><tr><th scope="col">Pengguna</th><th scope="col">Email</th><th scope="col">Nomor telepon</th><th scope="col">Bergabung</th><th scope="col">Pemesanan</th></tr></thead>
+        <thead><tr><th scope="col">Pengguna</th><th scope="col">Email</th><th scope="col">Pendaftaran</th><th scope="col">Verifikasi email</th><th scope="col">Nomor telepon</th><th scope="col">Bergabung</th><th scope="col">Pemesanan</th></tr></thead>
         <tbody>
         @forelse($users as $u)
         <tr>
             <td data-label="Pengguna"><div class="admin-person"><span class="admin-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($u->name, 0, 1)) }}</span><div><strong>{{ $u->name }}</strong><small>{{ '@' . $u->username }}</small></div></div></td>
             <td data-label="Email">{{ $u->email }}</td>
+            <td data-label="Pendaftaran">{{ $u->registrationMethodLabel() }}</td>
+            <td data-label="Verifikasi email">{{ $u->emailVerificationLabel() }}</td>
             <td data-label="Nomor telepon">{{ $u->phone ?: '-' }}</td>
             <td data-label="Bergabung">{{ $u->created_at?->format('d M Y') ?? '-' }}</td>
             <td data-label="Pemesanan"><span class="admin-count">{{ $u->pemesanan_count ?? 0 }}</span></td>
         </tr>
         @empty
-        <tr><td colspan="5"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">person_search</span><h3>{{ request('search') ? 'Pengguna tidak ditemukan' : __('messages.no_users') }}</h3><p>{{ request('search') ? 'Coba nama, username, atau email yang lain.' : 'Akun wisatawan akan muncul setelah melakukan pendaftaran.' }}</p></div></td></tr>
+        <tr><td colspan="7"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">person_search</span><h3>{{ request('search') ? 'Pengguna tidak ditemukan' : __('messages.no_users') }}</h3><p>{{ request('search') ? 'Coba nama, username, atau email yang lain.' : 'Akun wisatawan akan muncul setelah melakukan pendaftaran.' }}</p></div></td></tr>
         @endforelse
         </tbody>
     </table>

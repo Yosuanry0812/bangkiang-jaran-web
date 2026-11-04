@@ -54,6 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->dontFlash(['otp']);
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e) {
             return redirect('/')->with('error', 'Sesi telah berakhir, silakan login kembali.');
         });

@@ -45,23 +45,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        DB::table('users')->updateOrInsert(
-            ['email' => 'yosuanry66@gmail.com'],
-            [
-                'name'              => 'Yosuanry Simbolon (2301020122_yosuanry)',
-                'username'          => 'yosuanry66',
-                'google_id'         => '114819912863405494772',
-                'role'              => 'wisatawan',
-                'email_verified_at' => now(),
-                'password'          => null,
-                'last_login_at'     => now()->subDays(3),
-                'last_login_method' => 'google',
-                'login_count'       => 2,
-                'created_at'        => now()->subDays(13),
-                'updated_at'        => now(),
-            ]
-        );
-
         // ========== TIKET ==========
         $tikets = [
             ['nama_tiket' => 'Tiket Dewasa',                  'nama_tiket_en' => 'Adult Admission',       'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif'],
@@ -119,7 +102,7 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // ========== DATA DEMO 12 PEMESANAN + PEMBAYARAN ==========
-        $this->call(DemoDataSeeder::class);
+        // ========== DATA DEMO 12 PEMESANAN + PEMBAYARAN (OPSIONAL) ==========
+        // $this->call(DemoDataSeeder::class);
     }
 }

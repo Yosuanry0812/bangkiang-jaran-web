@@ -1,891 +1,1171 @@
 # E-Tourism Bangkiang Jaran Waterfall
 
-> Sistem pemesanan tiket online + promosi wisata untuk **Bangkiang Jaran Waterfall**, Desa Bakbakan, Gianyar, Bali. Dua role: **Wisatawan** (publik) & **Pengelola** (admin). Build dengan Laravel + Blade + Tailwind + Alpine, Vite, MySQL.
+Panduan lengkap penggunaan dan pengembangan website promosi wisata serta pemesanan tiket Bangkiang Jaran, Desa Bakbakan, Gianyar, Bali. Terdapat dua peran akun: **wisatawan** dan **pengelola**. Pengunjung tanpa akun dapat membaca halaman publik sebagai **tamu**.
 
-![Laravel](https://img.shields.io/badge/Laravel-13-red) ![PHP](https://img.shields.io/badge/PHP-8.3-777BB4) ![Tailwind](https://img.shields.io/badge/Tailwind-3.1-38BDF8) ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1) ![Docker](https://img.shields.io/badge/Docker-ready-2496ED)
+**Verifikasi: 4 November 2026.** Dokumentasi mengikuti source lokal, pengujian HTTP Laravel dengan SQLite in-memory, dan pemeriksaan browser aplikasi lokal. Hasil lokal tidak membuktikan kondisi deployment produksi. Fitur yang tersedia, yang membutuhkan konfigurasi, dan yang belum diuji pada layanan/perangkat nyata dibedakan di bawah.
 
----
+**Gambar dan video dokumentasi seluruh halaman serta fitur akan ditambahkan nanti.** Daftar pada [rencana media](#14-rencana-gambar-dan-video) bukan tautan ke rekaman atau tangkapan layar baru yang sudah tersedia.
 
-## Daftar Isi
+## Daftar isi
 
-1. [Ringkasan & Tujuan](#1-ringkasan--tujuan)
-2. [Demo & Akun](#2-demo--akun)
-3. [Tech Stack Lengkap](#3-tech-stack-lengkap)
-4. [Arsitektur & Alur Sistem](#4-arsitektur--alur-sistem)
-5. [Skema Database](#5-skema-database)
-6. [Fitur Lengkap per Role](#6-fitur-lengkap-per-role)
-7. [Routing Lengkap](#7-routing-lengkap)
-8. [Desain System — Tropical Sanctuary](#8-desain-system--tropical-sanctuary)
-9. [Struktur Direktori](#9-struktur-direktori)
-10. [Konfigurasi Environment](#10-konfigurasi-environment)
-11. [Instalasi Lokal](#11-instalasi-lokal)
-12. [Docker](#12-docker)
-13. [Menjalankan Demo & Ngrok HTTPS](#13-menjalankan-demo--ngrok-https)
-14. [Internasionalisasi (i18n)](#14-internasionalisasi-i18n)
-15. [Email & Notifikasi](#15-email--notifikasi)
-16. [Pemesanan → Pembayaran → Verifikasi → E-Ticket](#16-pemesanan--pembayaran--verifikasi--e-ticket)
-17. [Scan Tiket (Check-in / Check-out)](#17-scan-tiket-check-in--check-out)
-18. [Keamanan](#18-keamanan)
-19. [Backup, Log & Maintenance](#19-backup-log--maintenance)
-20. [Testing & QA](#20-testing--qa)
-21. [Checklist Deploy Production](#21-checklist-deploy-production)
-22. [Troubleshooting](#22-troubleshooting)
-23. [Panduan Penerus — Ubah Apa di Mana](#23-panduan-penerus--ubah-apa-di-mana)
-24. [Lisensi](#24-lisensi)
+1. [Gambaran sistem dan istilah](#1-gambaran-sistem-dan-istilah)
+2. [Mulai sebagai tamu dan halaman publik](#2-mulai-sebagai-tamu-dan-halaman-publik)
+3. [Buat akun melalui email dan OTP](#3-buat-akun-melalui-email-dan-otp)
+4. [Login email atau username](#4-login-email-atau-username)
+5. [Daftar dan login dengan Google](#5-daftar-dan-login-dengan-google)
+6. [Lupa password, profil, dan logout](#6-lupa-password-profil-dan-logout)
+7. [Pemesanan tiket online dari awal](#7-pemesanan-tiket-online-dari-awal)
+8. [Pembayaran, penolakan, dan unggah ulang](#8-pembayaran-penolakan-dan-unggah-ulang)
+9. [Riwayat, e-ticket, dan status transaksi](#9-riwayat-e-ticket-dan-status-transaksi)
+10. [Verifikasi publik dan pintu masuk](#10-verifikasi-publik-dan-pintu-masuk)
+11. [Pemesanan offline oleh pengelola](#11-pemesanan-offline-oleh-pengelola)
+12. [Seluruh menu pengelola](#12-seluruh-menu-pengelola)
+13. [Bahasa, email, dan pembaruan status](#13-bahasa-email-dan-pembaruan-status)
+14. [Rencana gambar dan video](#14-rencana-gambar-dan-video)
+15. [Teknologi dan cara kerja sistem](#15-teknologi-dan-cara-kerja-sistem)
+16. [Database dan penyimpanan berkas](#16-database-dan-penyimpanan-berkas)
+17. [Peta halaman dan endpoint](#17-peta-halaman-dan-endpoint)
+18. [Instalasi dan menjalankan secara lokal](#18-instalasi-dan-menjalankan-secara-lokal)
+19. [Konfigurasi layanan dan lingkungan](#19-konfigurasi-layanan-dan-lingkungan)
+20. [Pengujian otomatis dan bukti verifikasi](#20-pengujian-otomatis-dan-bukti-verifikasi)
+21. [Pemeliharaan dan operasional](#21-pemeliharaan-dan-operasional)
+22. [Pemecahan masalah](#22-pemecahan-masalah)
+23. [Batas fitur dan pekerjaan lanjutan](#23-batas-fitur-dan-pekerjaan-lanjutan)
+24. [Peta berkas untuk pengembang](#24-peta-berkas-untuk-pengembang)
 
----
+## 1. Gambaran sistem dan istilah
 
-## 1. Ringkasan & Tujuan
+Website menghubungkan promosi destinasi, transaksi tiket, dan pemeriksaan kunjungan. Alur online utama:
 
-Website melakukan dua fungsi utama:
-
-- **Promosi**: landing editorial premium, galeri foto, informasi sejarah & fasilitas, lokasi (Google Maps embed), halaman Restoran "Kepulauan Rasa", daftar tiket.
-- **Transaksi**: wisatawan pilih tiket → isi data pengunjung per orang → bayar (transfer/QRIS) → upload bukti → pengelola verifikasi → e-ticket per orang dengan `kode_tiket` unik + QR → scan di pintu masuk (check-in / check-out). Pengelola kelola tiket, galeri, laporan, user, dan entri offline.
-
-Prinsip: **mobile-first, SEO-friendly Blade SSR, no SPA overhead, transaksi aman dengan lock & idempotency**.
-
----
-
-## 2. Demo & Akun
-
-### Akun Seeder (`database/seeders/DatabaseSeeder.php` + `DemoDataSeeder.php`)
-
-Seeder membuat akun dan data demo untuk pengujian lokal. Untuk produksi, buat akun pengelola dengan kredensial sendiri; jangan gunakan akun demo.
-
-> 12 data pemesanan + pembayaran demo dibuat oleh `DemoDataSeeder`.
-
-### Akses Cepat
-
-- Lokal: `http://localhost:8000`
-- Setelah login otomatis redirect via `/redirect-after-login` → pengelola ke `pengelola.dashboard`, wisatawan ke `landing`.
-
----
-
-## 3. Tech Stack Lengkap
-
-| Layer | Teknologi | Versi / Catatan |
-|-------|-----------|-----------------|
-| Backend | **Laravel Framework** | `^13.0` (PHP `^8.3`) |
-| Auth | **Laravel Breeze** (Blade) | `^2.4` — dikustom 2 role + login email/username |
-| API Token | **Laravel Sanctum** | `^4.3` |
-| OAuth | **Laravel Socialite** | `^5.28` — Google Login |
-| Frontend | **Blade + Tailwind CSS + Alpine.js** | Tailwind `^3.1.0`, Alpine `^3.4.2`, `@tailwindcss/forms ^0.5.2` |
-| Build | **Vite** | `^4.0.0` + `laravel-vite-plugin ^0.7.2`, `postcss ^8.4.6`, `autoprefixer ^10.4.2` |
-| PDF | **barryvdh/laravel-dompdf** | `^3.1` — laporan kunjungan & transaksi |
-| HTTP Client | **guzzlehttp/guzzle** | `^7.2` |
-| DB | **MySQL / MariaDB** | `bangkiang_jaran`, `utf8mb4_unicode_ci`, timezone `Asia/Makassar` |
-| Dev | **ngrok** | `^5.0.0-beta.2` — `npm run tunnel` / `start-demo.bat` |
-| Container | **Docker** | `node:20-alpine` (build) + `php:8.3-apache` (runtime), `composer:2` |
-| Testing | **PHPUnit** | `^11.5`, `fakerphp/faker ^1.23`, `mockery ^1.6`, `pint ^1.18`, `collision ^8.0`, `sail ^1.63` |
-
-> `config/app.php`: `locale=id`, `fallback_locale=en`, `faker_locale=id_ID`, `timezone=Asia/Makassar`.
-
----
-
-## 4. Arsitektur & Alur Sistem
-
-```
-Browser (Blade SSR + Alpine)
-  → Routes (web.php + auth.php) → Middleware (auth, CheckRole, Localization, Throttle)
-    → Controller (Wisatawan/*, Pengelola/*, Auth/*)
-      → Model (Eloquent) → MySQL
-      → Mail (Mailable) → log/smtp
-      → Storage (public/galeri, bukti_bayar)
-      → DomPDF (laporan)
+```text
+Buka website sebagai tamu -> lihat informasi/tiket -> login atau daftar
+  -> bila daftar email: verifikasi OTP
+  -> pilih tanggal dan jumlah tiap jenis tiket
+  -> isi data pengunjung/kendaraan -> pesanan tersimpan
+  -> bayar di luar website -> unggah bukti
+  -> pengelola menerima atau menolak bukti
+  -> bila diterima: pesanan selesai dan tiket dapat digunakan
+  -> check-in pada tanggal kunjungan -> check-out setelah kunjungan
 ```
 
-**Alur pemesanan (happy path):**
+| Istilah | Arti dalam aplikasi |
+| --- | --- |
+| Tamu | Pengunjung tanpa sesi login; dapat membaca halaman publik |
+| Wisatawan | Akun untuk memesan dan melihat pesanan miliknya |
+| Pengelola | Akun operasional untuk verifikasi, tiket, galeri, loket, laporan, dan scan |
+| OTP | Kode 6 digit melalui email untuk menyelesaikan pendaftaran email |
+| Kode booking | Identitas satu pesanan yang dapat berisi beberapa tiket |
+| Kode tiket | Identitas satu detail tiket; berbeda dari kode booking |
+| E-ticket | Tampilan tiket digital beserta kode dan QR |
+| Pembayaran `pending` | Bukti diajukan dan menunggu pengelola |
+| Pembayaran `valid` | Pembayaran disetujui atau dicatat lunas melalui loket |
+| Pembayaran `ditolak` | Bukti ditolak; dapat diajukan ulang |
+| Check-in / check-out | Pencatatan waktu masuk / keluar |
 
-```
-[Landing] → [Tiket list/detail] → [Pemesanan: pilih tiket & tgl & qty] (throttle 10/menit)
-  → [Data Diri: nama, gender, plat per tiket] → DB::transaction → Pemesanan (kode_booking unik) + N DetailPemesanan (kode_tiket unik)
-    → [Pembayaran: pilih metode transfer/QRIS] → upload bukti (JPG/PNG/PDF 5MB)
-      → Pembayaran status=pending → Pengelola verifikasi (valid/ditolak)
-        → Pemesanan status=selesai → DetailPemesanan status=aktif → email PemesananBerhasil / PembayaranValid
-          → [Riwayat/Detail] QR per tiket → [Scan pengelola] check-in (aktif→digunakan) / check-out
-```
+**Pembayaran online diperiksa manual.** Website tidak memeriksa mutasi bank secara otomatis. Berhasil mengunggah bukti belum berarti lunas.
 
-**Validasi ketat:** hanya tiket `tgl_kunjungan = hari ini` + `status=selesai` + `status_tiket=aktif` yang bisa di-scan.
+## 2. Mulai sebagai tamu dan halaman publik
 
----
+### 2.1 Pertama kali membuka website
 
-## 5. Skema Database
+1. Buka alamat aplikasi; alamat pengembangan umumnya `http://127.0.0.1:8000` jika Artisan dijalankan di port 8000.
+2. Beranda dapat dibuka tanpa login.
+3. Gunakan navigasi Beranda, Restoran, dan Tiket; pada ponsel buka menu navigasinya.
+4. Gunakan pengalih bahasa Indonesia/Inggris bila diperlukan.
+5. Login atau daftar ketika ingin memesan tiket.
 
-29 migration di `database/migrations/`. Inti:
+Halaman login menyediakan pilihan melanjutkan sebagai tamu. Mode ini tidak memberi akses transaksi atau data pribadi. Sesi lama tanpa penanda login eksplisit dan cookie remember lama tidak otomatis memberi akses akun; perilaku ini tercakup pengujian sesi.
 
-### `users`
-| Kolom | Tipe | Ket |
-|-------|------|-----|
-| `id` | bigIncrements | PK |
-| `name`, `username`, `email`, `phone` | string | `username`/`email` unique |
-| `password` | string nullable | `null` untuk akun Google-only |
-| `role` | `enum(pengelola,wisatawan)` | |
-| `google_id` | string nullable | OAuth |
-| `email_verified_at` | datetime nullable | |
-| `last_login_at`, `last_login_method`, `login_count` | tracking | `manual`/`google` |
-| `remember_token` | | |
+### 2.2 Beranda `/`
 
-### `tiket`
-| Kolom | Tipe | Ket |
-|-------|------|-----|
-| `id_tiket` | PK | |
-| `nama_tiket`, `nama_tiket_en` | string 100 | i18n via accessor |
-| `harga` | decimal 10,2 | |
-| `kategori` | string | `perorangan` (paket keluarga dihapus via `2026_07_25_210000`) |
-| `status` | enum aktif/nonaktif | scope `aktif()` |
-| `kuota` | **dihapus** | `2024_01_01_000009_drop_kuota_from_tiket_table` — sekarang unlimited/harian di logic |
-| `deleted_at` | softDeletes | |
+Beranda memuat pembuka visual, pengantar destinasi, cerita air terjun/Hidden Canyon, foto, informasi fasilitas, panduan kunjungan, dan bagian rute. Tombol tiket mengarahkan pengguna ke pemilihan/pemesanan tiket.
 
-### `pemesanan`
-| Kolom | Tipe |
-|-------|------|
-| `id_pemesanan` PK | |
-| `id_user` FK→users.id | |
-| `id_tiket` FK→tiket.id_tiket | tiket utama (agregat) |
-| `tgl_kunjungan` date, indexed | |
-| `jumlah` int | |
-| `total_harga` decimal 10,2 | |
-| `detail` json nullable (text/long) | |
-| `status` enum `pending,diproses,selesai,dibatalkan` indexed | |
-| `kode_booking` string 20 unique indexed | `BJ-XXXX` style |
-| `deleted_at` | |
+- Foto wisata berasal dari galeri pengelola; foto contoh dengan pola nama tertentu disaring dari tampilan pemasaran.
+- Jika foto tambahan belum tersedia, halaman dapat memakai foto destinasi bawaan. Pengulangan foto tidak berarti ada dokumentasi berbeda untuk setiap objek.
+- Informasi Hidden Canyon meminta pengunjung menanyakan akses dan kondisi terkini kepada pengelola. Panduan ini tidak menjamin kondisi jalur atau kegiatan di lapangan.
+- Peta menampilkan tujuan Bangkiang Jaran. Pilihan titik keberangkatan dan tautan Google Maps membantu membuka rute di layanan peta.
+- Lokasi perangkat memerlukan kemampuan browser dan izin pengguna. Akurasi GPS belum diuji pada perangkat fisik dalam pekerjaan ini.
 
-### `detail_pemesanan` (tiket per orang)
-| Kolom | Tipe |
-|-------|------|
-| `id_detail` PK | |
-| `id_pemesanan` FK | |
-| `id_tiket` FK | |
-| `kode_tiket` string 20 | **unik per orang**, di-QR |
-| `nama_tiket` string | snapshot |
-| `nama_pengunjung` string | |
-| `jenis_kelamin` enum L/P | |
-| `plat_kendaraan` string nullable | |
-| `harga` decimal | snapshot |
-| `status_tiket` enum `aktif,digunakan,kadaluarsa` | |
-| `check_in_at`, `check_out_at` datetime nullable | |
+`/informasi` diarahkan kembali ke beranda. Berkas Blade lokasi/galeri lama tidak otomatis menjadi halaman publik tersendiri bila tidak dirutekan.
 
-### `pembayaran`
-| Kolom | Tipe |
-|-------|------|
-| `id_bayar` PK | |
-| `id_pemesanan` FK unique | 1:1 |
-| `total` decimal | |
-| `metode` string | `transfer`, `qris`, `e_wallet` |
-| `bukti_bayar` string | path `storage/app/public/bukti` |
-| `status` enum `pending,valid,ditolak` | |
-| `tgl_bayar` datetime | |
+### 2.3 Restoran `/restoran`
 
-### `galeri`
-| Kolom | Tipe |
-|-------|------|
-| `id_galeri` PK | |
-| `file` string | `galeri/galeri-01.jpg` |
-| `keterangan`, `keterangan_en` | i18n via accessor |
-| `tipe` enum `wisata,restoran` | scope `wisata()`/`restoran()` |
-| `deleted_at` | |
+Halaman ini menyajikan pengantar tempat makan, suasana, foto restoran, serta arahan menanyakan menu dan ketersediaan tempat kepada pengelola.
 
-### `konten`
-| `id`, `judul`, `isi` (longText), `jenis` enum `sejarah,info,umum` |
+- Foto bertipe `restoran` berasal dari menu Galeri pengelola.
+- Jika foto restoran belum ditambahkan, bagian dokumentasi menampilkan keadaan kosong. Foto air terjun pada pembuka adalah lanskap destinasi, bukan bukti foto restoran.
+- Informasi menu/harga mengarahkan pengguna untuk menanyakan menu terbaru.
+- Belum ada keranjang makanan, checkout makanan, pengelolaan stok makanan, atau reservasi meja dengan konfirmasi otomatis.
 
-### `activity_logs`
-| `id`, `id_user`, `aksi`, `deskripsi`, `ip`, `user_agent`, `created_at` |
+### 2.4 Tiket `/tiket` dan detail tiket
 
-### Lain
-- `password_resets`, `failed_jobs`, `personal_access_tokens` (Sanctum)
-- Seeder: tiket dewasa 20k, anak 15k, WNA 30k; konten sejarah/info; 8 galeri placeholder.
+Daftar menampilkan tiket aktif, harga, profil tiket, dan estimator biaya. Detail jenis tiket tersedia di `/tiket/{id}`.
 
-**Relasi Eloquent:**
-- `User hasMany Pemesanan`
-- `Pemesanan belongsTo User/Tiket, hasOne Pembayaran, hasMany DetailPemesanan`
-- `DetailPemesanan belongsTo Pemesanan/Tiket`
-- `Tiket hasMany Pemesanan`
+- Tarif mengikuti database yang dikelola pengelola. Angka contoh pengujian bukan harga resmi.
+- Estimator merupakan perkiraan; server menghitung kembali pesanan.
+- Tiket nonaktif tidak dapat dibuka melalui detail publik atau dipakai memulai pesanan online.
+- Tamu yang membuka pemesanan diminta login. URL tujuan, termasuk pilihan tiket yang ada pada URL, dapat diteruskan setelah autentikasi.
+- Daftar tiket bukan jaminan kuota per tanggal; backend aktif tidak mengurangi kuota harian.
 
----
+**Media:** gambar beranda, restoran, tiket/detail, navigasi ponsel, dan video rute akan ditambahkan nanti.
 
-## 6. Fitur Lengkap per Role
+## 3. Buat akun melalui email dan OTP
 
-### A. Publik (tanpa login)
-- **Landing `/`** (`LandingController@index`): hero editorial, narasi warisan, 4 pilar pengalaman (tirta 15M, kolam alami, jalur rimba, kuliner), daftar tiket aktif, galeri `wisata`, travel/akses (Ubud 15km/25m, Sanur 23km/40m, Kuta 32km/50m, Bandara 38km/60m), etika suaka, FAQ 5 item, CTA finale, footer.
-- **Restoran `/restoran`** (`LandingController@restoran`): filosofi Kepulauan Rasa, menu (utama/kudapan/minuman), 3 ambiance (gazebo tepi sungai, bale utama, lesehan bambu), reservasi WA, galeri `restoran`.
-- **Tiket `/tiket` + `/tiket/{id}`**: list & detail tiket, filter tanggal, sisa kuota harian, harga.
-- **Verifikasi QR `/tiket/verifikasi/{kode}`**: cek keabsahan `kode_tiket`.
-- **Auth**: login (email **atau** username) + register + forgot password + Google OAuth (`/auth/google` → `/auth/google/callback`).
-- **Ganti bahasa** `GET /lang/{id|en}` → `session.locale`.
+### 3.1 Mengisi formulir pendaftaran
 
-### B. Wisatawan (`middleware auth + role:wisatawan`, prefix `wisatawan.`)
+1. Buka `/register` dari tautan daftar pada autentikasi.
+2. Isi nama lengkap dan pilih username yang belum dipakai.
+3. Masukkan email aktif milik sendiri dengan huruf kecil.
+4. Isi password dan konfirmasinya dengan nilai sama.
+5. Kirim formulir untuk meminta OTP.
+6. Buka email tujuan, lalu masukkan kode pada `/register/otp`.
 
-| Route | Fungsi |
-|-------|--------|
-| `GET /wisatawan/pemesanan` | Form pilih tiket, tgl, qty (throttle 10/m) |
-| `POST /wisatawan/pemesanan` | `store()` — transaksi, buat `kode_booking` + N `detail_pemesanan` |
-| `GET /wisatawan/pemesanan/data-diri` | Form nama/gender/plat per tiket |
-| `POST /wisatawan/pemesanan/data-diri` | Simpan data pengunjung |
-| `GET /wisatawan/pemesanan/sukses/{id}` | Konfirmasi + kode booking |
-| `GET /wisatawan/pemesanan/riwayat` | Riwayat + ringkasan status (selesai/pending/dibatalkan/diproses) |
-| `GET /wisatawan/pemesanan/{id}` | Detail pemesanan + QR per `kode_tiket` + tombol Bayar/Cetak PDF |
-| `GET /wisatawan/pembayaran/{id}` | Pilih metode (BCA 1234 5678 9012 a.n. Pengelola, QRIS) |
-| `POST /wisatawan/pembayaran/{id}` | Upload bukti (JPG/PNG/PDF max 5MB) → `pembayaran.pending` |
+| Kolom | Aturan server |
+| --- | --- |
+| `name` | Wajib, teks, maksimal 255 karakter |
+| `username` | Wajib, unik, maksimal 50 karakter; huruf, angka, titik, garis bawah, tanda hubung |
+| `email` | Wajib, format email, huruf kecil, unik, maksimal 255 karakter |
+| `password` | Wajib, memenuhi aturan password Laravel yang dipakai aplikasi; bawaan minimal 8 karakter |
+| `password_confirmation` | Harus sama dengan password |
 
-> Pembayaran menunggu verifikasi 1×24 jam; notifikasi email setelah valid/ditolak. Tombol "Masuk & Pesan" → modal login jika guest.
+Pendaftaran publik menghasilkan role **wisatawan**. Menambahkan input role pengelola tidak mengubah hasil pendaftaran.
 
-### C. Pengelola (`middleware auth + role:pengelola`, prefix `pengelola.`)
+### 3.2 Setelah formulir dikirim
 
-| Route | Fungsi |
-|-------|--------|
-| `GET /pengelola/dashboard` | KPI: pengunjung hari ini (`pemesanan.selesai` sum jumlah), pendapatan bulan ini (`pembayaran.valid`), pemesanan pending, total wisatawan, scan hari ini, grafik pie komposisi per tiket, 5 pemesanan terbaru |
-| `resource /pengelola/galeri` | CRUD galeri (file, keterangan, tipe) — `except edit,update,show` |
-| `resource /pengelola/tiket` | CRUD tiket (nama, nama_en, harga, kategori, status) — `except show` |
-| `GET /pengelola/verifikasi` | List pemesanan butuh verifikasi |
-| `GET /pengelola/verifikasi/{id}` | Detail + bukti bayar |
-| `POST /pengelola/verifikasi/{id}/validasi` | valid/ditolak → update status, kirim `PembayaranValid`/`PembayaranDitolak`, log |
-| `GET /pengelola/notifikasi` | Polling verifikasi baru (realtime sederhana) |
-| `GET /pengelola/laporan` | Filter periode |
-| `GET /pengelola/laporan/kunjungan` | Laporan kunjungan + export PDF `pdf-kunjungan.blade.php` |
-| `GET /pengelola/laporan/transaksi` | Laporan transaksi + export PDF `pdf-transaksi.blade.php` |
-| `GET /pengelola/user` | List user + search + total pemesanan |
-| `GET /pengelola/scan` | Daftar tiket hari ini |
-| `POST /pengelola/scan/cari` | Cari `kode_tiket` (uppercase trim, max 20) |
-| `POST /pengelola/scan/gunakan` | Check-in: `aktif→digunakan`, set `check_in_at`, validasi lunas + tgl hari ini, `DB::transaction` |
-| `POST /pengelola/scan/checkout` | Check-out: `digunakan` + `check_out_at` |
-| `GET /pengelola/pemesanan-offline/*` | Flow offline mirror wisatawan (create/data-diri/sukses/riwayat) — untuk loket langsung |
+Formulir belum langsung membuat akun di `users` dan belum membuat pengguna login. Server memvalidasi input, membuat hash password, mengikat tantangan ke session, dan menyimpan data sementara terenkripsi pada cache. Server kemudian mengirim OTP melalui mailer yang dikonfigurasi.
 
-### D. Profile & Utilitas (auth)
-- `GET/PATCH /profile` — edit nama/username/email/phone, ganti password, `POST /profile/set-password` (akun Google), `DELETE /profile` (soft/hard sesuai policy)
-- `GET /logout` — fallback GET saat CSRF expired (invalidate + regenerateToken)
-- `GET /redirect-after-login` — router role
+OTP disimpan sebagai hash. Layanan OTP tidak menuliskan kodenya ke log dan tidak mengembalikan kode sebagai old input ketika validasi gagal.
 
----
+### 3.3 Verifikasi OTP
 
-## 7. Routing Lengkap
+1. Tetap gunakan browser/sesi tempat pendaftaran dimulai.
+2. Periksa inbox dan spam email tujuan.
+3. Masukkan kode 6 digit, lalu kirim verifikasi.
+4. Bila benar, server memeriksa ulang keunikan email/username dan membuat akun.
+5. Asal akun dicatat `email`; verifikasi email dicatat `otp` beserta waktunya.
+6. Data tantangan dihapus dan pengguna otomatis login.
+7. Pengguna diteruskan ke tujuan pemesanan tersimpan atau mengikuti pengalihan wisatawan menuju beranda.
 
-File: `routes/web.php` (136 baris), `routes/auth.php` (Breeze).
+Kode yang sudah berhasil digunakan tidak membuat akun kedua. Jika email/username dipakai pendaftaran lain selama proses berlangsung, pemeriksaan akhir dapat menolak penyelesaian.
 
-```
-PUBLIC
-  GET /                          → landing
-  GET /restoran                  → resto
-  GET /informasi                 → redirect landing (legacy)
-  GET /tiket                     → tiket.index
-  GET /tiket/{id}                → tiket.detail
-  GET /tiket/verifikasi/{kode}   → tiket.verifikasi
-  GET /auth/google
-  GET /auth/google/callback
+### 3.4 Batas waktu dan percobaan
 
-WISATAWAN (auth, role:wisatawan)
-  GET  /wisatawan/pemesanan
-  POST /wisatawan/pemesanan              (throttle:10,1)
-  GET  /wisatawan/pemesanan/data-diri
-  POST /wisatawan/pemesanan/data-diri
-  GET  /wisatawan/pemesanan/sukses/{id}
-  GET  /wisatawan/pemesanan/riwayat
-  GET  /wisatawan/pemesanan/{id}
-  GET  /wisatawan/pembayaran/{id_pemesanan}
-  POST /wisatawan/pembayaran/{id_pemesanan}
+| Aturan | Implementasi |
+| --- | --- |
+| Bentuk kode | 6 digit angka |
+| Masa berlaku OTP | 600 detik / 10 menit |
+| Masa data sementara | 1800 detik / 30 menit; diperpanjang setelah resend berhasil |
+| Jeda kirim ulang | 60 detik |
+| Kode salah | Maksimal 5 sebelum blokir sementara |
+| Batas pengiriman email | 5 percobaan per email per jam |
+| Batas pengiriman IP | 20 percobaan per IP per jam |
+| Route POST daftar | `throttle:5,1` |
+| Route POST verifikasi OTP | `throttle:10,1` |
+| Route POST resend | `throttle:5,1` |
 
-PENGELOLA (auth, role:pengelola)
-  GET  /pengelola/dashboard
-  RESOURCE /pengelola/galeri   (index,create,store,destroy)
-  RESOURCE /pengelola/tiket    (index,create,store,edit,update,destroy)
-  GET  /pengelola/verifikasi
-  GET  /pengelola/verifikasi/{id}
-  POST /pengelola/verifikasi/{id}/validasi
-  GET  /pengelola/notifikasi
-  GET  /pengelola/laporan
-  GET  /pengelola/laporan/kunjungan
-  GET  /pengelola/laporan/transaksi
-  GET  /pengelola/user
-  GET  /pengelola/scan
-  POST /pengelola/scan/cari
-  POST /pengelola/scan/gunakan
-  POST /pengelola/scan/checkout
-  GET  /pengelola/pemesanan-offline
-  POST /pengelola/pemesanan-offline
-  ...
+Batas pengiriman juga menghitung upaya menghubungi penyedia yang gagal setelah kuota dicadangkan. Memulai ulang pendaftaran tidak menghapus limit email/IP. Kode salah format ditolak. Penghitung kode salah tidak dihapus hanya dengan resend atau memulai pendaftaran kembali.
 
-AUTH (guest/profile)
-  GET  /profile, PATCH /profile, POST /profile/set-password, DELETE /profile
-  GET  /lang/{locale}
-  GET  /logout (fallback)
-  GET  /redirect-after-login
-  + Breeze routes (login, register, password.*)
-```
+### 3.5 Kirim ulang, batal, dan kegagalan
 
-Middleware terdaftar: `CheckRole`, `Localization` (set locale dari `session`), `TrustProxies`, `TrimStrings`, `VerifyCsrfToken`, dll (`app/Http/Middleware/` total 11 file).
+- **Kode kedaluwarsa:** minta kode baru setelah jeda memungkinkan.
+- **Resend berhasil:** gunakan kode terbaru; kode sebelumnya tidak berlaku.
+- **Resend gagal:** kode sebelumnya tetap berlaku sampai waktu kedaluwarsa semula jika belum habis.
+- **Salah berulang:** tunggu masa blokir yang ditampilkan; resend tidak melewati blokir.
+- **Sesi berakhir:** daftar kembali. Kode pada sesi lain tidak menyelesaikan tantangan sesi ini.
+- **Salah email:** batalkan pendaftaran sementara dan isi ulang dengan email benar. Tujuan pemesanan dipertahankan pada alur yang diuji.
+- **Mailer belum aktif:** pendaftaran belum selesai. Transport simulasi seperti `log` ditolak pada penggunaan biasa agar aplikasi tidak mengaku mengirim kode ke inbox.
 
----
+**Bukti uji:** mail fake memeriksa pengiriman dan seluruh kondisi OTP terkait, bukan penerimaan inbox nyata.
 
-## 8. Desain System — Tropical Sanctuary
+**Media:** gambar formulir, email OTP yang disamarkan, countdown, salah/kedaluwarsa, resend, dan video pendaftaran akan ditambahkan nanti.
 
-Sumber rujukan: `docs/DESIGN.md`. Tema: **Tropical Elegance** — atmosfer resor alam tropis yang tenang, mewah, minimal + tactile, mengedepankan fotografi dokumentasi riil sebagai focal point.
+## 4. Login email atau username
 
-### Palet Warna (Material 3 inspired)
+### 4.1 Langkah masuk
 
-| Token | Hex | Pakai |
-|-------|-----|-------|
-| `primary` | `#005344` | Header, CTA filled |
-| `primary-container` | `#006d5b` | Hover, Emerald depth |
-| `on-primary` | `#ffffff` | Teks di primary |
-| `secondary` | `#3b6934` | Depth, Leaf Green |
-| `secondary-container` | `#b9eeab` | Pill/tag bg |
-| `tertiary` | `#5b442a` | Wood Brown functional |
-| `background` | `#fbf9f4` | Page bg (cream warm) |
-| `surface` | `#fbf9f4` | Card base |
-| `surface-container` | `#f0eee9` | Section alt |
-| `on-surface` | `#1b1c19` | Body text (charcoal soft) |
-| `outline-variant` | `#bec9c4` | Input stroke |
-| `error` | `#ba1a1a` | Validasi |
+1. Buka `/login`.
+2. Isi email atau username pada kolom login.
+3. Isi password akun dan kirim.
+4. Jika benar, session diperbarui dan metadata login dicatat.
 
-> Cream `#fbf9f4` bukan putih murni → kurangi eye strain, lebih organik. Gradient hero: emerald → leaf → wood.
+Input berformat email dicari melalui email; input lainnya melalui username. Password diperiksa autentikasi Laravel.
 
-### Tipografi
+| Kondisi | Hasil |
+| --- | --- |
+| Wisatawan tanpa tujuan tersimpan | Melalui `/redirect-after-login` menuju beranda |
+| Wisatawan dari halaman pemesanan | Dapat kembali ke URL tujuan tersimpan |
+| Pengelola | Menuju `/pengelola/dashboard` |
+| Pengelola membuka pemasaran/guest tertentu | Diarahkan ke dashboard oleh middleware |
+| Akun/password salah | Pesan `Email/Username atau password salah.` |
+| Percobaan berlebihan | Dibatasi rate limiter dan route |
 
-- **Heading**: `Playfair Display` — editorial, elegan (display-lg 64px/700, headline-md 32px/600)
-- **Body/UI**: `DM Sans` — navbar, paragraf, tombol, form, harga, dan data teknis yang mudah dibaca.
-- **Editorial accent**: `Cormorant Garamond` — kutipan dan aksen italic terpilih, bukan untuk data transaksi.
-- Negatif tracking di display desktop, label uppercase + `letterSpacing 0.05em`.
+Rate limiter manual membatasi 5 percobaan pada kunci input login dan IP. POST login juga memakai `throttle:5,1`. Waktu tunggu mengikuti limit yang terkena.
 
-### Layout, Spacing & Elevation
+### 4.2 Hubungan dengan OTP dan session
 
-- **Desktop**: 12 kolom, gutter 24px, container max `1280px`, antar-section `80px (xl)`.
-- **Tablet**: 6 kolom, gutter 24px, margin 32px.
-- **Mobile**: 2 kolom, gutter 16px, margin 20px.
-- **Unit `8px` base** (4, 12, 24, 48, 80). Hero text offset agar foto air terjun tetap focal.
-- **Elevation**: L0 base `#fbf9f4`, L1 cards/inputs `#ffffff` + `0 4px 20px rgba(0,50,40,.04)`, L2 modal `0 12px 40px rgba(0,50,40,.08)`.
-- **Radius**: Tombol/input `12px` (`rounded-lg`), container/kartu `24px` (`rounded-2xl`), chip pill `full`.
+OTP digunakan menyelesaikan **pendaftaran email**. Login biasa memakai email/username dan password; tidak meminta OTP baru pada setiap login. OTP bukan kode reset password atau pembayaran.
 
-### Arsitektur Layering CSS
+Login eksplisit diberi penanda session. Input `remember` tidak membuat remember-me persisten. Session aktif tetap dipakai pada permintaan berikutnya; pergantian halaman tidak otomatis mengakhiri login. Masa session/cookie mengikuti konfigurasi. Penutupan/pemulihan browser fisik belum dibuktikan oleh pengujian HTTP.
 
-Untuk menjaga stabilitas styling antara halaman legasi dan pembaruan terkini, CSS dibagi menjadi 5 layer berjenjang:
-1. `resources/css/app.css` — Tailwind directives, scrollbar custom, print styles (dikompilasi Vite ke `public/build`).
-2. `public/css/site.css` — Gaya pondasi dasar aplikasi.
-3. `public/css/visual-refresh.css` — Layer presentasi editorial dan komponen visual utama.
-4. `public/css/responsive-refinement.css` — **Lapisan adaptasi responsif menyeluruh** (safe wrapping string panjang, stacking grid mobile, touch target minimum 44px, mitigasi overflow 320px–1440px).
-5. `public/css/typography-motion.css` — Token tipografi Playfair Display/DM Sans/Cormorant Garamond dan integrasi motion GSAP, Swiper, serta Lenis.
+## 5. Daftar dan login dengan Google
 
-### Standar Uji Responsif (Responsive Acceptance Bar)
+### 5.1 Alur pengguna
 
-Semua halaman antarmuka wajib lolos verifikasi visual pada 5 resolusi layar:
-- `320px`: Ponsel terkecil — tidak ada horizontal overflow, padding kontainer minimal 16px.
-- `375px`: Ponsel modern — teks terbaca nyaman, tombol CTA mudah dijangkau.
-- `768px`: Tablet portrait — form & rincian membagi grid 2 kolom secara proporsional.
-- `1024px`: Tablet landscape / laptop ringkas — sidebar rincian/ringkasan sticky proporsional.
-- `1280px–1440px`: Desktop lebar — batas kontainer `1280px` agar panjang baris nyaman dibaca.
+1. Pilih masuk dengan Google.
+2. Pilih akun dan selesaikan persetujuan pada Google.
+3. Google mengembalikan pengguna ke `/auth/google/callback`.
+4. Server memeriksa identitas serta verifikasi email Google.
+5. Akun baru dibuat sebagai wisatawan dan diarahkan ke Profil Saya.
+6. Pilih username sendiri, simpan, kemudian tekan Lanjutkan.
 
-### Halaman Kunci untuk Referensi Desain
+Akun baru mendapat username sementara `pengunjung_` dengan nilai acak. Username pilihan pengguna dipertahankan pada login berikutnya dan tidak mengubah nama Google.
 
-- `wisatawan/landing.blade.php` (~1100 baris) — hero fotografis, narasi warisan, 4 pilar pengalaman, tiket grid, galeri zoom, resto teaser, travel info, etika, FAQ accordion, finale CTA
-- `wisatawan/restoran.blade.php` — filosofi "Kepulauan Rasa", menu tabs (Alpine), ambiance cards, reservasi WA
-- `wisatawan/tiket.blade.php` — filter tanggal, qty stepper (Alpine), ringkasan transaksi
-- `wisatawan/pemesanan.blade.php`, `pemesanan-data-diri.blade.php`, `pemesanan-sukses.blade.php`, `pemesanan-detail.blade.php` (e-ticket QR)
-- `wisatawan/pembayaran.blade.php` — metode transfer/QRIS, upload area bukti, live preview, sidebar ringkasan adaptif
-### Aset Frontend
+### 5.2 Aturan identitas dan konflik akun
 
-- `resources/css/app.css` — Tailwind directives, custom scrollbar, print style
-- `resources/js/app.js` — bootstrap `Alpine.start()`, `axios`, Vite HMR
-- `vite.config.js` — input `css/app.css` + `js/app.js`
-- `tailwind.config.js` — content `resources/views/**/*.blade.php`, plugin `@tailwindcss/forms`, font `Figtree` fallback
-- `public/css/site.css` — dasar layout & komponen umum
-- `public/css/visual-refresh.css` — gaya presentasi editorial terkini & hero slider
-- `public/css/responsive-refinement.css` — lapisan penyempurnaan responsif lintas viewport
+- Email harus valid dan `email_verified` dari Google bernilai benar.
+- Asal akun dan metode verifikasi dicatat `google`; tidak meminta OTP aplikasi tambahan.
+- Pencocokan akun menggunakan `google_id`.
+- Akun manual yang emailnya sama tidak digabung otomatis. Konflik identitas/email mengembalikan pengguna untuk memakai akun lama atau menghubungi admin.
+- State OAuth yang tidak valid ditolak melalui Socialite.
+- Akun asal Google tetap berlabel Google setelah login password. `last_login_method` hanya menunjukkan login terakhir.
 
----
+Fitur memerlukan client ID, client secret, dan redirect URI sesuai environment serta konfigurasi Google. Jika belum lengkap, aplikasi kembali ke login dengan pesan konfigurasi. Penolakan izin/kegagalan callback juga dapat mengembalikan pengguna ke login.
 
-## 9. Struktur Direktori
+**Bukti uji:** provider dimock; persetujuan Google nyata dan callback domain produksi belum diuji pada pekerjaan ini.
 
-```
-bangkiang-jaran-web/
-├── app/
-│   ├── Console/
-│   │   ├── Kernel.php                         # scheduler
-│   │   └── Commands/AutoCheckout.php          # checkout otomatis tiket terlewat
-│   ├── Helpers/ActivityLogger.php             # helper log aktivitas
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── Auth/ (9 file)                # Breeze: login/register/password/reset
-│   │   │   ├── AuthController.php            # Google OAuth redirect/callback
-│   │   │   ├── ProfileController.php         # edit/update/set-password/destroy
-│   │   │   ├── Wisatawan/
-│   │   │   │   ├── LandingController.php     # index, restoran
-│   │   │   │   ├── TiketController.php       # index, detail, verifikasi
-│   │   │   │   ├── PemesananController.php   # create/store/dataDiri/riwayat/detail
-│   │   │   │   └── PembayaranController.php  # create/store bukti
-│   │   │   └── Pengelola/
-│   │   │       ├── DashboardController.php   # KPI + grafik
-│   │   │       ├── TiketController.php       # CRUD tiket
-│   │   │       ├── GaleriController.php      # CRUD galeri
-│   │   │       ├── VerifikasiController.php  # index/show/validasi/notifikasi
-│   │   │       ├── LaporanController.php     # index/kunjungan/transaksi + PDF
-│   │   │       ├── ScanController.php        # index/cari/gunakan/checkout
-│   │   │       ├── PemesananOfflineController.php # loket manual
-│   │   │       └── UserController.php        # list + search
-│   │   ├── Middleware/ (11)                  # CheckRole, Localization, TrustProxies, etc.
-│   │   └── Requests/
-│   │       ├── ProfileUpdateRequest.php
-│   │       └── Auth/LoginRequest.php         # email/username + rate limit 5x
-│   ├── Mail/ (5)                             # WelcomeMail, PemesananBerhasil, PembayaranValid/Ditolak, TestMail
-│   ├── Models/ (8)                           # User, Tiket, Pemesanan, DetailPemesanan, Pembayaran, Galeri, Konten, ActivityLog
-│   ├── Providers/ (5)                        # AppServiceProvider, Auth, Event, Route, Broadcast
-│   └── View/Components/ (2)                  # AppLayout, GuestLayout
-├── bootstrap/                                # app.php, cache
-├── config/                                   # app.php (locale id, tz Makassar), auth, database, mail, etc.
-├── database/
-│   ├── migrations/ (29)                      # users, tiket, pemesanan, pembayaran, galeri, konten, activity_logs, detail_pemesanan, etc.
-│   ├── seeders/                              # DatabaseSeeder, DemoDataSeeder
-│   └── factories/
-├── docs/
-│   ├── DESIGN.md                             # palet, tipografi, layout token
-│   ├── CLASS_DIAGRAM.md                      # PlantUML
-│   ├── BLACKBOX_TESTING.md                   # 61 skenario uji
-│   └── diagrams/ (PNG)                       # arsitektur
-├── docker/
-│   ├── Dockerfile                            # multi-stage node+php
-│   └── entrypoint.sh                         # migrate + cache + storage:link
-├── lang/
-│   ├── id/messages.php (660 baris)           # semua string UI ID
-│   └── en/messages.php                       # mirroring EN
-├── public/
-│   ├── index.php
-│   ├── build/ (Vite manifest)                # hasil npm run build
-│   ├── css/                                  # site.css, visual-refresh.css, responsive-refinement.css
-│   ├── js/site.js                            # runtime interaksi & slider
-│   ├── images/, videos/                      # aset statis
-│   └── storage → storage/app/public          # symlink
-├── resources/
-│   ├── css/app.css
-│   ├── js/app.js (Alpine + axios)
-│   └── views/
-│       ├── auth/ (6)                         # login, register, forgot, reset, verify, confirm
-│       ├── components/ (13)                  # button, input, modal, dropdown, nav-link, etc.
-│       ├── emails/ (5)                       # welcome, pemesanan-berhasil, pembayaran-valid/ditolak, test
-│       ├── layouts/ (3)                      # app.blade.php, guest.blade.php, navigation.blade.php
-│       ├── pengelola/
-│       │   ├── dashboard.blade.php
-│       │   ├── galeri/ (index, form)
-│       │   ├── tiket/ (index, form)
-│       │   ├── verifikasi/ (index, show)
-│       │   ├── laporan/ (index, kunjungan, transaksi, pdf-*.blade)
-│       │   ├── scan/index.blade.php
-│       │   ├── pemesanan-offline/ (4)
-│       │   ├── user/index.blade.php
-│       │   └── layouts/admin.blade.php
-│       ├── wisatawan/ (13)                   # landing, restoran, tiket, pemesanan, data-diri, sukses, detail, pembayaran, riwayat, galeri, lokasi
-│       ├── profile/ (edit + partials)
-│       └── vendor/pagination (11)
-├── routes/
-│   ├── web.php                               # semua route (lihat §7)
-│   └── auth.php                              # Breeze
-├── scripts/
-│   └── backup-db.bat                         # mysqldump helper (Windows)
-├── storage/
-│   ├── app/public/galeri/                    # upload galeri
-│   ├── app/public/bukti/                     # bukti bayar
-│   └── logs/laravel.log
-├── tests/                                    # Feature/Unit (PHPUnit)
-├── .env.example
-├── .env
-├── artisan
-├── composer.json / composer.lock
-├── package.json / package-lock.json
-├── vite.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── phpunit.xml
-├── start-demo.bat                            # one-click demo + ngrok
-└── README.md (file ini)
+**Media:** gambar tombol, profil akun baru, username tersimpan, dan video OAuth nyata akan ditambahkan nanti dengan data pribadi disamarkan.
+
+## 6. Lupa password, profil, dan logout
+
+### 6.1 Lupa password
+
+1. Pilih lupa password atau buka `/forgot-password`.
+2. Isi email akun dan minta tautan reset.
+3. Jika terdaftar dan terkirim, buka tautan dari email.
+4. Isi password baru serta konfirmasinya.
+5. Setelah berhasil, login dengan password baru.
+
+Reset memakai **tautan bertoken**, bukan OTP pendaftaran. Broker menetapkan token 60 menit dan throttle 60 detik; route permintaan/reset memakai `throttle:5,1`.
+
+Respons email dikenal/tidak dikenal dibuat sama: `Jika email terdaftar, link reset password akan dikirim. Periksa juga folder spam.` Respons ini bukan jaminan inbox menerima email. Jika pengiriman gagal dengan exception, aplikasi memberi pesan email belum dapat dikirim.
+
+Token salah/kedaluwarsa dan password confirmation berbeda ditolak. Kondisi ini tercakup test suite.
+
+### 6.2 Profil Saya `/profile`
+
+| Data | Perilaku |
+| --- | --- |
+| Nama | Dapat diubah, maksimal 255 karakter |
+| Username | Unik, maksimal 50 karakter, mengikuti format pendaftaran |
+| Telepon | Opsional, maksimal 20 karakter, validasi karakter nomor telepon |
+| Email OTP/Google | Dikunci terhadap penggantian melalui profil |
+| Email akun lama di luar kondisi penguncian | Perubahan dapat divalidasi; bukti verifikasi sebelumnya dihapus bila berubah |
+| Asal dan verifikasi akun | Menampilkan asal pendaftaran dan status/metode verifikasi yang tercatat |
+
+Ubah kolom yang diizinkan, tekan Simpan Perubahan, lalu Lanjutkan bila ingin kembali. Pengelola memakai navigasi pengelola saat membuka profil.
+
+### 6.3 Kata sandi dan penghapusan akun
+
+Profil aktif menampilkan tab **Atur Kata Sandi** bagi akun dengan `google_id`. Form mengirim ke `/profile/set-password`, meminta password/konfirmasi, dan tidak meminta password lama pada jalur ini. Akun Google kemudian dapat memakai login manual. Endpoint hanya untuk akun Google yang sudah login.
+
+`PUT /password` tersedia dan teruji untuk perubahan dengan password lama. `DELETE /profile` tersedia dan teruji dengan konfirmasi password benar. Namun, **view profil aktif tidak menampilkan formulir ubah password manual atau hapus akun tersebut**. Endpoint yang ada tidak otomatis berarti tombolnya tersedia. Akun manual dapat memakai lupa password dari login.
+
+### 6.4 Logout
+
+Gunakan logout pada navigasi akun. Logout mengakhiri autentikasi, menginvalidasi session, meregenerasi token CSRF, dan kembali ke beranda. Halaman pribadi meminta login lagi. Selain POST logout, aplikasi memiliki fallback `GET /logout`.
+
+**Media:** gambar login/gagal, lupa/reset password, profil tiap peran, password Google, dan video logout akan ditambahkan nanti.
+
+## 7. Pemesanan tiket online dari awal
+
+### 7.1 Tahap pertama: tanggal dan jumlah
+
+1. Login sebagai wisatawan.
+2. Buka pemesanan dari tiket atau `/wisatawan/pemesanan`.
+3. Pilih tanggal hari ini atau setelah hari ini.
+4. Isi jumlah tiap jenis tiket. Satu pesanan dapat berisi beberapa jenis.
+5. Periksa ringkasan dan lanjutkan ke data pengunjung.
+
+Server memeriksa tanggal, array pilihan, bilangan bulat tidak negatif, dan sedikitnya satu jumlah lebih dari nol. Setiap tiket terpilih harus aktif. Harga/subtotal dihitung dari database, bukan mempercayai total kiriman browser.
+
+Pada tahap ini pilihan tersimpan di session `pemesanan_flow`. **Belum ada pesanan permanen** sampai data pengunjung berhasil dikirim. POST awal pemesanan dibatasi `throttle:10,1`.
+
+Validator jumlah saat ini tidak menetapkan batas maksimum bisnis. Test menguji jumlah di atas batas lama; hal itu bukan uji kapasitas server untuk jumlah tak terbatas.
+
+### 7.2 Tahap kedua: identitas tiap tiket
+
+| Kategori | Data wajib |
+| --- | --- |
+| `perorangan` | Nama maksimal 100 karakter dan jenis kelamin `L` atau `P` untuk setiap tiket |
+| `kendaraan` | Plat kendaraan maksimal 20 karakter untuk setiap tiket kendaraan |
+
+Jumlah formulir mengikuti jumlah unit. Dua tiket orang dan satu kendaraan memerlukan dua nama/gender serta satu plat. Nama akun pemesan tidak menggantikan semua identitas pengunjung.
+
+1. Lengkapi setiap kolom dan periksa tanggal, jumlah, serta total.
+2. Kirim data; perbaiki pesan validasi bila ada.
+3. Server menyimpan pesanan dan detail dalam transaksi database.
+4. Flow sementara dihapus dan aplikasi menuju pembayaran.
+
+Jika flow session tidak ada, halaman data diri mengarahkan pengguna untuk memulai lagi.
+
+### 7.3 Data dan status awal
+
+Satu pesanan menyimpan pemilik akun, tanggal, jumlah agregat, total, ringkasan pilihan, dan kode booking. Setiap unit menghasilkan satu detail dengan kode tiket sendiri, termasuk kendaraan.
+
+Status pesanan awal `pending`. Detail sudah dibuat dengan `status_tiket=aktif`, tetapi belum dapat digunakan sebelum pesanan selesai. Aktif pada detail bukan bukti sudah lunas.
+
+Setelah tersimpan, aplikasi mencoba mengirim `PemesananBerhasil`. Email ini berarti pesanan tercatat, bukan pembayaran disetujui. Kegagalan email tidak otomatis membatalkan pesanan yang sudah tersimpan.
+
+### 7.4 Contoh yang dibuktikan pengujian
+
+Data uji memakai tiket orang Rp15.000 dan kendaraan Rp5.000. Ini **bukan penetapan tarif resmi**.
+
+```text
+2 x Rp15.000 = Rp30.000
+1 x Rp 5.000 = Rp 5.000
+Total        = Rp35.000
 ```
 
-> Total Blade: 76 file (18 folder). Total PHP app: 60 file (14 folder).
+Server tetap menyimpan Rp35.000 meskipun request uji sengaja mengirim `total_harga=1`. Tarif aktual mengikuti database tiket.
 
----
+**Media:** gambar pilihan, ringkasan, identitas orang/kendaraan, validasi, dan video pemesanan akan ditambahkan nanti.
 
-## 10. Konfigurasi Environment
+## 8. Pembayaran, penolakan, dan unggah ulang
 
-`.env.example` (74 baris) — salin ke `.env`:
+### 8.1 Metode online
 
-```ini
-APP_NAME="E-Tourism Bangkiang Jaran Waterfall"
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-APP_URL=http://localhost:8000
+`/wisatawan/pembayaran/{id_pemesanan}` hanya untuk pemilik pesanan. Katalog `config/payment.php` memuat **BCA, BRI, Mandiri, DANA, OVO, dan GoPay**. Ketersediaan aktual mengikuti environment.
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=bangkiang_jaran
-DB_USERNAME=root
-DB_PASSWORD=
+- Di luar percobaan, metode memerlukan nomor tujuan dan nama penerima lengkap.
+- Jika belum ada metode resmi lengkap, pengajuan ditolak dan pengguna diminta menghubungi pengelola.
+- **QRIS tidak ada pada katalog pembayaran online aktif.** Label QRIS pada loket offline berbeda konteks.
+- Tidak ada gateway yang mengonfirmasi dana otomatis dari penyedia.
 
-# Aiven prod: path CA cert, mis /var/www/html/database/database-ca.pem
-MYSQL_ATTR_SSL_CA=
+### 8.2 Langkah wisatawan
 
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=5256000
+1. Periksa pesanan dan total.
+2. Pilih metode yang tersedia.
+3. Periksa tujuan/nama penerima; gunakan kontrol salin bila tersedia.
+4. Lakukan pembayaran di aplikasi bank/dompet digital di luar website.
+5. Kembali, pilih bukti, dan periksa pratinjau gambar/informasi PDF.
+6. Gunakan ganti/hapus jika berkas salah, kemudian pilih ulang.
+7. Kirim bukti dan tunggu keputusan pada detail/riwayat.
 
-MAIL_MAILER=log
-MAIL_HOST=127.0.0.1
-MAIL_PORT=587
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="info@bangkiangjaran.com"
-MAIL_FROM_NAME="${APP_NAME}"
+README tidak memuat rekening/kredensial. Simpan bukti asli untuk klarifikasi dengan pengelola.
 
-GOOGLE_MAPS_API_KEY=
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=           # default APP_URL + /auth/google/callback
+### 8.3 Validasi bukti
 
-AWS_*, PUSHER_*                # optional
-VITE_PUSHER_*                  # optional
+| Aturan | Implementasi |
+| --- | --- |
+| Format | JPG, JPEG, PNG, PDF |
+| Ukuran | Maksimal 5120 KB / 5 MB menurut validator `max:5120` |
+| Berkas | Wajib pada pengajuan |
+| Metode | Harus termasuk metode yang tersedia pada server |
+| MIME server | `image/jpeg`, `image/png`, `application/pdf` |
+| Penyimpanan | Disk `public`, direktori `bukti/`, nama acak |
+
+Unggah berhasil membuat pembayaran `pending`; pesanan tetap `pending`. Pratinjau dan keberhasilan upload tidak menetapkan lunas.
+
+### 8.4 Pemeriksaan pengelola
+
+1. Buka Verifikasi Pembayaran dan pilih bukti menunggu.
+2. Cocokkan pemesan, total, metode, serta bukti dengan penerimaan dana di luar aplikasi.
+3. Pilih `valid` atau `ditolak`.
+4. Server menyimpan keputusan menggunakan transaksi dan penguncian baris.
+
+| Keputusan | Pembayaran | Pesanan | Berikutnya |
+| --- | --- | --- | --- |
+| Diterima | `valid` | `selesai` | Tiket digunakan sesuai tanggal dan syarat masuk |
+| Ditolak | `ditolak` | `pending` | Wisatawan memperbaiki bukti |
+
+Keputusan hanya diproses untuk kondisi menunggu yang sesuai. Pembayaran valid tidak dapat diputuskan ulang melalui endpoint biasa. Sistem mencoba mengirim email hasil setelah perubahan tersimpan.
+
+### 8.5 Pengajuan ulang
+
+1. Setelah ditolak, buka pembayaran pesanan yang sama.
+2. Periksa kembali tujuan/total, pilih metode dan bukti pengganti.
+3. Kirim; record pembayaran yang sama diperbarui menjadi `pending`.
+4. Berkas lama dihapus setelah penggantian berhasil.
+5. Tunggu pemeriksaan baru.
+
+Pengajuan ulang tidak membuat pembayaran kedua. Pembayaran masih pending atau sudah valid tidak menerima upload ulang lewat alur biasa; membuka halaman pembayarannya diarahkan ke detail.
+
+### 8.6 Mode percobaan
+
+`PAYMENT_TRIAL_MODE` hanya berlaku pada `APP_ENV=local` atau `testing`. Metode tanpa nomor/nama lengkap dapat dipakai menguji bukti contoh dengan label percobaan. Label ini bukan tujuan transfer sungguhan.
+
+Test membuktikan mode percobaan tidak mengaktifkan metode tanpa rekening pada environment `production`. Jangan menganggap metode percobaan sebagai kanal pembayaran resmi.
+
+**Media:** gambar metode, kondisi belum tersedia, pratinjau JPG/PDF, ganti/hapus, menunggu, ditolak, unggah ulang, dan video keputusan akan ditambahkan nanti.
+
+## 9. Riwayat, e-ticket, dan status transaksi
+
+### 9.1 Riwayat dan kepemilikan
+
+`/wisatawan/pemesanan/riwayat` menampilkan pesanan akun login dari yang terbaru. Detail memuat booking, tanggal, total, status, dan tiket sesuai kondisi transaksi.
+
+Mengganti ID tidak memberi akses pesanan orang lain. Detail, halaman sukses, pembayaran, endpoint status, dan upload milik akun lain ditolak dengan 404 pada pengujian tambahan.
+
+### 9.2 Membaca status
+
+| Data | Arti |
+| --- | --- |
+| Pesanan `pending`, belum ada pembayaran | Belum mengajukan bukti |
+| Pesanan `pending`, pembayaran `pending` | Menunggu pengelola |
+| Pesanan `pending`, pembayaran `ditolak` | Perlu pengajuan ulang |
+| Pesanan `selesai`, pembayaran `valid` | Transaksi disetujui; tetap ikuti syarat masuk |
+| Status tidak konsisten | Tidak dianggap berhasil hanya dari satu kolom |
+
+`isApproved()` memerlukan pesanan `selesai` **dan** pembayaran `valid`. Endpoint mengirim token gabungan untuk mendeteksi perubahan.
+
+Nilai `diproses`/`dibatalkan` terdapat pada skema, tetapi tidak membuktikan ada tombol pembatalan/refund wisatawan. Route tersebut tidak tersedia pada alur aktif.
+
+### 9.3 Menggunakan e-ticket
+
+1. Setelah diterima, buka detail pesanan.
+2. Periksa tanggal/identitas setiap unit.
+3. Siapkan QR atau kode tiket ketika datang.
+4. Gunakan cetak/unduh untuk membuka dialog cetak browser.
+5. Pilih simpan PDF di browser bila fasilitas tersebut tersedia.
+
+E-ticket memakai `window.print()` dan gaya cetak, berbeda dari endpoint PDF laporan. Browser tidak selalu langsung mengunduh PDF secara otomatis.
+
+Gambar QR menggunakan layanan eksternal `api.qrserver.com` dan memuat URL verifikasi. Pemuatan bergantung internet dan layanan tersebut; ketersediaannya pada semua perangkat tidak dibuktikan suite aplikasi.
+
+### 9.4 Status tiap detail
+
+| Data | Arti |
+| --- | --- |
+| `aktif` | Belum digunakan; tetap perlu pesanan selesai dan tanggal hari ini |
+| `digunakan` | Telah check-in |
+| `kadaluarsa` | Dikenali pemeriksaan; tidak membuktikan job otomatis mengisinya |
+| `check_out_at` terisi | Sudah keluar; status detail tetap `digunakan` |
+
+**Media:** gambar riwayat, seluruh kondisi status, e-ticket, dialog cetak, dan video penggunaan akan ditambahkan nanti.
+
+## 10. Verifikasi publik dan pintu masuk
+
+### 10.1 Verifikasi publik
+
+`/tiket/verifikasi/{kode}` dapat dibuka tanpa login. Kode tak dikenal memberi hasil tidak ditemukan; kode dikenal menampilkan hasil/data tiket yang disiapkan controller.
+
+Penanda `valid` publik memeriksa pesanan `selesai` dan detail `aktif`. Perhitungannya **tidak memeriksa tanggal kunjungan**. Membuka URL atau QR tidak melakukan check-in dan tidak mengubah penggunaan tiket. Pemeriksaan tanggal ada pada check-in petugas.
+
+Karena publik, pertimbangkan data yang tampil sebelum membagikan kode/tautan. Hasil publik bukan otorisasi untuk mengubah tiket.
+
+### 10.2 Pencarian petugas
+
+1. Login pengelola dan buka `/pengelola/scan`.
+2. Ketik kode tiket, gunakan scanner pengisi kode, atau aktifkan kamera.
+3. Izinkan kamera bila diminta; tampilan menggunakan `html5-qrcode` eksternal.
+4. Periksa identitas, tanggal, status pesanan, dan status penggunaan.
+5. Konfirmasikan masuk bila memenuhi syarat.
+
+Pencarian/kamera memasukkan kode; server memutuskan penggunaannya. Endpoint teruji tidak membuktikan izin kamera dan QR fisik pada semua perangkat.
+
+### 10.3 Check-in
+
+Server menolak bila kode tidak ditemukan, detail bukan `aktif`, pesanan bukan `selesai`, atau tanggal kunjungan bukan hari ini pada timezone aplikasi.
+
+Jika diterima, detail menjadi `digunakan` dan `check_in_at` diisi. Check-in kedua ditolak. Perubahan menggunakan transaksi dan penguncian tiket.
+
+Controller scan memeriksa status **pesanan** sebagai syarat lunas; tidak memeriksa ulang record pembayaran seperti `isApproved()` wisatawan. Alur persetujuan normal mengubah pesanan dan pembayaran bersama. Jangan mengklaim scan memeriksa mutasi bank atau pembayaran secara terpisah.
+
+### 10.4 Check-out
+
+Cari kode yang sudah masuk, lalu pilih check-out. Server mensyaratkan detail `digunakan`, waktu keluar belum ada, dan tanggal kunjungan hari ini. Hasilnya `check_out_at` terisi. Check-out kedua ditolak dan tiket tidak kembali aktif untuk masuk ulang.
+
+### 10.5 Auto-checkout
+
+`php artisan tiket:auto-checkout` mengisi waktu keluar untuk detail dengan check-in **lebih dari 24 jam** yang belum check-out. Perintah ini teruji pada fixture.
+
+Pada verifikasi, `php artisan schedule:list` menghasilkan `No scheduled tasks have been defined.` Definisi di Kernel lama belum terlihat pada scheduler aktif. **Belum dapat dinyatakan auto-checkout berjalan otomatis setiap jam.** Aktivasi jadwal perlu pekerjaan terpisah.
+
+**Media:** gambar hasil publik, kode salah, scanner/kamera, check-in/out, penolakan, dan video petugas pada perangkat nyata akan ditambahkan nanti.
+
+## 11. Pemesanan offline oleh pengelola
+
+Offline berarti **penjualan loket yang dicatat pengelola pada aplikasi web**. Bukan kemampuan tanpa internet, PWA, atau sinkronisasi otomatis setelah jaringan pulih.
+
+### 11.1 Alur loket
+
+1. Login pengelola dan buka Pemesanan Offline.
+2. Pilih tanggal/jumlah tiket, lalu lanjutkan.
+3. Isi nama dan jenis kelamin tiap detail.
+4. Pilih metode penerimaan pembayaran.
+5. Pastikan dana telah diperiksa petugas, lalu simpan.
+6. Sistem membuat pesanan `selesai` dan pembayaran `valid` tanpa antrean online.
+7. Tinjau tiket pada halaman sukses atau riwayat loket.
+
+Booking berawalan `BJ-OFF-`. Pemilik record adalah pengelola pencatat. Riwayat loket dibatasi pada akun pencatat yang login dan pesanan selesai.
+
+### 11.2 Perbedaan alur
+
+| Aspek | Online | Loket offline |
+| --- | --- | --- |
+| Pelaksana/pemilik | Wisatawan | Pengelola pencatat |
+| Tanggal | Hari ini atau setelahnya | Validator meminta tanggal valid tanpa `after_or_equal:today` |
+| Orang | Nama dan gender | Nama dan gender |
+| Kendaraan | Plat | Nama/gender untuk semua detail; plat `null` |
+| Metode | Katalog online terkonfigurasi | `Tunai,BCA,BRI,Mandiri,Dana,OVO,GoPay,QRIS` |
+| Bukti | Wajib unggah | `null`, tidak diwajibkan |
+| Setelah simpan | Pesanan `pending` | Pesanan `selesai`, pembayaran `valid` |
+| Verifikasi | Perlu pengelola | Tidak lewat antrean online |
+
+QRIS loket adalah label pencatatan, bukan QR dinamis atau konfirmasi penyedia. Tanggal lampau yang bisa dicatat loket tetap tidak membuat tiket boleh check-in pada tanggal berbeda.
+
+**Media:** gambar pilihan, identitas, metode, sukses/riwayat, dan video penjualan loket akan ditambahkan nanti.
+
+## 12. Seluruh menu pengelola
+
+### 12.1 Dashboard
+
+| Ringkasan | Dasar controller |
+| --- | --- |
+| Pengunjung hari ini | Agregat `jumlah` pesanan selesai dengan kunjungan hari ini |
+| Pendapatan bulan ini | Total pembayaran valid berdasarkan bulan/tahun `tgl_bayar` |
+| Menunggu verifikasi | Pesanan dengan pembayaran pending |
+| Total wisatawan | Akun role wisatawan |
+| Scan hari ini | Detail digunakan dengan tanggal `updated_at` hari ini |
+| Grafik komposisi | Jumlah pesanan selesai dikelompokkan menurut tiket utama |
+| Pesanan terbaru | Lima pesanan terbaru |
+
+Pengunjung merupakan unit pesanan dan dapat mencakup kendaraan, bukan jumlah orang yang fisik masuk. Grafik memakai tiket utama, bukan seluruh detail pesanan campuran. Scan menurut `updated_at` juga bukan pengukuran terpisah arus masuk/keluar.
+
+### 12.2 Kelola Tiket
+
+1. Buka daftar dan pilih tambah.
+2. Isi nama Indonesia, nama Inggris opsional, harga, kategori, dan status.
+3. Simpan; yang aktif dapat muncul di publik.
+4. Gunakan edit untuk mengubah harga/data atau menonaktifkan.
+5. Gunakan hapus untuk soft delete bila tak diperlukan.
+
+Nama maksimal 100 karakter; harga angka minimal 0; kategori `perorangan,kendaraan`; status `aktif,nonaktif`. Detail transaksi menyimpan snapshot nama/harga. Form/controller tidak menyediakan pengaturan kuota harian.
+
+### 12.3 Kelola Galeri
+
+1. Tambah foto JPG/JPEG/PNG maksimal 5120 KB / 5 MB.
+2. Pilih tipe `wisata` atau `restoran`.
+3. Isi keterangan Indonesia/Inggris opsional, masing-masing maksimal 255 karakter.
+4. Simpan dan tinjau tampilan tujuan.
+5. Gunakan filter tipe dan tindakan hapus bila diperlukan.
+
+Server memvalidasi gambar/MIME. Hapus melakukan soft delete record dan menghapus berkas. Route aktif mendukung daftar, tambah, simpan, hapus; **tidak ada edit/update galeri**. Form ini untuk gambar, bukan video.
+
+Gunakan foto asli sesuai lokasi/keterangan. Pola nama foto contoh tertentu disaring dari sejumlah bagian pemasaran.
+
+### 12.4 Verifikasi Pembayaran
+
+Daftar hanya mengambil pesanan yang sudah memiliki pembayaran, memprioritaskan pending lalu terbaru, dengan pagination 20. Detail menyediakan informasi pemesan, pesanan, tiket, dan bukti. Ikuti [langkah keputusan](#84-pemeriksaan-pengelola).
+
+Pesanan belum memiliki pembayaran dapat muncul pada notifikasi pesanan baru, tetapi belum masuk daftar bukti yang diajukan.
+
+### 12.5 Scan Tiket
+
+Menu menyediakan pencarian kode, kamera, hasil pemeriksaan, tindakan masuk/keluar, dan tiket hari ini dengan pesanan selesai. Aturannya dijelaskan pada [pintu masuk](#10-verifikasi-publik-dan-pintu-masuk).
+
+### 12.6 Pemesanan Offline dan riwayat
+
+Menu menyediakan flow loket dan daftar transaksi selesai milik pencatat yang login. Riwayat menggunakan pagination 20. Gunakan laporan untuk meninjau data offline sesuai filter.
+
+### 12.7 Laporan kunjungan
+
+1. Pilih laporan kunjungan.
+2. Isi tanggal awal/akhir; akhir tidak boleh lebih awal.
+3. Pilih online/offline bila perlu; tanpa pilihan berarti keduanya.
+4. Tampilkan, lalu ekspor PDF jika dibutuhkan.
+
+Periode berdasarkan `tgl_kunjungan`. Offline dikenali dari kode `BJ-OFF-`; online adalah yang tidak berawalan itu.
+
+Controller menjumlahkan `jumlah` hasil filter tanpa syarat tambahan selesai/check-in. Rekap ini memuat unit pesanan, termasuk kemungkinan kendaraan dan pesanan belum selesai; bukan bukti semuanya datang.
+
+### 12.8 Laporan transaksi
+
+Langkah periode/filter/ekspor serupa. Laporan hanya mengambil pembayaran `valid`, memakai `tgl_bayar`, dan menjumlahkan total pembayaran hasil filter. Kedua laporan memiliki tampilan web serta PDF server DomPDF dengan A4 landscape.
+
+Test lama memeriksa PDF kosong; tambahan memeriksa isi/filter online-offline pada transaksi loket. Seluruh variasi laporan berisi data nyata belum diaudit hasil cetaknya.
+
+### 12.9 Data Wisatawan
+
+Daftar hanya mengambil role wisatawan. Tersedia pencarian nama/username/email, jumlah pesanan, asal pendaftaran, status/metode verifikasi, dan pagination 20.
+
+Menu ini **daftar/pencarian, bukan CRUD pengguna**. Tidak ada endpoint tambah, ubah peran, atau hapus wisatawan dari menu ini.
+
+### 12.10 Notifikasi, profil, dan logout
+
+Notifikasi mengelompokkan bukti pending dan pesanan baru tanpa pembayaran. Profil dan logout mengikuti [panduan akun](#6-lupa-password-profil-dan-logout).
+
+**Media:** gambar semua daftar/form/detail pengelola, filter, pagination, dashboard, notifikasi, laporan/PDF, dan video tiap pekerjaan akan ditambahkan nanti.
+
+## 13. Bahasa, email, dan pembaruan status
+
+### 13.1 Bahasa
+
+`/lang/id` dan `/lang/en` menyimpan locale ke session dan kembali ke halaman sebelumnya. Locale tak dikenal tidak mengganti pilihan.
+
+Teks memakai `lang/id/messages.php`, `lang/en/messages.php`, serta beberapa pilihan teks pada view. Nama tiket/keterangan foto memiliki kolom Inggris dengan fallback Indonesia. Pengalih bahasa tidak membuktikan seluruh pesan validasi dan halaman pengelola telah diterjemahkan lengkap.
+
+### 13.2 Email
+
+| Pemicu | Mekanisme | Makna |
+| --- | --- | --- |
+| Daftar email | `RegistrationOtpMail` | Bukti kepemilikan sebelum akun dibuat |
+| Lupa password | Notifikasi reset Laravel | Tautan token password baru |
+| Pesanan tersimpan | `PemesananBerhasil` | Pencatatan pesanan, belum persetujuan bayar |
+| Persetujuan | `PembayaranValid` | Keputusan valid |
+| Penolakan | `PembayaranDitolak` | Pengajuan perlu diperbaiki |
+
+Adanya template lain seperti `WelcomeMail` tidak membuktikan email itu selalu dikirim saat daftar. SMTP/pengirim harus benar untuk pengiriman nyata. Test fake tidak membuktikan inbox, spam, reputasi domain, atau latensi penyedia.
+
+### 13.3 Polling status
+
+Halaman transaksi menggunakan endpoint status milik pemesan untuk mendeteksi perubahan token/indikator persetujuan. Notifikasi pengelola juga memakai polling; interval layout pengelola adalah 20000 milidetik.
+
+Endpoint notifikasi mengambil sampai 10 pembayaran pending dan sampai 10 pesanan baru tanpa pembayaran. `count` adalah jumlah hasil dua kelompok yang dibatasi itu, bukan total seluruh pekerjaan tanpa batas.
+
+Pembaruan otomatis berarti permintaan berkala browser. Dependency/variabel broadcast tidak membuktikan WebSocket atau push notification aktif.
+
+## 14. Rencana gambar dan video
+
+### 14.1 Dokumentasi README
+
+**Seluruh tangkapan layar dan video tutorial berikut akan ditambahkan nanti.** Penjelasan teks tersedia; tabel ini tidak menyatakan media baru sudah dibuat.
+
+| Halaman/fitur | Gambar yang akan ditambahkan | Video yang akan ditambahkan |
+| --- | --- | --- |
+| Beranda/navigasi | Desktop, ponsel, menu, konten utama | Tur halaman publik |
+| Peta/rute | Titik awal, tujuan, tautan Maps | Memilih keberangkatan |
+| Restoran | Pembuka, foto, keadaan kosong | Menelusuri informasi |
+| Tiket/detail | Jenis, harga, estimator | Memilih dan memahami biaya |
+| Login/tamu | Form, gagal, pilihan guest | Login tiap peran dan alur tamu |
+| Daftar | Form dan validasi | Daftar sampai meminta OTP |
+| OTP/email | Form, countdown, resend, salah/kedaluwarsa; data disamarkan | Verifikasi, kirim ulang, batal |
+| Google | Tombol, profil baru, username | OAuth dan pemilihan username |
+| Lupa/reset | Form, notifikasi, reset | Tautan sampai login kembali |
+| Profil | Tiap peran, email terkunci, password Google | Ubah profil/password Google |
+| Pemesanan | Tanggal, jumlah, ringkasan | Memesan beberapa jenis |
+| Identitas | Nama/gender dan plat per unit | Melengkapi sampai tersimpan |
+| Pembayaran | Aktif, belum tersedia, percobaan | Instruksi dan unggah |
+| Pratinjau bukti | Gambar/PDF, ganti/hapus, berkas ditolak | Memperbaiki berkas |
+| Riwayat/status | Belum bayar, pending, ditolak, berhasil | Melacak dan unggah ulang |
+| E-ticket | Kode/QR tiap tiket, dialog cetak | Menyiapkan dan simpan PDF browser |
+| Verifikasi publik | Ditemukan, tidak ada, sudah digunakan | Membuka QR |
+| Dashboard | Metrik, grafik, pesanan terbaru | Membaca angka dan batasnya |
+| Kelola Tiket | Daftar, tambah/edit, nonaktif/hapus | Siklus kelola tiket |
+| Galeri | Upload, dua bahasa, filter/hapus | Menambah foto asli |
+| Verifikasi bayar | Daftar, bukti, keputusan | Terima dan tolak |
+| Notifikasi | Dua kelompok dan badge | Membuka pekerjaan |
+| Scan | Manual, kamera, sukses/gagal | Check-in/out perangkat nyata |
+| Loket offline | Pilihan, identitas, metode, sukses | Penjualan awal sampai akhir |
+| Riwayat loket | Daftar/detail | Meninjau transaksi pencatat |
+| Laporan kunjungan | Periode, tipe, hasil/PDF | Filter dan ekspor |
+| Laporan transaksi | Periode, tipe, total/PDF | Rekap pembayaran valid |
+| Data Wisatawan | Pencarian, asal/verifikasi, pagination | Menemukan dan membaca akun |
+| Bahasa/logout | ID/EN dan kembali guest | Ganti bahasa dan akhiri sesi |
+
+Saat media ditambahkan, gunakan keadaan aplikasi yang benar dan samarkan email, kode aktif, bukti transfer, serta data pribadi. Jangan tampilkan password/token/kredensial. Rekaman layanan nyata baru menjadi bukti setelah alurnya benar-benar dijalankan.
+
+### 14.2 Media di dalam website
+
+Foto asli destinasi, canyon, fasilitas, dan restoran dapat dilengkapi nanti melalui Galeri sesuai tipe. Foto lanskap tidak dinyatakan sebagai foto restoran.
+
+Video latar beranda dapat ditambahkan nanti di `public/videos/bangkiang-jaran.mp4` atau path relatif `TOURISM_HERO_VIDEO`. Berkas default itu tidak ditemukan saat sesi ini; ini tidak memeriksa seluruh path kustom pada deployment lain.
+
+Template menampilkan video hanya bila path aman, ekstensi MP4/WebM, dan berkas lokal ada di bawah `public/`. Upload video melalui Galeri belum tersedia. Menambah media tidak otomatis memverifikasi fakta lapangan atau harga resmi.
+
+## 15. Teknologi dan cara kerja sistem
+
+### 15.1 Stack dari manifest
+
+| Bagian | Teknologi/constraint |
+| --- | --- |
+| Backend / PHP | Laravel `^13.0` / PHP `^8.3` |
+| Tampilan | Blade, Tailwind `^3.1.0`, Alpine.js `^3.4.2` |
+| Auth dasar | Breeze `^2.4`, disesuaikan aplikasi |
+| OAuth | Socialite `^5.28` |
+| Token API | Sanctum `^4.3`; bukan bukti UI kelola token tersedia |
+| Build | Vite `^4.0.0`, `laravel-vite-plugin ^0.7.2` |
+| PDF | `barryvdh/laravel-dompdf ^3.1` |
+| HTTP client | Guzzle `^7.2` |
+| Database lokal | MySQL/MariaDB sesuai environment proyek |
+| Database test | SQLite in-memory dari `phpunit.xml` |
+| Pengujian | PHPUnit `^11.5` |
+
+Constraint bukan versi terpasang yang persis. `composer.lock` dan `package-lock.json` mengunci instalasi.
+
+### 15.2 Alur request
+
+```text
+Browser -> route web/auth
+  -> middleware session, CSRF, login eksplisit, locale, auth, role
+  -> controller -> validasi/otorisasi
+  -> Eloquent/transaksi database
+  -> Blade HTML atau JSON
+  -> JavaScript untuk interaksi dan polling
 ```
 
-**Wajib isi untuk fitur penuh:**
-- `GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI` → https://console.cloud.google.com/apis/credentials (Authorized redirect URI harus cocok)
-- `MAIL_MAILER=smtp` + kredensial jika ingin email beneran terkirim (default `log` hanya ke `storage/logs`)
-- `GOOGLE_MAPS_API_KEY` jika embed Maps pakai JS API (saat ini pakai iframe gratis tanpa key juga jalan)
-- `MYSQL_ATTR_SSL_CA` jika DB Aiven/SSL
+Controller/service juga memanggil filesystem untuk upload, mailer untuk email, dan DomPDF untuk laporan. Halaman dirender server; aplikasi ini bukan Next.js atau SPA React. Alpine/JavaScript menambahkan interaksi pada halaman.
 
----
+### 15.3 Hak akses
 
-## 11. Instalasi Lokal
+| Pelaku | Akses utama |
+| --- | --- |
+| Tamu | Publik, autentikasi, verifikasi tiket publik |
+| Wisatawan | Publik, profil, pemesanan, pembayaran/riwayat/detail sendiri |
+| Pengelola | Route pengelola dan profil |
 
-### Prasyarat
-- PHP 8.3+, Composer 2.x, Node 20+, MySQL 5.7+/MariaDB 10.3+ (atau XAMPP), Git
+Route wisatawan memakai `auth` + `role:wisatawan`; pengelola memakai `auth` + `role:pengelola`. Kepemilikan diperiksa lagi pada query pesanan wisatawan. Menyembunyikan tombol saja bukan otorisasi.
 
-### Langkah (Windows / XAMPP)
+### 15.4 Mekanisme pengamanan yang terlihat
 
-```bash
-# 1. Clone
-git clone https://github.com/Yosuanry0812/bangkiang-jaran-web.git
-cd bangkiang-jaran-web
+- Hash password dan OTP; cache tantangan terenkripsi serta terikat session.
+- Pembatasan login, daftar, OTP, reset, dan awal pemesanan.
+- CSRF pada route web dan regenerasi session setelah autentikasi.
+- Username/email unik, validasi ukuran/MIME upload, harga dari server.
+- Transaksi/penguncian perubahan pembayaran, keputusan, dan scan.
+- Constraint identitas tertentu dan satu pembayaran per pesanan.
+- Tidak menggabungkan akun Google hanya berdasarkan email sama.
 
-# 2. Dependencies
+Ini bukan sertifikasi keamanan atau pentest menyeluruh. Bukti pembayaran saat ini berada pada disk publik; dokumentasi ini tidak mengubahnya menjadi penyimpanan privat. Pengujian SQLite juga bukan pembuktian seluruh race condition pada MySQL produksi.
+
+## 16. Database dan penyimpanan berkas
+
+### 16.1 Tabel utama
+
+| Tabel | Fungsi |
+| --- | --- |
+| `users` | Identitas, role, kredensial/Google ID, metadata login dan metode akun |
+| `tiket` | Nama dua bahasa, harga, kategori, status, soft delete |
+| `pemesanan` | Pemilik, tanggal, jumlah, total, booking, ringkasan JSON, status |
+| `detail_pemesanan` | Kode per unit, nama/gender/plat, snapshot tiket, status dan waktu masuk/keluar |
+| `pembayaran` | Pesanan, total, metode, bukti, status, tanggal bayar |
+| `galeri` | Path foto, keterangan dua bahasa, tipe, soft delete |
+| `konten` | Tabel/model yang ada; bukan bukti CRUD konten aktif |
+| `activity_logs` | Aktivitas yang dicatat helper |
+| `log_login_sukses`, `log_login_gagal` | Log terpisah menurut model/migrasi lokal |
+| `password_resets` | Token broker reset password |
+
+Tabel log tidak otomatis menyediakan menu manajemen log.
+
+### 16.2 Relasi dan kode
+
+```text
+User -> banyak Pemesanan
+Pemesanan -> satu pemilik, satu tiket utama
+          -> banyak DetailPemesanan
+          -> satu Pembayaran
+DetailPemesanan -> satu Pemesanan dan jenis Tiket terkait
+Galeri -> foto wisata atau restoran
+```
+
+Tiket utama pesanan tidak menggantikan seluruh daftar detail. Pesanan campuran mempunyai rincian pada ringkasan/detail. `kode_booking` menandai keseluruhan pesanan; `kode_tiket` dipakai pemeriksaan tiap unit. Jangan memakai booking sebagai pengganti seluruh kode tiket di pintu masuk.
+
+### 16.3 Asal akun dan verifikasi
+
+| Kolom | Arti |
+| --- | --- |
+| `registration_method` | Asal pendaftaran email/Google |
+| `email_verification_method` | Bukti OTP/Google atau kondisi akun lama |
+| `email_verified_at` | Waktu verifikasi |
+| `last_login_method` | Login terakhir manual/Google |
+| `last_login_at`, `login_count` | Waktu/jumlah login |
+
+Migrasi akun lama tidak memberi bukti OTP palsu. `AccountRegistrationMethodTest` memeriksa klasifikasi tersebut.
+
+### 16.4 Penyimpanan runtime
+
+| Lokasi | Isi |
+| --- | --- |
+| `storage/app/public/galeri/` | Foto unggahan |
+| `storage/app/public/bukti/` | Bukti pembayaran |
+| `public/storage` | Tautan publik ke unggahan |
+| `public/images/`, `public/videos/` | Aset statis foto/video bila tersedia |
+| `public/build/` | Hasil Vite |
+| `storage/framework/` | Session/cache/view runtime |
+| `storage/logs/` | Log aplikasi |
+
+Backup SQL tidak otomatis mencakup unggahan. Pemulihan lengkap memerlukan database dan berkas yang cocok.
+
+## 17. Peta halaman dan endpoint
+
+Parameter `{id}` adalah identitas record. Tabel mengelompokkan endpoint, bukan menganggap semua respons JSON sebagai menu. Untuk daftar runtime beserta middleware, gunakan `php artisan route:list`.
+
+### 17.1 Publik dan autentikasi
+
+| Metode | URL | Fungsi |
+| --- | --- | --- |
+| GET | `/` | Beranda |
+| GET | `/restoran` | Restoran |
+| GET | `/informasi` | Redirect beranda |
+| GET | `/tiket`, `/tiket/{id}` | Daftar/detail tiket aktif |
+| GET | `/tiket/verifikasi/{kode}` | Verifikasi publik |
+| GET, POST | `/register` | Form/permintaan OTP |
+| GET, POST | `/register/otp` | Form/verifikasi OTP |
+| POST | `/register/otp/resend` | Kirim ulang |
+| POST | `/register/otp/cancel` | Batal |
+| GET, POST | `/login` | Form/proses login |
+| GET | `/auth/google`, `/auth/google/callback` | Mulai/callback OAuth |
+| GET, POST | `/forgot-password` | Form/minta tautan reset |
+| GET | `/reset-password/{token}` | Form reset |
+| POST | `/reset-password` | Simpan melalui token |
+| GET | `/lang/{locale}` | Pilih ID/EN |
+| GET | `/up` | Health framework, bukan menu wisatawan |
+
+### 17.2 Akun dan kompatibilitas
+
+| Metode | URL | Fungsi |
+| --- | --- | --- |
+| GET | `/redirect-after-login` | Pengalihan peran/tujuan |
+| GET, PATCH | `/profile` | Tampil/simpan profil |
+| POST | `/profile/set-password` | Password akun Google |
+| DELETE | `/profile` | Hapus akun dengan password; form tidak tampil di profil aktif |
+| PUT | `/password` | Ubah dengan password lama; form manual tidak tampil di profil aktif |
+| GET, POST | `/confirm-password` | Konfirmasi Breeze |
+| GET | `/verify-email` | Prompt kompatibilitas Breeze |
+| GET | `/verify-email/{id}/{hash}` | Verifikasi tautan signed |
+| POST | `/email/verification-notification` | Minta tautan verifikasi Breeze |
+| POST, GET | `/logout` | Logout utama/fallback |
+| GET | `/api/user` | Pengguna terautentikasi Sanctum, bukan API CRUD lengkap |
+
+Route verifikasi tautan lama tetap ada; daftar email utama memakai OTP sebelum akun dibuat. Keduanya bukan dua tahap wajib pada alur daftar yang sama.
+
+### 17.3 Wisatawan
+
+Semua memakai prefix `/wisatawan` dan role wisatawan.
+
+| Metode | Sisa URL | Fungsi |
+| --- | --- | --- |
+| GET, POST | `/pemesanan` | Pilihan/simpan flow |
+| GET, POST | `/pemesanan/data-diri` | Data/simpan pesanan |
+| GET | `/pemesanan/sukses/{id}` | Hasil pesanan sendiri |
+| GET | `/pemesanan/riwayat` | Riwayat sendiri |
+| GET | `/pemesanan/status` | JSON status daftar sendiri |
+| GET | `/pemesanan/{id}/status` | JSON satu pesanan sendiri |
+| GET | `/pemesanan/{id}` | Detail/e-ticket sendiri |
+| GET, POST | `/pembayaran/{id_pemesanan}` | Form/unggah bukti sendiri |
+
+### 17.4 Pengelola
+
+Semua memakai prefix `/pengelola` dan role pengelola.
+
+| Metode | Sisa URL | Fungsi |
+| --- | --- | --- |
+| GET | `/dashboard` | Ringkasan |
+| GET | `/tiket`, `/tiket/create` | Daftar/tambah |
+| POST | `/tiket` | Simpan tiket |
+| GET | `/tiket/{id}/edit` | Form edit |
+| PUT, PATCH | `/tiket/{id}` | Ubah |
+| DELETE | `/tiket/{id}` | Soft delete |
+| GET | `/galeri`, `/galeri/create` | Daftar/form foto |
+| POST | `/galeri` | Simpan foto |
+| DELETE | `/galeri/{id}` | Hapus berkas/soft delete |
+| GET | `/verifikasi`, `/verifikasi/{id}` | Daftar/detail pembayaran |
+| POST | `/verifikasi/{id}/validasi` | Keputusan |
+| GET | `/notifikasi` | JSON polling |
+| GET | `/scan` | Halaman scan |
+| POST | `/scan/cari` | Cari kode |
+| POST | `/scan/gunakan`, `/scan/checkout` | Masuk/keluar |
+| GET, POST | `/pemesanan-offline` | Pilihan loket |
+| GET, POST | `/pemesanan-offline/data-diri` | Data/simpan transaksi lunas |
+| GET | `/pemesanan-offline/sukses/{id}` | Hasil milik pencatat |
+| GET | `/pemesanan-offline/riwayat` | Transaksi selesai milik pencatat |
+| GET | `/laporan` | Pilihan laporan |
+| GET | `/laporan/kunjungan`, `/laporan/transaksi` | Rekap; PDF bila parameter `export` disertakan |
+| GET | `/user` | Daftar/pencarian wisatawan |
+
+## 18. Instalasi dan menjalankan secara lokal
+
+Prosedur ini berasal dari konfigurasi repository. Instalasi mesin kosong, migrasi MySQL pengguna, dan Docker tidak dijalankan ulang saat penulisan panduan.
+
+### 18.1 Prasyarat
+
+- PHP `^8.3`, Composer, dan ekstensi yang dibutuhkan dependency.
+- Node/npm kompatibel lockfile; tahap aset Docker memakai Node 20.
+- MySQL/MariaDB; lingkungan lokal proyek yang tercatat memakai XAMPP.
+- Ekstensi SQLite PHP untuk pengujian in-memory.
+- Pengiriman email nyata untuk menyelesaikan daftar email di luar pengujian.
+
+### 18.2 Checkout baru
+
+Jalankan dari folder aplikasi, bukan root `Sistem/`:
+
+```powershell
 composer install
-npm install
+npm ci
+```
 
-# 3. Env
-copy .env.example .env
+Jika `.env` belum ada, salin contoh sekali:
+
+```powershell
+Copy-Item .env.example .env
 php artisan key:generate
+```
 
-# 4. DB — buat via phpMyAdmin atau CLI
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS bangkiang_jaran CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+Jangan menimpa `.env` berisi konfigurasi pengguna. Isi database, URL, dan layanan melalui environment tanpa menyalin rahasia ke README/commit.
 
-# 5. Migrasi & seeder (demo akun + 12 pemesanan)
-php artisan migrate --seed
+Untuk database baru yang sengaja disiapkan, buat database dan tinjau migrasi terlebih dahulu, kemudian:
 
-# 6. Storage symlink (wajib agar galeri/bukti bisa diakses)
+```powershell
+php artisan migrate
 php artisan storage:link
-
-# 7. Build frontend (prod) atau dev
-npm run build        # prod
-# atau
-npm run dev          # dev HMR
-
-# 8. Serve
-php artisan serve --port=8000
-# buka http://localhost:8000
-```
-
-> Pint (`composer pint` / `vendor/bin/pint`) untuk format. `php artisan migrate:fresh --seed` untuk reset total.
-
----
-
-## 12. Docker
-
-### Build & Run
-
-```bash
-docker build -f docker/Dockerfile -t bangkiang-jaran .
-docker run -p 8000:80 --env-file .env bangkiang-jaran
-# atau compose jika ada
-```
-
-### Dockerfile (2 stage)
-
-- **Stage 1 `assets`**: `node:20-alpine` → `npm ci` → `npm run build` → `public/build`
-- **Stage 2 `php`**: `php:8.3-apache` → install `libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libxml2-dev libicu-dev libonig-dev zlib1g-dev` → `docker-php-ext-install pdo_mysql mbstring zip gd exif intl opcache` → `a2enmod rewrite` → copy `composer:2` → `composer install --no-dev` → `chown storage bootstrap/cache` → set `APACHE_DOCUMENT_ROOT=/var/www/html/public`.
-
-### Entrypoint (`docker/entrypoint.sh`)
-
-```sh
-[ -L public/storage ] || php artisan storage:link
-php artisan migrate --force
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-exec "$@"
-```
-
-Idempotent — aman tiap boot container.
-
----
-
-## 13. Menjalankan Demo & Ngrok HTTPS
-
-Fitur **scan kamera** butuh **HTTPS** agar browser HP izinkan kamera.
-
-### Opsi A — One-click Windows
-
-```bash
-# double-click
-start-demo.bat
-```
-
-Skrip: cek `public/build/manifest.json` → `npm run build` jika belum ada → cek `ngrok config` → minta token jika belum → `php artisan serve --port=8000` (window 1) → `ngrok http 8000` (window 2) → buka `http://localhost:8000`.
-
-> 1 token ngrok bisa untuk 2 website **gantian**, bukan bareng. Tutup window ngrok website lain dulu.
-
-### Opsi B — Manual
-
-```bash
 npm run build
-php artisan serve --port=8000
-# terminal baru
-ngrok config add-authtoken <TOKEN>  # sekali saja — dari https://dashboard.ngrok.com/get-started/your-authtoken
-ngrok http 8000
-# salin https://xxxx.ngrok-free.app → buka di HP
+php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-**Test scan di HP:**
-- Pengelola: login `pengelola / Password123` → **Scan QR / Validasi Tiket** → izinkan kamera → scan QR wisatawan.
-- Wisatawan: login `wisatawan / Password123` → **Tiket Saya / Riwayat** → tampilkan QR.
+Migrasi mengubah schema; perintah itu panduan setup, bukan tindakan yang dilakukan pada MySQL pengguna saat dokumentasi. Seeder opsional untuk pengembangan; tinjau `DatabaseSeeder`/`DemoDataSeeder` beserta environment sebelum menjalankannya. Pendaftaran publik tidak membuat pengelola. Tidak ada akun/password demo dalam README.
 
-### Script npm
+### 18.3 Pengembangan frontend
 
-```json
-"scripts": {
-  "dev": "vite",
-  "build": "vite build",
-  "tunnel": "ngrok http 8000"
-}
+Jalankan `npm run dev` pada terminal terpisah untuk Vite pengembangan, atau `npm run build` untuk hasil kompilasi. Script npm tersedia: `dev`, `build`, `tunnel`. Jangan mengasumsikan `npm start` atau `composer run dev`.
+
+Jika MySQL XAMPP belum aktif, halaman pembaca data bisa gagal walaupun server PHP aktif. Gunakan stack proyek yang sesuai.
+
+## 19. Konfigurasi layanan dan lingkungan
+
+### 19.1 Nama variabel
+
+Tabel menyebut nama, bukan nilai rahasia.
+
+| Kelompok | Variabel |
+| --- | --- |
+| Aplikasi | `APP_ENV`, `APP_KEY`, `APP_DEBUG`, `APP_URL` |
+| Database | `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` |
+| CA database | `MYSQL_ATTR_SSL_CA` |
+| Session/cache | `SESSION_DRIVER`, `SESSION_LIFETIME`, `CACHE_DRIVER` |
+| Filesystem | `FILESYSTEM_DISK`; beberapa controller menyebut disk `public` eksplisit |
+| Email | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` |
+| Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` |
+| Penerima | `PAYMENT_ACCOUNT_NAME` |
+| Bank | `PAYMENT_BCA_NUMBER`, `PAYMENT_BRI_NUMBER`, `PAYMENT_MANDIRI_NUMBER` |
+| Dompet digital | `PAYMENT_DANA_NUMBER`, `PAYMENT_OVO_NUMBER`, `PAYMENT_GOPAY_NUMBER` |
+| Percobaan | `PAYMENT_TRIAL_MODE` |
+| Bantuan | `CONTACT_WHATSAPP` |
+| Video | `TOURISM_HERO_VIDEO`, relatif terhadap `public/` |
+
+Beberapa opsi dibaca konfigurasi walaupun tidak tercantum pada setiap revisi `.env.example`.
+
+### 19.2 Mengaktifkan pengiriman OTP nyata
+
+1. Pilih transport pengiriman, misalnya SMTP.
+2. Isi pengirim/kredensial melalui environment dan penuhi persyaratan penyedia.
+3. Pastikan koneksi server ke penyedia tersedia.
+4. Segarkan cache konfigurasi sesuai lingkungan setelah perubahan.
+5. Uji memakai alamat sendiri dan periksa inbox/spam.
+
+`MAIL_MAILER=log` ditolak layanan OTP pada penggunaan biasa; bukan cara memperoleh OTP pengguna. `array` hanya diizinkan untuk simulasi unit test. Jangan mematikan perlindungan agar pendaftaran terlihat berhasil.
+
+Pada beberapa instance, session/cache tantangan dan rate limit harus konsisten antar-instance. File pada satu mesin tidak otomatis dibagikan ke mesin lain.
+
+### 19.3 Ketergantungan eksternal
+
+| Layanan | Yang dipakai | Batas verifikasi sesi ini |
+| --- | --- | --- |
+| Google OAuth | Socialite/callback | Provider mock, bukan persetujuan nyata |
+| Email | OTP/reset/transaksi | Fake/notifikasi test, bukan inbox |
+| Google Maps | Iframe/tautan | Bukan akurasi GPS lapangan |
+| QR tiket | Gambar eksternal | Bukan pembacaan QR fisik |
+| Kamera | `html5-qrcode` | Endpoint scan, bukan izin kamera nyata |
+| WhatsApp | Tautan bantuan jika dikonfigurasi | Bukan chatbot/konfirmasi otomatis |
+
+## 20. Pengujian otomatis dan bukti verifikasi
+
+### 20.1 Isolasi
+
+`phpunit.xml` memakai `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` dengan `force=true`, session/cache array, dan mail array. Flow test memakai fake filesystem/mail bila dibutuhkan.
+
+Pekerjaan dokumentasi ini tidak menjalankan migrasi/seed pada MySQL pengguna, transfer bank, pembuatan akun nyata, atau pengiriman OTP ke pihak lain. Browser membuka publik secara read-only; session dapat membuat berkas runtime normal.
+
+### 20.2 Hasil sesi
+
+| Pemeriksaan | Hasil |
+| --- | --- |
+| Suite awal | `95 passed (606 assertions)` |
+| Tambahan `DocumentedFeatureFlowTest` | `9 passed (107 assertions)` |
+| Suite final | `104 passed (713 assertions)` |
+| `php artisan view:cache` | Lulus; cache dibersihkan setelah pemeriksaan |
+| `npm run build` | Lulus |
+| Sintaks PHP test tambahan | Lulus |
+| Diff berkas yang dikerjakan | Lulus |
+| Browser enam halaman x lima preset | 30 kombinasi tanpa overflow horizontal/gambar selesai dimuat yang rusak |
+| Scheduler | Tidak ada jadwal aktif terdaftar |
+
+PHPUnit masih memberi peringatan schema XML deprecated yang sudah ada. Hasil lulus tidak berarti semua lingkungan bebas peringatan.
+
+Preset browser: 320, 375, 768, 1024, 1440 piksel. `window.innerWidth` Agentty berturut-turut **321, 376, 769, 1025, 1442** pada sesi ini; ini pemeriksaan preset, bukan klaim angka ukur persis sama. Halaman: `/`, `/restoran`, `/tiket`, `/login`, `/register`, `/forgot-password`.
+
+Pemeriksaan DOM mencocokkan URL, judul, overflow, dan gambar yang sudah selesai dimuat. Ini bukan audit piksel, semua gambar lazy-load setelah scroll, seluruh interaksi keyboard, atau perangkat fisik. Halaman privat diuji melalui feature test; tidak diklaim semuanya diuji di browser sesi ini.
+
+### 20.3 Tes tambahan untuk memeriksa panduan
+
+[DocumentedFeatureFlowTest.php](tests/Feature/DocumentedFeatureFlowTest.php) menambahkan:
+
+1. Flow online dua orang/satu kendaraan, total dari server, identitas, upload, persetujuan, e-ticket, check-in, penolakan check-in ganda, check-out.
+2. Penolakan tanggal lampau online, jumlah nol, dan data pengunjung kosong.
+3. Loket tunai menghasilkan transaksi lunas dan filter laporan online/offline sesuai.
+4. Tambah/ubah/nonaktif/soft delete tiket; detail nonaktif ditolak bagi wisatawan.
+5. Unggah/filter/hapus berkas/soft delete galeri.
+6. Pembatasan detail, sukses, pembayaran, status, dan upload pesanan orang lain.
+7. Pengalih bahasa serta kode publik tak ditemukan tanpa mengubah penggunaan tiket.
+8. Pencarian daftar wisatawan tidak mengembalikan akun pengelola.
+9. Auto-checkout hanya detail check-in lebih dari 24 jam dan belum keluar.
+
+Dua asumsi draft assertion dikoreksi setelah uji awal: pengelola diarahkan dari detail publik ke dashboard, dan penghapusan galeri memakai soft delete. Tes akhir mengikuti implementasi; source bisnis tidak diubah agar cocok dengan asumsi panduan.
+
+### 20.4 Cakupan suite yang sudah ada
+
+| Kelompok test | Cakupan |
+| --- | --- |
+| `Auth/RegistrationTest.php` | OTP benar/salah/format/kedaluwarsa, resend, limit, sesi, cancel, keunikan, kegagalan mail, tujuan booking |
+| `Auth/AuthenticationTest.php`, `Auth/GuestSessionTest.php` | Login/gagal, guest, sesi lama/remember, role, tujuan booking, logout |
+| `Auth/GoogleLoginTest.php` | Email terverifikasi, konflik identitas, state, username, redirect |
+| `Auth/PasswordResetTest.php` | Reset/token/kedaluwarsa, konfirmasi, mail gagal, limit |
+| `Auth/PasswordUpdateTest.php`, `Auth/PasswordConfirmationTest.php`, `Auth/EmailVerificationTest.php` | Endpoint Breeze terkait |
+| `ProfileTest.php`, `AccountRegistrationMethodTest.php` | Profil, email terkunci, username, asal/bukti verifikasi |
+| `ExampleTest.php` | Render publik, placeholder/foto, restoran, tiket |
+| `VisitorRevisionTest.php`, `TransactionIntegrityTest.php` | Jumlah, percobaan, persetujuan, integritas pembayaran/identitas |
+| `Wisatawan/PembayaranUlangTest.php` | Resubmit ditolak/metode belum tersedia |
+| `Pengelola/ScanTiketTest.php` | Masuk/keluar, tanggal salah, belum lunas, kode tidak ada |
+| `Pengelola/NotifikasiTest.php` | Notifikasi/prioritas pending |
+| `Pengelola/HalamanPengelolaTest.php` | Render menu utama tanpa seed |
+| `Pengelola/LaporanPdfTest.php`, `EmailTemplateTest.php` | PDF kosong/template email |
+
+### 20.5 Menjalankan ulang
+
+Jalankan dari folder aplikasi:
+
+```powershell
+php artisan test --compact
+php artisan test --compact --filter=DocumentedFeatureFlowTest
+php artisan test --compact --filter=RegistrationTest
+php artisan test --compact --filter=GoogleLoginTest
+php artisan test --compact --filter=ScanTiketTest
+php artisan view:cache
+php artisan view:clear
+npm run build
+php -l tests/Feature/DocumentedFeatureFlowTest.php
 ```
 
----
+Filter merupakan alternatif pemeriksaan terarah; tidak perlu semuanya diulang setelah suite lengkap lulus tanpa perubahan.
 
-## 14. Internasionalisasi (i18n)
+### 20.6 Belum dibuktikan sesi ini
 
-- File: `lang/id/messages.php` (660 baris) & `lang/en/messages.php` — 1:1 mirror.
-- Middleware `Localization` set `app()->setLocale(session('locale','id'))`.
-- Switch: `GET /lang/{id|en}` → `session.put('locale')` → redirect back.
-- Model accessor: `Tiket::getNamaTiketAttribute()` & `Galeri::getKeteranganAttribute()` fallback ke ID jika EN kosong.
-- Blade pakai `__('messages.key')` atau `__()`; contoh `__('messages.book_now')`, `__('messages.hero_title_lead')`.
-- Tambah bahasa: duplikat `lang/id/messages.php` → `lang/fr/...`, tambah di `in_array` check `routes/web.php` & `Localization`.
+- Inbox OTP/reset/keputusan nyata, spam, dan latensi penyedia.
+- OAuth nyata dan callback produksi.
+- Transfer, mutasi, nomor tujuan resmi, rekonsiliasi keuangan.
+- Kamera/QR fisik, izin GPS, akurasi lokasi.
+- Printer fisik, simpan PDF semua browser, seluruh variasi PDF data nyata.
+- Semua halaman privat di semua perangkat, screen reader/keyboard fisik.
+- Instalasi bersih, Docker build/run, deploy, cron berjalan terus.
+- Locking pada beban konkuren MySQL produksi.
+- Kondisi destinasi/fasilitas, akses canyon, menu/harga resmi terbaru.
 
----
+## 21. Pemeliharaan dan operasional
 
-## 15. Email & Notifikasi
+### 21.1 Cache dan build
 
-Mailable di `app/Mail/` (5):
+Gunakan `view:cache` untuk kompilasi Blade dan `view:clear` untuk membersihkan cache hasil pemeriksaan. Aset memakai `npm run build`. Setelah environment berubah, segarkan cache konfigurasi sesuai lingkungan.
 
-| Mailable | Trigger | Template `resources/views/emails/` |
-|----------|---------|------------------------------------|
-| `WelcomeMail` | register berhasil | `welcome.blade.php` |
-| `PemesananBerhasil` | pemesanan dibuat | `pemesanan-berhasil.blade.php` |
-| `PembayaranValid` | verifikasi valid | `pembayaran-valid.blade.php` |
-| `PembayaranDitolak` | verifikasi ditolak | `pembayaran-ditolak.blade.php` |
-| `TestMail` | `php artisan mail:test` (jika ada) | `test.blade.php` |
+### 21.2 Backup
 
-Default `MAIL_MAILER=log` → email masuk `storage/logs/laravel.log`. Ganti ke `smtp` + isi `MAIL_HOST/PORT/USERNAME/PASSWORD/ENCRYPTION` untuk kirim beneran. `MAIL_FROM_ADDRESS=info@bangkiangjaran.com`.
+`scripts/backup-db.bat` mengasumsikan path MySQL XAMPP dan database lokal tertentu. Tidak dijalankan pada sesi ini dan tidak otomatis cocok semua konfigurasi.
 
-Pengelola juga punya polling `GET /pengelola/notifikasi` (JSON count pending) — bisa dipoles ke WebSocket (Pusher) jika perlu realtime push.
+Simpan backup SQL serta unggahan di lokasi aman di luar publik. Kredensial berasal dari environment/konfigurasi klien aman, bukan password command line/README. Uji restore pada lingkungan terpisah.
 
----
+### 21.3 Log
 
-## 16. Pemesanan → Pembayaran → Verifikasi → E-Ticket
+`ActivityLogger` mencatat aktivitas dan meneruskan login sukses/gagal ke model terpisah bila penyimpanan berhasil. Metadata dapat memuat input login/identitas, IP, user-agent, dan metode; perlakukan sebagai data pribadi.
 
-### Urutan Kode
+Ini bukan audit trail semua aksi. Menu log khusus tidak terdaftar. Saat diagnosis, jangan menyalin data sensitif/kredensial dari log ke dokumen.
 
-1. `PemesananController@create` — tampilkan tiket aktif + datepicker.
-2. `PemesananController@store` — validasi tanggal dan jumlah tiket bilangan bulat nonnegatif, minimal satu tiket dipilih. Tidak ada kuota 10/100 per jenis. Simpan pilihan ke session untuk tahap data pengunjung; harga dihitung server dari tiket aktif.
-3. `PemesananController@dataDiri` / `storeDataDiri` — isi `nama_pengunjung`, `jenis_kelamin`, `plat_kendaraan` per `kode_tiket`.
-4. `PembayaranController@create` — tampilkan total dan bank/e-wallet dari `config/payment.php`. Pada `APP_ENV=local/testing`, `PAYMENT_TRIAL_MODE` aktif secara default: metode tanpa rekening menerima bukti contoh tanpa transfer. Set `PAYMENT_TRIAL_MODE=false` untuk mematikannya. Produksi hanya mengaktifkan metode yang memiliki nomor dan nama penerima.
-5. `PembayaranController@store` — validasi `metode`, `bukti_bayar` (`mimetypes:jpeg,png,jpg,pdf`, `max 5120`), simpan `storage/app/public/bukti`, `pembayaran.status=pending`.
-6. `VerifikasiController@validasi` — pengelola pilih `valid`/`ditolak` (+ alasan), `DB::transaction`, update `pembayaran` + `pemesanan.status` (`selesai`/`dibatalkan`) + `detail_pemesanan.status_tiket` (`aktif`/`kadaluarsa`), kirim `PembayaranValid`/`PembayaranDitolak`, `ActivityLogger::log()`.
-7. Wisatawan lihat `pemesanan-detail.blade.php` — tiap `kode_tiket` render QR (pakai library JS QR atau `qrcode` package), tombol **Cetak/Download PDF** (DomPDF).
+### 21.4 Scheduler
 
-Label berhasil memerlukan pesanan `selesai` dan pembayaran `valid`. Upload bukti tetap pending sampai pengelola menyetujui. Pembayaran, detail, dan riwayat memeriksa status milik pengguna setiap 6 detik saat tab aktif; endpoint tidak di-cache. Mode percobaan tetap membutuhkan persetujuan pengelola dan validasi file yang sama.
+Perintah auto-checkout tersedia, tetapi jadwal belum terdaftar saat verifikasi. Sebelum mengandalkan otomatisasi, pasang jadwal melalui mekanisme bootstrap aktif, periksa `schedule:list`, lalu siapkan pemanggilan scheduler host. Aktivasi tidak dilakukan saat penulisan README.
 
-### File Upload
+### 21.5 Docker
 
-- Validasi MIME + ekstensi + ukuran di controller (jangan hanya di frontend).
-- Path: `storage/app/public/bukti/{kode_booking}.{ext}` & `galeri/{file}`.
-- Wajib `php artisan storage:link`.
+`docker/Dockerfile` memakai build aset Node 20 dan runtime PHP 8.3 Apache dengan Composer/ekstensi terkait. Entrypoint membuat storage link, menjalankan migrasi `--force`, lalu cache konfigurasi/route/view.
 
----
+Karena startup menjalankan migrasi, tinjau efeknya dan arahkan hanya ke database yang disiapkan. Build/run Docker belum diuji dalam sesi ini; keberadaan Dockerfile bukan bukti image lolos pada mesin pengguna.
 
-## 17. Scan Tiket (Check-in / Check-out)
+### 21.6 Demo dan produksi
 
-Controller: `ScanController.php` (177 baris). View: `pengelola/scan/index.blade.php` (kamera via `getUserMedia`).
+`start-demo.bat` dan `npm run tunnel` tersedia untuk demo/ngrok. Tunnel dapat membuka server lokal ke jaringan publik; tidak dijalankan pada pekerjaan ini.
 
-| Aksi | Endpoint | Validasi |
-|------|----------|----------|
-| Lihat hari ini | `GET /pengelola/scan` | `DetailPemesanan` where `pemesanan.tgl_kunjungan = today` & `status=selesai` |
-| Cari | `POST /pengelola/scan/cari` | `kode` required string max 20, uppercase trim |
-| Check-in | `POST /pengelola/scan/gunakan` | `status_tiket=aktif` + `pemesanan.status=selesai` + `tgl_kunjungan=today` → `status_tiket=digunakan`, `check_in_at=now()` |
-| Check-out | `POST /pengelola/scan/checkout` | `status_tiket=digunakan` + `check_out_at null` + `tgl=today` → `check_out_at=now()` |
+Produksi memerlukan URL/HTTPS, debug sesuai, database, SMTP, storage persisten, session/cache, akun pengelola, dan tujuan pembayaran resmi. Panduan ini bukan catatan bahwa konfigurasi produksi tersebut sudah diterapkan.
 
-Semua pakai `DB::beginTransaction/commit/rollBack`. Error message spesifik (sudah digunakan, kadaluarsa, dibatalkan, belum lunas, bukan hari ini).
+## 22. Pemecahan masalah
 
-**Butuh HTTPS** — jalankan via `start-demo.bat` / `ngrok http 8000`, buka `https://xxxx.ngrok-free.app/pengelola/scan` di HP.
+| Gejala | Pemeriksaan/tindakan |
+| --- | --- |
+| Tamu diminta login untuk pesan | Batas normal; login/daftar lalu lanjutkan tujuan |
+| Akun belum muncul setelah daftar | Belum dibuat sampai OTP benar |
+| OTP tak masuk | Periksa email/spam, SMTP/pengirim, limit; jangan mencari kode di log |
+| OTP salah/habis waktu | Gunakan kode terbaru, sesi sama, masih berlaku |
+| Resend belum tersedia | Tunggu 60 detik; limit per jam tetap dapat berlaku |
+| Kode lama masih berlaku setelah resend gagal | Disengaja sampai expiry semula |
+| Google belum aktif | Lengkapi environment OAuth/callback |
+| Email manual sama dengan Google ditolak | Tidak digabung otomatis; gunakan metode akun lama |
+| Email profil terkunci | Sesuai aturan email OTP/Google |
+| Form hapus akun/password manual tidak ada | Endpoint tersimpan, tetapi form tidak tampil pada profil aktif |
+| Sesi data diri hilang | Mulai flow pesan kembali |
+| Tiket nonaktif tak tersedia | Tinjau status tiket melalui pengelola |
+| Metode bayar kosong | Lengkapi penerima/nomor resmi; percobaan hanya local/testing |
+| Tidak ada QRIS online | Katalog online belum memuat QRIS |
+| Bukti ditolak format/ukuran | Pakai JPG/JPEG/PNG/PDF valid dalam batas |
+| Upload sukses belum lunas | Tunggu keputusan pengelola |
+| Pembayaran ditolak | Buka pembayaran dan unggah pengganti |
+| QR tak muncul | Periksa layanan/internet; siapkan kode teks |
+| Publik valid tetapi belum boleh masuk | Check-in tetap meminta tanggal hari ini |
+| Check-in ditolak | Periksa kode, tanggal, pesanan selesai, detail aktif |
+| Check-out ditolak | Harus sudah masuk, belum keluar, tanggal hari ini |
+| Auto-checkout tak berjalan periodik | Scheduler belum memiliki jadwal aktif |
+| Notifikasi tidak seketika | Polling; periksa koneksi/session |
+| Angka pengunjung berbeda dari lapangan | Agregat unit pesanan bukan hitung orang fisik |
+| Foto tidak tampil | Periksa berkas/path/storage link/tipe/filter placeholder |
+| Video tidak tampil | Periksa berkas MP4/WebM dan path `TOURISM_HERO_VIDEO` |
+| Error database | Pastikan MySQL proyek aktif dan environment cocok |
+| Sesi berakhir | Login lagi; CSRF expired dapat kembali ke beranda |
 
-Auto-checkout sisa `digunakan` tanpa `check_out_at` bisa via `php artisan` command `AutoCheckout` + scheduler `app/Console/Kernel.php` (jalankan `php artisan schedule:run` atau cron).
+## 23. Batas fitur dan pekerjaan lanjutan
 
----
+Belum boleh dinyatakan tersedia hanya berdasarkan teks/berkas lama:
 
-## 18. Keamanan
+- QRIS online, gateway, konfirmasi bank atau refund otomatis;
+- pembatalan mandiri melalui menu wisatawan;
+- reservasi meja, keranjang makanan, stok/checkout makanan;
+- kuota harian dan pengurangan stok tiket;
+- upload video Galeri, edit/update galeri, CRUD wisatawan;
+- loket tanpa internet/PWA dan sinkronisasi;
+- aplikasi native, push notification, WebSocket aktif;
+- galeri/lokasi publik tersendiri dari view tidak dirutekan;
+- email sambutan setiap daftar hanya karena template ada;
+- job auto-checkout/kedaluwarsa yang sudah aktif periodik;
+- menu aktif untuk setiap endpoint Breeze tersimpan.
 
-- **Hash**: `bcrypt` via `Hash::make` (seeder & register).
-- **Role**: `CheckRole` middleware — `abort(403)` jika role tak cocok; route group `role:wisatawan` / `role:pengelola`.
-- **CSRF**: `VerifyCsrfToken` di semua POST; form pakai `@csrf`; fallback `GET /logout` untuk sesi expired.
-- **XSS**: Blade `{{ }}` escaped; hindari `{!! !!}` kecuali sanitized.
-- **SQL Injection**: Eloquent ORM + binding; jangan `DB::raw` dari input user.
-- **IDOR**: tiap query cek ownership (`where id_user = auth()->id()` untuk wisatawan; pengelola boleh semua tapi tetap via policy).
-- **Rate Limit**: `LoginRequest` 5x (throttle login), `throttle:10,1` di pemesanan.
-- **Upload**: validasi `mimes`, `max`, ekstensi; simpan di `storage` bukan `public` langsung.
-- **Soft Delete**: `tiket`, `pemesanan`, `galeri` pakai `SoftDeletes`.
-- **Session**: `regenerate()` setelah login; `SESSION_LIFETIME=5256000`.
-- **Transaction + Row Lock**: `DB::transaction` + `lockForUpdate` saat buat pemesanan.
+Tindak lanjut dapat meliputi foto/video asli, media panduan, uji layanan/perangkat nyata, scheduler, serta peninjauan perbedaan metrik/alur online-offline. Ini batas dan peluang lanjutan, bukan klaim implementasi.
 
----
+## 24. Peta berkas untuk pengembang
 
-## 19. Backup, Log & Maintenance
+| Kebutuhan | Berkas utama |
+| --- | --- |
+| Route | [routes/web.php](routes/web.php), [routes/auth.php](routes/auth.php) |
+| Bootstrap | [bootstrap/app.php](bootstrap/app.php), `app/Http/Middleware/` |
+| Daftar/OTP | [RegisteredUserController.php](app/Http/Controllers/Auth/RegisteredUserController.php), [RegistrationOtpController.php](app/Http/Controllers/Auth/RegistrationOtpController.php), [RegistrationOtp.php](app/Services/RegistrationOtp.php) |
+| Email/form OTP | `app/Mail/RegistrationOtpMail.php`, `resources/views/auth/registration-otp.blade.php`, `public/js/registration-otp.js` |
+| Login | `app/Http/Controllers/Auth/AuthenticatedSessionController.php`, `app/Http/Requests/Auth/LoginRequest.php` |
+| Google | [AuthController.php](app/Http/Controllers/AuthController.php), `config/services.php` |
+| Profil | `app/Http/Controllers/ProfileController.php`, `app/Http/Requests/ProfileUpdateRequest.php`, `resources/views/profile/edit.blade.php` |
+| Publik | `app/Http/Controllers/Wisatawan/LandingController.php`, `resources/views/wisatawan/` |
+| Tiket publik | `app/Http/Controllers/Wisatawan/TiketController.php` |
+| Pemesanan | [PemesananController.php](app/Http/Controllers/Wisatawan/PemesananController.php) |
+| Pembayaran | [PembayaranController.php](app/Http/Controllers/Wisatawan/PembayaranController.php), [config/payment.php](config/payment.php) |
+| Pengelola | `app/Http/Controllers/Pengelola/`, `resources/views/pengelola/` |
+| Persetujuan | [Pemesanan.php](app/Models/Pemesanan.php), `resources/views/partials/booking-status.blade.php` |
+| Rute/video | [config/tourism.php](config/tourism.php), `public/js/section-refinement.js`, `public/js/site.js` |
+| Bahasa | `lang/id/messages.php`, `lang/en/messages.php` |
+| Model/migrasi | `app/Models/`, `database/migrations/` |
+| Aset | `resources/css/app.css`, `resources/js/app.js`, `vite.config.js`, `public/css/` |
+| Pengujian panduan | [DocumentedFeatureFlowTest.php](tests/Feature/DocumentedFeatureFlowTest.php), [phpunit.xml](phpunit.xml) |
+| Operasional | `docker/`, `scripts/backup-db.bat` |
 
-### Backup DB
-
-```bash
-# phpMyAdmin → Export Quick
-
-# CLI
-mysqldump -u root bangkiang_jaran > backup_bangkiang_jaran_20240101.sql
-mysql -u root bangkiang_jaran < backup_bangkiang_jaran_20240101.sql
-
-# Windows helper
-scripts\backup-db.bat
-# atau
-php artisan backup:run  # jika spatie/laravel-backup terpasang
-```
-
-Cron produksi (tiap jam 2 pagi):
-```
-0 2 * * * /usr/bin/mysqldump -u root bangkiang_jaran > /backups/bangkiang_jaran_$(date +\%Y\%m\%d).sql
-```
-
-### Log
-
-- `storage/logs/laravel.log` (level `debug` di local, `error` di prod)
-- `ActivityLog` model → `activity_logs` table (aksi verifikasi, CRUD tiket/galeri)
-
-### Scheduler
-
-```bash
-php artisan schedule:run   # di cron tiap menit
-# Kernel.php jadwalkan AutoCheckout harian
-```
-
----
-
-## 20. Testing & QA
-
-- **PHPUnit**: `phpunit.xml` — `php artisan test` atau `vendor/bin/phpunit`
-- **Black Box**: `docs/BLACKBOX_TESTING.md` — 61 skenario (auth, pemesanan, pembayaran, verifikasi, scan, laporan, i18n)
-- **Class Diagram**: `docs/CLASS_DIAGRAM.md` (PlantUML) + `docs/diagrams/*.png`
-- Manual checklist penting:
-  - [ ] Register → email log muncul
-  - [ ] Login email vs username
-  - [ ] Google OAuth (butuh `GOOGLE_*` terisi)
-  - [ ] Pemesanan + data diri + pembayaran upload
-  - [ ] Verifikasi valid/ditolak → status berubah + email
-  - [ ] Scan hari H (aktif→digunakan→checkout)
-  - [ ] Scan H-1/H+1 ditolak
-  - [ ] Ganti bahasa ID↔EN
-  - [ ] Laporan filter & export PDF
-  - [ ] Galeri upload & tampil di landing/restoran
-
----
-
-## 21. Checklist Deploy Production
-
-1. `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://domain.com`
-2. `php artisan key:generate` (jika fresh), `php artisan migrate --force`, `php artisan storage:link`
-3. `composer install --no-dev --optimize-autoloader`, `npm run build`
-4. `php artisan config:cache && route:cache && view:cache`
-5. DB: isi `MYSQL_ATTR_SSL_CA` jika Aiven, buat user DB non-root
-6. Mail: `MAIL_MAILER=smtp` + kredensial valid, test kirim
-7. Google OAuth: tambah `https://domain.com/auth/google/callback` di Google Console
-8. HTTPS wajib (Let's Encrypt / Cloudflare) — untuk scan kamera
-9. Cron: `* * * * * php /var/www/html/artisan schedule:run >> /dev/null 2>&1`
-10. Backup harian (mysqldump + simpan offsite)
-11. Permission: `chown -R www-data:www-data storage bootstrap/cache`, `chmod 775`
-12. Apache/Nginx: `DocumentRoot` → `public`, `AllowOverride All`, `mod_rewrite` on
-
----
-
-## 22. Troubleshooting
-
-| Gejala | Sebab | Fix |
-|--------|-------|-----|
-| Galeri/bukti 404 | symlink belum | `php artisan storage:link` |
-| `Vite manifest not found` | belum build | `npm run build` (prod) atau `npm run dev` |
-| Kamera tidak muncul di HP | buka via HTTP | pakai `ngrok http 8000` → buka `https://...` |
-| Google login error `redirect_uri_mismatch` | `GOOGLE_REDIRECT_URI` beda | samakan dengan yang di Google Console (`APP_URL + /auth/google/callback`) |
-| Email tidak terkirim | `MAIL_MAILER=log` | ganti `smtp` + cek `storage/logs` |
-| 403 saat buka `/pengelola/*` | role bukan pengelola | login sebagai `pengelola` |
-| CSRF token mismatch | sesi expired | refresh, atau pakai `GET /logout` lalu login lagi |
-| `SQLSTATE HY000 SSL` | Aiven butuh CA | isi `MYSQL_ATTR_SSL_CA=/path/to/aiven-ca.pem` |
-| Docker build gagal `libonig-dev` | base image trixie purge | sudah di-fix di `docker/Dockerfile` (install ulang `libonig-dev`) |
-
----
-
-## 23. Panduan Penerus — Ubah Apa di Mana
-
-| Kebutuhan | File |
-|-----------|------|
-| **Ganti warna/tema** | `docs/DESIGN.md` (token) + `tailwind.config.js` + `resources/css/app.css` |
-| **Perbaikan responsif (320px–1440px)** | `public/css/responsive-refinement.css` |
-| **Tipografi & motion editorial** | `public/css/typography-motion.css` + `public/js/site.js` (GSAP/ScrollTrigger, Swiper, Lenis selektif) |
-| **Ganti font** | `tailwind.config.js` (`fontFamily`) + `resources/views/layouts/*.blade.php` (Google Fonts link) |
-| **Tambah tiket baru default** | `database/seeders/DatabaseSeeder.php` (`$tikets`) |
-| **Ubah harga/logic pajak** | `PemesananController` + `wisatawan/tiket.blade.php` (Alpine calc) — pajak 10% di ringkasan |
-| **Tambah metode bayar** | `PembayaranController` + `lang/*/messages.php` + `wisatawan/pembayaran.blade.php` + `pengelola/verifikasi/show.blade.php` |
-| **Ganti nomor rekening/QRIS** | `lang/id/messages.php` (`bank_*`, `scan_qris*`) + `wisatawan/pembayaran.blade.php` |
-| **Tambah bahasa** | duplikat `lang/id/messages.php` → `lang/xx/`, update `Localization` & `routes/web.php` `in_array` |
-| **Edit landing/restoran copy** | `lang/id/messages.php` (semua `hero_*`, `narrative_*`, `resto_*`, `faq_*`) + `wisatawan/landing.blade.php` |
-| **Ganti foto hero/galeri** | upload ke `storage/app/public/galeri/` via **Pengelola → Galeri**, atau ganti `public/images/hero.jpg` |
-| **Ubah alamat/jam buka** | `lang/*/messages.php` (`address`, `operating_hours`) + `wisatawan/landing.blade.php` section travel |
-| **Laporan kolom baru** | `LaporanController` + `pengelola/laporan/*.blade.php` + `pdf-*.blade.php` |
-| **Scan rule (mis allow H+1)** | `ScanController@cari/gunakan/checkout` — ubah `tgl_kunjungan !== today` |
-| **Email template** | `resources/views/emails/*.blade.php` + `app/Mail/*.php` |
-| **Menambah field user** | migration baru + `User.php $fillable` + `ProfileController` + `profile/edit.blade.php` |
-
-> **Jangan** edit `vendor/` manual. Jalankan `composer update` / `npm update` untuk dependency. Pakai `php artisan make:migration` untuk skema baru; jangan ubah migration lama yang sudah di-push (buat migration baru).
-
----
-
-## 24. Lisensi
-
-Hak cipta © 2024 Pengelola Bangkiang Jaran Waterfall — untuk demonstrasi produk jasa. Dibuat oleh Yosuanry Simbolon (`2301020122`). Bebas dikembangkan lanjut untuk Desa Bakbakan.
-
----
-
-### Perintah Penting Ringkas
-
-```bash
-composer install && npm install
-copy .env.example .env && php artisan key:generate
-php artisan migrate --seed && php artisan storage:link
-npm run build && php artisan serve --port=8000
-# demo HTTPS
-start-demo.bat        # Windows one-click
-npm run tunnel        # atau npx ngrok http 8000
-php artisan test      # QA
-php artisan schedule:run  # scheduler
-```
-
-**Butuh bantuan?** Cek `storage/logs/laravel.log`, `docs/BLACKBOX_TESTING.md`, atau hubungi pengelola via WA di halaman **Restoran → Reservasi**.
-
+Setelah pengembangan berikutnya, periksa route/controller/view aktif, jalankan uji terkait, dan perbarui tanggal/bukti bagian yang berubah. Nama berkas, tampilan lama, dan rencana fitur tidak cukup untuk menyatakan suatu alur sudah berhasil.

@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Providers\RouteServiceProvider;
+use App\Services\RegistrationOtp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -20,7 +18,7 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, RegistrationOtp $otp): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -29,22 +27,12 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'username' => $validated['username'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'wisatawan',
-            'last_login_at' => now(),
-            'last_login_method' => 'manual',
-            'login_count' => 1,
-        ]);
+        try {
+            $otp->start($request, $validated);
+        } catch (ValidationException $e) {
+            return redirect()->route('registration.otp')->withErrors($e->errors());
+        }
 
-        ActivityLogger::log('Registrasi', 'Akun baru: ' . $user->email);
-
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('redirect.after.login');
+        return redirect()->route('registration.otp')->with('status', 'otp-sent');
     }
 }

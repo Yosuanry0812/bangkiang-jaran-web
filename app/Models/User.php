@@ -47,4 +47,22 @@ class User extends Authenticatable
     {
         return $this->role === 'wisatawan';
     }
+
+    public function registrationMethodLabel(): string
+    {
+        return $this->registration_method === 'google' ? 'Google' : 'Email';
+    }
+
+    public function emailVerificationLabel(): string
+    {
+        if (!$this->hasVerifiedEmail()) {
+            return 'Belum diverifikasi';
+        }
+
+        return match ($this->email_verification_method) {
+            'otp' => 'OTP email',
+            'google' => 'Google',
+            default => 'Terverifikasi (akun lama)',
+        };
+    }
 }

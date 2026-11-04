@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Panel Pengelola — ' . config('app.name', 'Bangkiang Jaran'))</title>
 
@@ -59,6 +59,7 @@
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-workspace.css') . '?v=' . filemtime(public_path('css/admin-workspace.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive-refinement.css') . '?v=' . filemtime(public_path('css/responsive-refinement.css')) }}">
 </head>
 
 <body class="bj-admin font-sans antialiased bg-slate-50 text-slate-800 min-h-screen overflow-x-clip">

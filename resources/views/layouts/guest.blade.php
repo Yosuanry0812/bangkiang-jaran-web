@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,9 +40,7 @@
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
     <link rel="stylesheet" href="{{ asset('css/auth-refinement.css') }}">
     <link rel="stylesheet" href="{{ asset('css/typography-motion.css') . '?v=' . filemtime(public_path('css/typography-motion.css')) }}">
-    @if(Route::is('registration.otp*'))
     <link rel="stylesheet" href="{{ asset('css/responsive-refinement.css') . '?v=' . filemtime(public_path('css/responsive-refinement.css')) }}">
-    @endif
 </head>
 <body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-guest {{ Route::is('login', 'register', 'registration.otp*') ? 'bj-auth-page' : '' }} font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
 

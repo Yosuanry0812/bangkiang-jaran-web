@@ -21,10 +21,9 @@
 </dl>
 <div class="admin-dashboard-grid">
     <section class="admin-panel">
-        <div class="admin-panel-head"><div><h2>Pemesanan terbaru</h2><p>Lima transaksi terakhir yang masuk</p></div><a class="admin-text-action" href="{{ route('pengelola.verifikasi.index') }}">Lihat pemesanan<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
+        <div class="admin-panel-head"><div><h2 id="recent-bookings-title">Pemesanan terbaru</h2><p>Lima transaksi terakhir yang masuk</p></div><a class="admin-text-action" href="{{ route('pengelola.verifikasi.index') }}">Lihat pemesanan<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
         <div class="admin-table-wrap">
-            <table class="admin-table admin-table--responsive">
-                <caption class="sr-only">Pemesanan terbaru</caption>
+            <table class="admin-table admin-table--responsive" aria-labelledby="recent-bookings-title">
                 <thead><tr><th scope="col">Pemesanan</th><th scope="col">Tiket</th><th scope="col">Status</th><th scope="col">Tanggal</th></tr></thead>
                 <tbody>
                 @forelse($pemesananTerbaru ?? [] as $p)

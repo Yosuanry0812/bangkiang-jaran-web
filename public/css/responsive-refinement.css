@@ -315,3 +315,84 @@ body.bj-nature .bj-payment-file-picker:focus-within { outline: 2px solid #006d5b
 .bj-otp-cancel { margin-top:8px; }
 .bj-otp-card .bj-otp-note { margin-top:20px; font-size:12px; }
 @media (max-width:767px) { .bj-otp-card .bj-auth-form { padding:28px 22px !important; } }
+
+/* Mobile browser chrome, display cutouts and the software keyboard. Keep zoom enabled. */
+:root {
+    --bj-safe-top: env(safe-area-inset-top, 0px);
+    --bj-safe-right: env(safe-area-inset-right, 0px);
+    --bj-safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bj-safe-left: env(safe-area-inset-left, 0px);
+}
+body:is(.bj-public, .bj-guest, .bj-admin) {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-inline: var(--bj-safe-left) var(--bj-safe-right);
+    padding-bottom: var(--bj-safe-bottom);
+}
+body.bj-public #main-nav {
+    padding-top: var(--bj-safe-top);
+    padding-inline: var(--bj-safe-left) var(--bj-safe-right);
+}
+body.bj-public #mobileMenu { overscroll-behavior-y: contain; padding-bottom: var(--bj-safe-bottom); }
+body.bj-guest { padding-top: var(--bj-safe-top); }
+body.bj-admin #sidebar {
+    height: 100vh;
+    height: 100dvh;
+    padding-top: var(--bj-safe-top);
+    padding-left: var(--bj-safe-left);
+}
+body.bj-admin #sidebar nav { min-height: 0; }
+body.bj-admin #sidebar > div:last-child { padding-bottom: calc(14px + var(--bj-safe-bottom)); }
+body.bj-admin .admin-topbar { height: calc(76px + var(--bj-safe-top)); padding-top: var(--bj-safe-top); }
+body.bj-admin .admin-notification-panel {
+    right: calc(16px + var(--bj-safe-right));
+    width: min(405px, calc(100vw - 32px - var(--bj-safe-left) - var(--bj-safe-right)));
+    max-height: min(660px, calc(100dvh - 100px - var(--bj-safe-top) - var(--bj-safe-bottom)));
+}
+body.bj-admin .bj-review-facts { table-layout: fixed; }
+body.bj-admin .bj-review-facts td { overflow-wrap: anywhere; vertical-align: top; }
+body.bj-admin .bj-review-facts td:first-child { padding-right: 12px; }
+
+@media (max-width: 1279px), (pointer: coarse) {
+    /* Native text/date controls remain readable when Safari focuses a field. */
+    body:is(.bj-public, .bj-guest, .bj-admin) :is(input, select, textarea):not([type='hidden'], [type='checkbox'], [type='radio'], [type='range'], [type='file'], [type='submit'], [type='button'], [name='otp']) {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 48px;
+        font-size: max(16px, 1em) !important;
+        scroll-margin-block: calc(var(--bj-nav-height, 76px) + 16px) 24px;
+    }
+    body:is(.bj-public, .bj-guest, .bj-admin) :is(button, [type='submit'], .nav-mobile-link) {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+    }
+    body.bj-public .nav-mobile-link { display: flex; align-items: center; overflow-wrap: anywhere; }
+    body:is(.bj-public, .bj-guest, .bj-admin) nav[aria-label='Pagination Navigation'] :is(a, span[aria-current] > span, span[aria-disabled] > span) { min-height: 44px; min-width: 44px; justify-content: center; }
+    body.bj-admin .admin-text-action { min-width: 44px; }
+    body.bj-public .bj-booking-date__input { min-width: 0; }
+    body.bj-public .bj-booking-date__input input { width: 100%; }
+    body.bj-public input[type='date']::-webkit-date-and-time-value { text-align: left; }
+    body.bj-guest .bj-auth-form input:is([autocomplete='current-password'], [autocomplete='new-password']) { padding-right: 56px; }
+    body.bj-guest .bj-auth-form button[onclick^='togglePwd'] { right: 4px; display: grid; place-items: center; }
+    body.bj-admin :is(.grid, .flex) > :not(button):not(a) { min-width: 0; }
+    body.bj-admin .admin-topbar { height: calc(68px + var(--bj-safe-top)); }
+    body.bj-admin .admin-notification-panel { top: calc(75px + var(--bj-safe-top)); }
+    body.bj-admin .admin-content :is(td, .admin-page-head, .admin-panel-head) { overflow-wrap: anywhere; }
+    body.bj-admin .admin-status { white-space: normal; }
+}
+
+@media (max-width: 767px) {
+    /* The guest header is also used by password recovery and confirmation. */
+    body.bj-guest > nav { padding-inline: 16px; }
+    body.bj-guest > nav > div { flex-wrap: wrap; gap: 8px 12px; }
+    body.bj-guest > nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; }
+    body.bj-guest > nav > div > div { flex-wrap: wrap; }
+    body.bj-guest > main { padding-inline: 16px; padding-bottom: 24px; }
+    body.bj-guest .bj-auth-login .bj-auth-image { display: none; }
+    body.bj-guest .bj-auth-login .bj-auth-form > .bj-login-header { flex-wrap: wrap; gap: 12px; width: 100%; }
+    body.bj-guest .bj-auth-login .bj-login-header-actions { flex-wrap: wrap; }
+    body.bj-admin .admin-topbar { flex-shrink: 0; }
+    body.bj-admin .admin-breadcrumb strong { overflow-wrap: anywhere; line-height: 1.35; }
+    body.bj-admin .admin-table--responsive td { overflow-wrap: anywhere; }
+}

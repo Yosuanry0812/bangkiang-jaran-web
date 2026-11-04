@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
     <meta name="description" content="Rencanakan kunjungan ke Air Terjun Bangkiang Jaran di Desa Bakbakan, Gianyar. Temukan informasi tempat, lokasi, dan tiket dalam satu tempat.">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
@@ -114,8 +114,8 @@
             transform: scaleY(1);
             pointer-events: auto;
             visibility: visible;
-            max-height: calc(100vh - 48px);
-            max-height: calc(100svh - 48px);
+            max-height: calc(100vh - var(--bj-nav-height, 48px));
+            max-height: calc(100dvh - var(--bj-nav-height, 48px));
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -190,7 +190,7 @@
             data-nav="{{ $navMode ?? (View::hasSection('nav-mode') ? View::getSection('nav-mode') : 'light') }}"
             class="fixed top-0 left-0 right-0 z-50 border-b border-transparent"
             aria-label="Navigasi utama">
-        <div class="max-w-7xl mx-auto px-gutter">
+        <div id="nav-bar" class="max-w-7xl mx-auto px-gutter">
             <div class="flex items-center justify-between h-12 md:h-[68px]">
 
                 {{-- Logo --}}
@@ -277,7 +277,7 @@
         <div id="mobileMenu"
              class="menu-close xl:hidden"
              style="background: rgba(10,18,14,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06);"
-             aria-label="Menu mobile">
+             aria-label="Menu mobile" aria-hidden="true" inert>
             <div class="max-w-7xl mx-auto px-gutter py-2.5 pb-4 space-y-0.5">
                 <a href="{{ route('landing') }}"          class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">home</span>{{ __('messages.home') }}</a>
                 <a href="{{ route('restoran') }}"         class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">restaurant</span>{{ __('messages.resto_title_nav') }}</a>
@@ -521,7 +521,8 @@
                 if (!ticking) { requestAnimationFrame(update); ticking = true; }
             }, { passive: true });
             const measureNav = () => {
-                navHeight = nav.offsetHeight || 88;
+                // Measure the bar alone: the open dropdown must not inflate its own offset.
+                navHeight = document.getElementById('nav-bar').offsetHeight + (parseFloat(getComputedStyle(nav).paddingTop) || 0);
                 heroBoundary = document.getElementById('hero-section')?.offsetHeight || 0;
                 document.documentElement.style.setProperty('--bj-nav-height', navHeight + 'px');
                 update();
@@ -539,15 +540,20 @@
         function openMenu() {
             menuOpen = true;
             mobileMenu.classList.replace('menu-close','menu-open');
+            mobileMenu.inert = false;
+            mobileMenu.setAttribute('aria-hidden', 'false');
             menuIcon.textContent = 'close';
             menuBtn.setAttribute('aria-expanded','true');
             setNav(LIGHT.solid);
             applyTokens(LIGHT);
             document.body.style.overflow = 'hidden';
+            mobileMenu.querySelector('a')?.focus({ preventScroll: true });
         }
         function closeMenu() {
             menuOpen = false;
             mobileMenu.classList.replace('menu-open','menu-close');
+            mobileMenu.inert = true;
+            mobileMenu.setAttribute('aria-hidden', 'true');
             menuIcon.textContent = 'menu';
             menuBtn.setAttribute('aria-expanded','false');
             document.body.style.overflow = '';
@@ -558,7 +564,16 @@
             menuBtn.addEventListener('click', function() { menuOpen ? closeMenu() : openMenu(); });
             mobileMenu.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
             document.addEventListener('click', function(e) { if (menuOpen && !nav.contains(e.target)) closeMenu(); });
-            document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) closeMenu(); });
+            document.addEventListener('keydown', function(e) {
+                if (!menuOpen) return;
+                if (e.key === 'Escape') { closeMenu(); menuBtn.focus({ preventScroll: true }); }
+                if (e.key === 'Tab') {
+                    const links = mobileMenu.querySelectorAll('a');
+                    const lastLink = links[links.length - 1];
+                    if (e.shiftKey && document.activeElement === menuBtn) { e.preventDefault(); lastLink?.focus(); }
+                    else if (!e.shiftKey && document.activeElement === lastLink) { e.preventDefault(); menuBtn.focus(); }
+                }
+            });
             window.addEventListener('resize', function() { if (window.innerWidth >= 1280 && menuOpen) closeMenu(); });
         }
 

@@ -617,6 +617,8 @@ Teks memakai `lang/id/messages.php`, `lang/en/messages.php`, serta beberapa pili
 
 Adanya template lain seperti `WelcomeMail` tidak membuktikan email itu selalu dikirim saat daftar. SMTP/pengirim harus benar untuk pengiriman nyata. Test fake tidak membuktikan inbox, spam, reputasi domain, atau latensi penyedia.
 
+Email pesanan, persetujuan, dan penolakan memakai `TransactionalMail` dengan `TRANSACTIONAL_MAIL_QUEUE=background`. Proses PHP terpisah mengirim email setelah respons HTTP, sehingga booking/verifikasi tidak menunggu SMTP. OTP dan reset password tetap mengikuti mekanisme langsung. Windows memakai peluncur `Start-Process -WindowStyle Hidden`; Linux memakai driver background Laravel. PHP CLI dan izin membuat proses harus tersedia. Driver ini tidak memerlukan worker/tabel antrean, tetapi tidak menyediakan penyimpanan antrean atau retry yang tahan restart. Kegagalan pengiriman dicatat tanpa isi email/kredensial. Untuk antrean persisten, siapkan backend dan worker terlebih dahulu sebelum mengganti `TRANSACTIONAL_MAIL_QUEUE`. Rujukan: [antrean Laravel](https://laravel.com/framework/docs/queues#deferred-dispatching).
+
 ### 13.3 Polling status
 
 Halaman transaksi menggunakan endpoint status milik pemesan untuk mendeteksi perubahan token/indikator persetujuan. Notifikasi pengelola juga memakai polling; interval layout pengelola adalah 20000 milidetik.
@@ -669,7 +671,9 @@ Saat media ditambahkan, gunakan keadaan aplikasi yang benar dan samarkan email, 
 
 Foto asli destinasi, canyon, fasilitas, dan restoran dapat dilengkapi nanti melalui Galeri sesuai tipe. Foto lanskap tidak dinyatakan sebagai foto restoran.
 
-Video latar beranda dapat ditambahkan nanti di `public/videos/bangkiang-jaran.mp4` atau path relatif `TOURISM_HERO_VIDEO`. Berkas default itu tidak ditemukan saat sesi ini; ini tidak memeriksa seluruh path kustom pada deployment lain.
+Video beranda tersedia di `public/videos/hero-bangkiang.mp4`; versi web `hero-bangkiang-web.mp4` dipakai otomatis untuk sumber tersebut jika tersedia. Keduanya berdurasi sama, dengan tampilan lanskap 1280×720 dan 24 fps. Versi web mengurangi bitrate; sumber tetap disimpan. `TOURISM_HERO_VIDEO` dapat menunjuk sumber lokal lain. Video/poster memenuhi layar desktop, tablet, dan ponsel memakai `object-fit: cover`; bidang gambar menyesuaikan rasio layar.
+
+Foto pengantar dan cerita berganti otomatis dengan crossfade. Sumber utama berasal dari foto galeri asli; bila belum ada, foto destinasi bawaan dan tiga cuplikan video Bangkiang Jaran menjadi sumber pergantian. Satu foto tetap statis. Gerak berhenti ketika bagian di luar layar, tab tersembunyi, foto diperbesar, atau tautan foto mendapat fokus. Reduced motion/Save-Data menampilkan foto statis. Tombol jeda kolom galeri dihapus; fokus keyboard tetap menghentikan gerak untuk membaca foto.
 
 Template menampilkan video hanya bila path aman, ekstensi MP4/WebM, dan berkas lokal ada di bawah `public/`. Upload video melalui Galeri belum tersedia. Menambah media tidak otomatis memverifikasi fakta lapangan atau harga resmi.
 
@@ -936,6 +940,7 @@ Tabel menyebut nama, bukan nilai rahasia.
 | Session/cache | `SESSION_DRIVER`, `SESSION_LIFETIME`, `CACHE_DRIVER` |
 | Filesystem | `FILESYSTEM_DISK`; beberapa controller menyebut disk `public` eksplisit |
 | Email | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` |
+| Antrean email transaksi | `TRANSACTIONAL_MAIL_QUEUE`, default `background`; terpisah dari `QUEUE_CONNECTION` |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` |
 | Penerima | `PAYMENT_ACCOUNT_NAME` |
 | Bank | `PAYMENT_BCA_NUMBER`, `PAYMENT_BRI_NUMBER`, `PAYMENT_MANDIRI_NUMBER` |

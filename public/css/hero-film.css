@@ -12,13 +12,13 @@
     transform: none;
 }
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__media img {
-    object-fit: contain;
+    object-fit: cover;
     opacity: 1;
     transition: opacity 900ms ease;
 }
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film.is-film-ready .bj-home-hero__media img { opacity: 0; }
 .bj-home-hero--film .bj-hero-film {
-    object-fit: contain;
+    object-fit: cover;
     object-position: center;
     opacity: 0;
     transition: opacity 900ms ease;
@@ -39,32 +39,30 @@ body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero_
     text-shadow: 0 2px 18px rgba(5,30,24,.4);
 }
 @keyframes bj-film-drift {
-    from { transform: scale(.985); }
-    to { transform: scale(1); }
+    from { transform: scale(1); }
+    to { transform: scale(1.025); }
 }
-/* A landscape film gets its own full-width area on portrait screens. The copy
-   follows underneath so it cannot obscure the waterfall on phones or tablets. */
-@media (max-width: 1023px) and (orientation: portrait) {
-    .bj-home-hero--film { --bj-hero-media-height: calc(100vw * 9 / 16); }
-    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__media {
-        top: var(--bj-safe-top, 0px);
-        bottom: auto;
-        height: var(--bj-hero-media-height);
-    }
-    .bj-home-hero--film .bj-hero-film-frame {
-        top: var(--bj-safe-top, 0px);
-        bottom: auto;
-        height: var(--bj-hero-media-height);
-    }
-    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__content {
-        padding-top: calc(var(--bj-hero-media-height) + var(--bj-safe-top, 0px) + 32px);
-        padding-bottom: max(64px, calc(32px + var(--bj-safe-bottom, 0px)));
-        justify-content: flex-start;
-    }
-    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__shade {
-        background: linear-gradient(0deg, rgba(5,30,24,.7), rgba(5,30,24,.2) 60%, transparent);
-    }
-    .bj-home-hero--film .bj-home-hero__copy { margin-bottom: 0; }
+/* The film fills the viewport; compact copy leaves the landscape visible. */
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__content {
+    min-height: 100svh;
+    justify-content: flex-end;
+    padding-block: max(48px, var(--bj-safe-top, 0px)) max(72px, calc(48px + var(--bj-safe-bottom, 0px)));
+}
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__copy { max-width: 680px; margin-bottom: 0; }
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-title { font-size: clamp(2.5rem, 5.5vw, 5rem); line-height: 1.08; margin-block: 16px; }
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__lead { margin: 0; font-size: 1rem; }
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__actions { margin-top: 28px; }
+@media (max-width: 767px) {
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__content { width: calc(100% - 40px); padding-block: max(32px, var(--bj-safe-top, 0px)) max(56px, calc(32px + var(--bj-safe-bottom, 0px))); }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-title { font-size: clamp(2.5rem, 10vw, 3.6rem); max-width: 16ch; }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__actions { gap: 12px; flex-wrap: wrap; }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__actions a { flex: 1; min-height: 48px; padding-inline: 16px; white-space: nowrap; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__content { padding-block: 28px; }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-title { font-size: 2.5rem; margin-block: 12px; }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__actions { margin-top: 16px; }
+    .bj-home-hero__scroll { display: none; }
 }
 /* Reserve the final text layout while the opening shot plays. */
 [data-hero-intro].is-intro-pending :is(.bj-home-hero__copy, .bj-home-hero__scroll, .bj-resto-hero-copy) {

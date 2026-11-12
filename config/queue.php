@@ -15,6 +15,8 @@ return [
 
     'default' => env('QUEUE_CONNECTION', 'sync'),
 
+    'transactional_connection' => env('TRANSACTIONAL_MAIL_QUEUE', 'background'),
+
     /*
     |--------------------------------------------------------------------------
     | Queue Connections
@@ -29,6 +31,11 @@ return [
     */
 
     'connections' => [
+
+        'background' => [
+            'driver' => 'background',
+            'after_commit' => true,
+        ],
 
         'sync' => [
             'driver' => 'sync',

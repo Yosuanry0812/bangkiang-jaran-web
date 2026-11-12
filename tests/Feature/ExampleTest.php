@@ -53,6 +53,7 @@ class ExampleTest extends TestCase
             ->assertSee('Jalur masuk');
 
         $response = $this->get('/')->assertSee('bj-photo-collage--3', false)->assertSee('Tepian air');
+        $response->assertSee('data-photo-slideshow', false)->assertDontSee('data-columns-pause', false);
         $this->assertSame(3, substr_count($response->getContent(), 'class="bj-photo-collage__photo bj-photo-collage__photo--'));
     }
 
@@ -141,7 +142,7 @@ class ExampleTest extends TestCase
             ->assertOk()
             ->assertSee('bj-restaurant-hero', false)
             ->assertSee('data-photo-columns', false)
-            ->assertSee('data-columns-pause', false)
+            ->assertDontSee('data-columns-pause', false)
             ->assertSee('Ruang makan')
             ->assertSee('Hidangan lokal');
     }

@@ -570,6 +570,7 @@
     <script defer src="{{ asset('js/nature-refresh.js') . '?v=' . filemtime(public_path('js/nature-refresh.js')) }}"></script>
     <script defer src="{{ asset('js/waterfall-experience.js') . '?v=' . filemtime(public_path('js/waterfall-experience.js')) }}"></script>
     @if (Route::is('landing', 'restoran'))
+    <script defer src="{{ asset('js/photo-slideshow.js') . '?v=' . filemtime(public_path('js/photo-slideshow.js')) }}"></script>
     <script defer src="{{ asset('js/home-flow.js') . '?v=' . filemtime(public_path('js/home-flow.js')) }}"></script>
     @include('partials.photo-viewer')
     <script defer src="{{ asset('js/photo-viewer.js') . '?v=' . filemtime(public_path('js/photo-viewer.js')) }}"></script>

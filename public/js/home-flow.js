@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         image.addEventListener('error', fail, { once: true });
         if (image.complete && !image.naturalWidth) fail();
     };
-    document.querySelectorAll('.bj-photo-collage__photo img').forEach(imageFallback);
 
     const syncWall = wall => {
         const enabled = allowsMotion() && wall.animations.length > 0;
@@ -35,11 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         wall.element.classList.toggle('is-static-view', reading);
         wall.element.dataset.columnsMotion = enabled ? (active ? 'running' : 'paused') : 'static';
         wall.animations.forEach(animation => active ? animation.play() : animation.pause());
-        wall.controls.hidden = !enabled;
-        wall.button.setAttribute('aria-pressed', String(reading));
-        wall.button.setAttribute('aria-label', reading ? wall.button.dataset.playLabel : wall.button.dataset.pauseLabel);
-        wall.button.querySelector('[data-columns-button-label]').textContent = reading ? wall.button.dataset.playLabel : wall.button.dataset.pauseLabel;
-        wall.button.querySelector('.material-symbols-outlined').textContent = reading ? 'play_arrow' : 'pause';
     };
 
     const buildWall = wall => {
@@ -50,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Measure visible tracks even when resizing while the reader has paused.
         wall.element.classList.remove('is-enhanced', 'is-static-view');
         wall.lanes.hidden = true;
-        if (!allowsMotion() || !Element.prototype.animate) { wall.controls.hidden = true; wall.element.dataset.columnsMotion = 'static'; return; }
+        if (!allowsMotion() || !Element.prototype.animate) { wall.element.dataset.columnsMotion = 'static'; return; }
 
         wall.element.classList.add('is-enhanced');
         wall.lanes.hidden = false;
@@ -114,14 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const photos = [...element.querySelectorAll('[data-columns-source] figure')];
         photos.forEach(photo => imageFallback(photo.querySelector('img')));
         if (!photos.length) return;
-        const wall = { element, photos, viewport: element.querySelector('[data-columns-viewport]'), lanes: element.querySelector('[data-columns-lanes]'), controls: element.querySelector('[data-columns-controls]'), button: element.querySelector('[data-columns-pause]'), animations: [], paused: false, focused: false, visible: false, covered: false, width: 0, coverage: 0, columns: 0, resizeFrame: null };
+        const wall = { element, photos, viewport: element.querySelector('[data-columns-viewport]'), lanes: element.querySelector('[data-columns-lanes]'), animations: [], paused: false, focused: false, visible: false, covered: false, width: 0, coverage: 0, columns: 0, resizeFrame: null };
         walls.push(wall);
         // The animated copies remain hidden from assistive technology. Keep
         // pointer activation from switching to the keyboard's static gallery.
         wall.lanes.addEventListener('pointerdown', event => {
             if (event.target.closest('[data-photo-open]')) event.preventDefault();
         });
-        wall.button.addEventListener('click', () => { wall.paused = !wall.paused; syncWall(wall); });
         wall.viewport.addEventListener('focusin', () => { wall.focused = true; syncWall(wall); });
         wall.viewport.addEventListener('focusout', () => { wall.focused = false; syncWall(wall); });
         wallObserver.observe(element);

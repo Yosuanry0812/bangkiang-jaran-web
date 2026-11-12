@@ -11,12 +11,22 @@
     $heroVideoPath = ltrim((string) config('tourism.hero_video'), '/');
     $hasHeroVideo = $heroVideoPath && ! str_contains($heroVideoPath, '..') && preg_match('/\.(mp4|webm)$/i', $heroVideoPath) && is_file(public_path($heroVideoPath));
     $heroPoster = $heroVideoPath === 'videos/hero-bangkiang.mp4' && is_file(public_path('videos/hero-bangkiang.webp')) ? asset('videos/hero-bangkiang.webp') : $fallbackPhoto;
+    $heroPlaybackPath = $heroVideoPath === 'videos/hero-bangkiang.mp4' && is_file(public_path('videos/hero-bangkiang-web.mp4')) ? 'videos/hero-bangkiang-web.mp4' : $heroVideoPath;
     $usableGallery = $galeri->filter(fn ($item) => ! preg_match('/(?:^|\/)(?:galeri-\d+|placeholder\d*)\.(?:jpe?g|png|webp)$/i', (string) $item->file))->values();
     $photoAt = function (int $index) use ($usableGallery, $fallbackPhoto) {
         if ($usableGallery->isEmpty()) return ['url' => $fallbackPhoto, 'caption' => 'Air Terjun Bangkiang Jaran'];
         $media = $usableGallery->get($index % $usableGallery->count());
         return ['url' => asset('storage/' . ltrim((string) $media->file, '/')), 'caption' => $media->keterangan ?: 'Air Terjun Bangkiang Jaran'];
     };
+    $sectionPhotos = $usableGallery->map(fn ($media) => ['url' => asset('storage/' . ltrim((string) $media->file, '/')), 'caption' => $media->keterangan ?: 'Bangkiang Jaran'])->unique('url')->take(12)->values();
+    if ($sectionPhotos->isEmpty()) {
+        $sectionPhotos->push($photoAt(0));
+        foreach ([12, 36, 62] as $second) {
+            if (is_file(public_path("images/bangkiang-film-{$second}.webp"))) {
+                $sectionPhotos->push(['url' => asset("images/bangkiang-film-{$second}.webp"), 'caption' => $isEnglish ? 'Bangkiang Jaran valley' : 'Lembah Bangkiang Jaran']);
+            }
+        }
+    }
     $stories = $isEnglish ? [
         ['Waterfall', 'Water, rock, and a canopy of green. Take a closer look at the landscape that gives Bangkiang Jaran its character.', 'The sound of the valley'],
         ['Hidden Canyon', 'Another side of Bangkiang Jaran to ask about before you visit. Confirm access and current conditions with the team on site.', 'Before you set off'],
@@ -84,27 +94,26 @@
         </div>
         @if($hasHeroVideo)
         <div class="bj-hero-film-frame" aria-hidden="true">
-            <video class="bj-hero-film" data-hero-film autoplay muted loop playsinline preload="none" poster="{{ $heroPoster }}" tabindex="-1" disablepictureinpicture disableremoteplayback><source data-video-src="{{ asset($heroVideoPath) }}" type="{{ str_ends_with(strtolower($heroVideoPath), '.webm') ? 'video/webm' : 'video/mp4' }}"></video>
+            <video class="bj-hero-film" data-hero-film autoplay muted loop playsinline preload="none" poster="{{ $heroPoster }}" tabindex="-1" disablepictureinpicture disableremoteplayback><source data-video-src="{{ asset($heroPlaybackPath) }}" type="{{ str_ends_with(strtolower($heroPlaybackPath), '.webm') ? 'video/webm' : 'video/mp4' }}"></video>
         </div>
         @endif
         <div class="bj-home-hero__shade" aria-hidden="true"></div>
         <div class="bj-home-wrap bj-home-hero__content">
             <div class="bj-home-hero__copy">
-                <p class="bj-home-kicker bj-reveal">{{ $isEnglish ? 'Bakbakan Village · Gianyar, Bali' : 'Desa Bakbakan · Gianyar, Bali' }}</p>
+                <p class="bj-home-kicker bj-reveal">Bangkiang Jaran · Bali</p>
                 <div class="bj-hero-title-motion">
                 <h1 id="home-hero-title" class="bj-home-title bj-reveal" @if($hasHeroVideo) data-hero-typewriter @else data-bj-split @endif>
                     @if($isEnglish)
-                        A little closer<br>to the waterfall.
+                        Let the day<br>flow a little slower.
                     @else
-                        Sejenak di luar.<br>Dekat dengan alam.
+                        Di sini, waktu<br>mengalir pelan.
                     @endif
                 </h1>
                 </div>
-                <p class="bj-editorial-destination">Bangkiang Jaran Waterfall</p>
-                <p class="bj-home-hero__lead bj-reveal">{{ $isEnglish ? 'A waterfall, a green valley, and a reason to linger in Bakbakan, Gianyar.' : 'Air terjun, lembah yang rimbun, dan alasan untuk tinggal sedikit lebih lama di Bakbakan, Gianyar.' }}</p>
+                <p class="bj-home-hero__lead bj-reveal">{{ $isEnglish ? 'Discover the waterfall and the quiet greenery of Bakbakan.' : 'Nikmati air terjun dan teduhnya alam Bakbakan.' }}</p>
                 <div class="bj-home-hero__actions bj-reveal">
-                    <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Choose your ticket' : 'Pilih tiket kunjungan' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
-                    <a class="bj-home-button bj-home-button--ghost" href="#kisah">{{ $isEnglish ? 'Meet Bangkiang Jaran' : 'Kenali Bangkiang Jaran' }}</a>
+                    <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Book tickets' : 'Pesan tiket' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+                    <a class="bj-home-button bj-home-button--ghost" href="#kisah">{{ $isEnglish ? 'Explore' : 'Jelajahi' }}</a>
                 </div>
             </div>
 
@@ -134,7 +143,7 @@
                     <p>{{ $isEnglish ? 'In Bakbakan, Gianyar, Bangkiang Jaran brings falling water and a green landscape into one view. Pause by the valley, look closer, and make room for a day outdoors.' : 'Di Desa Bakbakan, Gianyar, Bangkiang Jaran mempertemukan aliran air dan lanskap hijau dalam satu pandangan. Berhenti sejenak di tepian lembah, perhatikan sekeliling, dan sisakan waktu untuk menikmati alam.' }}</p>
                     <a class="bj-home-text-link" href="#perjalanan">{{ $isEnglish ? 'Follow the journey' : 'Ikuti perjalanannya' }}<span class="material-symbols-outlined" aria-hidden="true">south_east</span></a>
                 </div>
-                @include('partials.photo-collage', ['collagePhotos' => $usableGallery->isNotEmpty() ? $usableGallery->map(fn ($media) => ['url' => asset('storage/' . ltrim((string) $media->file, '/')), 'caption' => $media->keterangan ?: 'Bangkiang Jaran']) : [$photoAt(0)]])
+                @include('partials.photo-collage', ['rotationPhotos' => $sectionPhotos, 'collagePhotos' => $usableGallery->isNotEmpty() ? $usableGallery->map(fn ($media) => ['url' => asset('storage/' . ltrim((string) $media->file, '/')), 'caption' => $media->keterangan ?: 'Bangkiang Jaran']) : [$photoAt(0)]])
             </div>
         </section>
 
@@ -148,7 +157,7 @@
                     @php($photo = $photoAt($index + 4))
                     <article class="bj-home-story {{ $index % 2 ? 'bj-home-story--reverse' : '' }}">
                         @if($index === 0 || $usableGallery->count() > 1)
-                        <figure class="bj-home-story__media bj-reveal" data-bj-parallax><img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" width="1200" height="800" loading="lazy" decoding="async"><span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>@include('partials.photo-link', ['photoUrl' => $photo['url'], 'photoCaption' => $photo['caption']])</figure>
+                        <figure class="bj-home-story__media bj-reveal" data-bj-parallax>@include('partials.photo-slideshow', ['slideshowPhotos' => $sectionPhotos, 'slideshowPhoto' => $photo, 'slideshowIndex' => $index])<span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span></figure>
                         @endif
                         <div class="bj-home-story__copy bj-reveal"><p class="bj-home-kicker">{{ $eyebrow }}</p><h3>{{ $title }}</h3><p>{{ $copy }}</p><a class="bj-home-text-link" href="#lokasi">{{ $isEnglish ? 'Prepare your visit' : 'Siapkan perjalanan Anda' }}</a></div>
                     </article>

@@ -13,7 +13,4 @@
         </div>
         <div class="bj-photo-columns__lanes" data-columns-lanes aria-hidden="true" hidden></div>
     </div>
-    <div class="bj-photo-columns__controls" data-columns-controls hidden>
-        <button type="button" data-columns-pause aria-pressed="false" data-play-label="{{ $columnsEnglish ? 'Play photo motion' : 'Putar gerak foto' }}" data-pause-label="{{ $columnsEnglish ? 'Pause photo motion' : 'Jeda gerak foto' }}"><span class="material-symbols-outlined" aria-hidden="true">pause</span><span data-columns-button-label>{{ $columnsEnglish ? 'Pause photo motion' : 'Jeda gerak foto' }}</span></button>
-    </div>
 </div>

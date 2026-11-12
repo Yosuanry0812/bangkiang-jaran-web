@@ -60,35 +60,18 @@ class PemesananController extends Controller
             $subtotal = $tiket->harga * $jumlah;
             $items = [];
 
-            if ($tiket->kategori === 'kendaraan') {
-                for ($i = 0; $i < $jumlah; $i++) {
-                    $kode = 'BJ-' . strtoupper(substr(uniqid(), -6)) . chr(rand(65, 90));
-                    $items[] = ['kode' => $kode];
-                    $detailRows[] = [
-                        'id_tiket'        => (int) $id_tiket,
-                        'kode_tiket'      => $kode,
-                        'nama_tiket'      => $tiket->nama_tiket,
-                        'kategori'        => $tiket->kategori,
-                        'harga'           => (int) $tiket->harga,
-                        'nama_pengunjung' => null,
-                        'plat_kendaraan'  => null,
-                    ];
-                }
-            } else {
-                // perorangan
-                for ($i = 0; $i < $jumlah; $i++) {
-                    $kode = 'BJ-' . strtoupper(substr(uniqid(), -6)) . chr(rand(65, 90));
-                    $items[] = ['kode' => $kode];
-                    $detailRows[] = [
-                        'id_tiket'        => (int) $id_tiket,
-                        'kode_tiket'      => $kode,
-                        'nama_tiket'      => $tiket->nama_tiket,
-                        'kategori'        => $tiket->kategori,
-                        'harga'           => (int) $tiket->harga,
-                        'nama_pengunjung' => null,
-                        'plat_kendaraan'  => null,
-                    ];
-                }
+            for ($i = 0; $i < $jumlah; $i++) {
+                $kode = 'BJ-' . strtoupper(substr(uniqid(), -6)) . chr(rand(65, 90));
+                $items[] = ['kode' => $kode];
+                $detailRows[] = [
+                    'id_tiket'        => (int) $id_tiket,
+                    'kode_tiket'      => $kode,
+                    'nama_tiket'      => $tiket->nama_tiket,
+                    'kategori'        => $tiket->kategori,
+                    'harga'           => (int) $tiket->harga,
+                    'nama_pengunjung' => null,
+                    'plat_kendaraan'  => null,
+                ];
             }
 
             $detail[] = [
@@ -148,17 +131,11 @@ class PemesananController extends Controller
         $rules = [];
         $messages = [];
         foreach ($detailRows as $i => $row) {
-            if ($row['kategori'] === 'kendaraan') {
-                $rules["plat_$i"] = ['required', 'string', 'max:20'];
-                $messages["plat_$i.required"] = 'Plat kendaraan untuk ' . $row['nama_tiket'] . ' wajib diisi.';
-            } else {
-                // perorangan
-                $rules["nama_$i"] = ['required', 'string', 'max:100'];
-                $messages["nama_$i.required"] = 'Nama pengunjung untuk ' . $row['nama_tiket'] . ' wajib diisi.';
-                $rules["gender_$i"] = ['required', 'in:L,P'];
-                $messages["gender_$i.required"] = 'Jenis kelamin untuk ' . $row['nama_tiket'] . ' wajib diisi.';
-                $messages["gender_$i.in"] = 'Jenis kelamin harus Laki-laki atau Perempuan.';
-            }
+            $rules["nama_$i"] = ['required', 'string', 'max:100'];
+            $messages["nama_$i.required"] = 'Nama pengunjung untuk ' . $row['nama_tiket'] . ' wajib diisi.';
+            $rules["gender_$i"] = ['required', 'in:L,P'];
+            $messages["gender_$i.required"] = 'Jenis kelamin untuk ' . $row['nama_tiket'] . ' wajib diisi.';
+            $messages["gender_$i.in"] = 'Jenis kelamin harus Laki-laki atau Perempuan.';
         }
 
         $request->validate($rules, $messages);
@@ -185,9 +162,9 @@ class PemesananController extends Controller
                     'id_tiket'        => $row['id_tiket'],
                     'kode_tiket'      => $row['kode_tiket'],
                     'nama_tiket'      => $row['nama_tiket'],
-                    'nama_pengunjung' => $row['kategori'] === 'kendaraan' ? null : $request->input("nama_$i"),
-                    'jenis_kelamin'   => $row['kategori'] === 'kendaraan' ? null : $request->input("gender_$i"),
-                    'plat_kendaraan'  => $row['kategori'] === 'kendaraan' ? $request->input("plat_$i") : null,
+                    'nama_pengunjung' => $request->input("nama_$i"),
+                    'jenis_kelamin'   => $request->input("gender_$i"),
+                    'plat_kendaraan'  => null,
                     'harga'           => $row['harga'],
                     'status_tiket'    => 'aktif',
                 ];

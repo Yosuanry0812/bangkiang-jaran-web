@@ -6,6 +6,16 @@ html { -webkit-text-size-adjust: 100%; }
 img, picture, video, canvas, svg { max-width: 100%; }
 input, select, textarea, button { font: inherit; }
 button, [type='button'], [type='submit'], a { -webkit-tap-highlight-color: transparent; }
+/* Reserve one glyph while the icon font downloads, including after rotation. */
+:where(.bj-public, .bj-guest, .bj-admin) .material-symbols-outlined {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    line-height: 1;
+    overflow: hidden;
+    vertical-align: middle;
+}
 
 .bj-public .px-gutter { padding-inline: var(--bj-page-gutter); }
 .bj-public main { min-width: 0; }
@@ -395,4 +405,31 @@ body.bj-admin .bj-review-facts td:first-child { padding-right: 12px; }
     body.bj-admin .admin-topbar { flex-shrink: 0; }
     body.bj-admin .admin-breadcrumb strong { overflow-wrap: anywhere; line-height: 1.35; }
     body.bj-admin .admin-table--responsive td { overflow-wrap: anywhere; }
+}
+
+/* Touch layouts retain native momentum and pinch zoom, including nested lists. */
+@media (hover: none), (pointer: coarse) {
+    body.bj-public :is(.bj-nature-text-link, .bj-home-text-link, .bj-site-brand),
+    body.bj-public footer a,
+    body.bj-admin .admin-text-action {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        min-width: 44px;
+    }
+    body.bj-public :is(.bj-home-hero__actions, .bj-resto-hero-copy) a { touch-action: manipulation; }
+    body:is(.bj-public, .bj-admin) :is(.overflow-x-auto, .bj-photo-columns.is-static-view .bj-photo-columns__viewport) {
+        overscroll-behavior-x: contain;
+    }
+}
+
+@media (max-width: 1023px) and (max-height: 500px) and (orientation: landscape) {
+    body.bj-public #mobileMenu.menu-open { max-height: calc(100svh - var(--bj-nav-height, 72px)); overflow-y: auto; }
+    body.bj-public.bj-nature.bj-marketing :is(.bj-home--journey .bj-home-hero__content, .bj-resto-full-hero .bj-resto-heading__grid) {
+        padding-block: calc(var(--bj-safe-top) + 56px) calc(var(--bj-safe-bottom) + 48px);
+    }
+    body.bj-public.bj-nature.bj-marketing :is(.bj-home-title, .bj-resto-full-hero h1) {
+        font-size: clamp(2.25rem, 5.5vw, 3.4rem);
+    }
+    body.bj-guest > main { align-items: flex-start; padding-block: 24px; }
 }

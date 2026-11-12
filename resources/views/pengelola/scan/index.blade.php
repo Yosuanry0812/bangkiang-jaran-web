@@ -178,11 +178,9 @@
                         <div class="space-y-4">
                             <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Data Pengunjung</h3>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">
-                                    {{ $detail->plat_kendaraan ? 'Plat Kendaraan' : 'Nama Pengunjung' }}
-                                </p>
+                                <p class="font-sans text-[11px] text-gray-400">Nama Pengunjung</p>
                                 <p class="font-sans text-base font-semibold text-gray-900">
-                                    {{ $detail->plat_kendaraan ?? $detail->nama_pengunjung ?? '-' }}
+                                    {{ $detail->nama_pengunjung ?? '-' }}
                                 </p>
                             </div>
                             <div>
@@ -236,7 +234,7 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="font-mono text-xs font-bold text-gray-800 tracking-wider truncate">{{ $dt->kode_tiket }}</p>
-                        <p class="font-sans text-[10px] text-gray-400 truncate">{{ $dt->plat_kendaraan ?? $dt->nama_pengunjung ?? $dt->nama_tiket }}</p>
+                        <p class="font-sans text-[10px] text-gray-400 truncate">{{ $dt->nama_pengunjung ?? $dt->nama_tiket }}</p>
                     </div>
                     <span class="font-sans text-[10px] text-gray-400 uppercase flex-shrink-0">{{ substr($dt->status_tiket, 0, 4) }}</span>
                 </div>
@@ -295,7 +293,7 @@
                             <span class="font-mono text-xs font-bold text-gray-700 tracking-wider">{{ $t->kode_tiket }}</span>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="font-sans text-xs font-medium text-gray-600">{{ $t->nama_pengunjung ?? $t->plat_kendaraan ?? $t->pemesanan->user->name ?? '-' }}</span>
+                            <span class="font-sans text-xs font-medium text-gray-600">{{ $t->nama_pengunjung ?? $t->pemesanan->user->name ?? '-' }}</span>
                         </td>
                         <td class="px-4 py-3 hidden sm:table-cell">
                             <span class="font-sans text-xs text-gray-400">{{ $t->nama_tiket }}</span>

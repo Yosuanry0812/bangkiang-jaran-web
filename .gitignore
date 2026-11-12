@@ -7,6 +7,8 @@
 # Local environment and credentials; keep the installation template.
 .env
 .env.*
+*.env
+.env.vault
 !.env.example
 *.pem
 *.key
@@ -90,3 +92,7 @@ Thumbs.db
 /coverage/
 /test-results/
 /playwright-report/
+
+# Local AI Security Audit Skill
+/.agents/skills/security-audit/
+/.claude/skills/security-audit

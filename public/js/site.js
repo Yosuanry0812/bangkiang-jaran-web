@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const hero = document.querySelector('[data-bj-hero]');
-    if (hero) {
+    if (hero && !hero.querySelector('[data-hero-film]')) {
         const slides = [...hero.querySelectorAll('[data-bj-hero-slide]')];
         const current = hero.querySelector('[data-bj-hero-current]');
         const caption = hero.querySelector('[data-bj-hero-caption]');
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const heroTitleWords = [...document.querySelectorAll('.bj-home-title .bj-word > span')];
     const heroTimeline = document.querySelector('.bj-home-hero__copy');
-    if (heroTimeline && motionLevel === 'high' && document.body.classList.contains('bj-nature')) {
+    if (heroTimeline && !heroTimeline.closest('[data-hero-intro]') && motionLevel === 'high' && document.body.classList.contains('bj-nature')) {
         gsap.from(heroTimeline, { y: 14, duration: .5, ease: 'power2.out', clearProps: 'transform' });
     }
     if (heroTimeline && motionLevel === 'high' && !document.body.classList.contains('bj-nature')) {
@@ -570,7 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
             x: direction,
             y: direction ? 0 : motionLevel === 'high' ? 28 : motionLevel === 'medium' ? 20 : 12,
             scale: isMedia ? .985 : 1,
-            clipPath: isMedia ? 'inset(0 0 12% 0 round 18px)' : 'inset(0 0 0 0)',
             duration: motionLevel === 'high' ? .78 : motionLevel === 'medium' ? .68 : .48,
             delay: ['high', 'medium'].includes(motionLevel) ? order * .06 : 0,
             ease: 'power3.out',

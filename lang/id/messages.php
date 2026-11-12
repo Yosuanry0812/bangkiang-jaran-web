@@ -687,7 +687,7 @@ return [
     'step_visitor_data' => 'Data Pengunjung',
     'step_payment' => 'Pembayaran',
     'visitor_data_title' => 'Lengkapi Data Pengunjung',
-    'visitor_data_desc' => 'Isikan nama setiap pengunjung & plat kendaraan',
+    'visitor_data_desc' => 'Isikan nama setiap pengunjung yang ikut berkunjung',
     'input_vehicle_plate' => 'Masukkan plat nomor kendaraan',
     'input_full_name' => 'Masukkan nama lengkap pengunjung',
     'vehicle_plate' => 'Plat Nomor Kendaraan',

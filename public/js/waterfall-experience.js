@@ -105,31 +105,147 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const film = document.querySelector('[data-hero-film]');
-    const toggle = document.querySelector('[data-film-toggle]');
-    if (film && toggle) {
-        let loaded = false;
-        let userPaused = reduced.matches || Boolean(navigator.connection?.saveData);
-        const update = () => {
-            toggle.setAttribute('aria-pressed', String(!film.paused));
-            toggle.setAttribute('aria-label', film.paused ? toggle.dataset.playLabel : toggle.dataset.pauseLabel);
-            toggle.querySelector('.material-symbols-outlined').textContent = film.paused ? 'play_arrow' : 'pause';
-            toggle.querySelector('[data-film-label]').textContent = film.paused ? (document.documentElement.lang === 'en' ? 'Play video' : 'Putar video') : (document.documentElement.lang === 'en' ? 'Pause video' : 'Jeda video');
+    const film = document.querySelector('[data-hero-film], [data-resto-film]');
+    if (film) {
+        const photoFilm = film.hasAttribute('data-resto-film');
+        const hero = film.closest('[data-hero-intro]') || film.closest('section');
+        const source = film.querySelector('source');
+        const connection = navigator.connection;
+        const copy = hero.querySelector('.bj-home-hero__copy, .bj-resto-hero-copy');
+        const title = hero.querySelector('[data-hero-typewriter]');
+        let introStarted = hero.classList.contains('is-intro-complete');
+        let introElapsed = 0;
+        let introClock = null;
+        let introTimer;
+        let completionTimer;
+        let letterCount = 0;
+        if (!photoFilm || film.dataset.restoPlayback) hero.setAttribute('data-intro-managed', '');
+        if (title) {
+            const label = title.cloneNode(true);
+            label.querySelectorAll('br').forEach(br => br.replaceWith(' '));
+            title.setAttribute('aria-label', label.textContent.replace(/\s+/g, ' ').trim());
+            const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            nodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                node.textContent.split(/(\s+)/).forEach(word => {
+                    if (!word.trim()) { fragment.append(document.createTextNode(word)); return; }
+                    const wrapper = document.createElement('span');
+                    wrapper.className = 'bj-type-word';
+                    wrapper.setAttribute('aria-hidden', 'true');
+                    Array.from(word).forEach(letter => {
+                        const span = document.createElement('span');
+                        span.className = 'bj-type-letter';
+                        span.style.setProperty('--letter-index', letterCount++);
+                        span.textContent = letter;
+                        wrapper.append(span);
+                    });
+                    fragment.append(wrapper);
+                });
+                node.replaceWith(fragment);
+            });
+        }
+        const typeDuration = 120 + letterCount * 22 + 180;
+        hero.style.setProperty('--type-duration', `${typeDuration}ms`);
+        const completeIntro = () => {
+            clearTimeout(completionTimer);
+            hero.classList.remove('is-intro-pending', 'is-intro-typing');
+            hero.classList.add('is-intro-complete');
+            copy.inert = false;
         };
-        const play = () => {
-            if (!loaded) { const source = film.querySelector('source'); source.src = source.dataset.videoSrc; film.load(); loaded = true; }
-            film.play().catch(update);
+        const revealIntro = (immediate = false) => {
+            clearTimeout(introTimer);
+            if (immediate) { introStarted = true; completeIntro(); return; }
+            if (introStarted) return;
+            introStarted = true;
+            hero.classList.remove('is-intro-pending');
+            hero.classList.add('is-intro-typing');
+            completionTimer = setTimeout(completeIntro, typeDuration + 850);
         };
-        toggle.addEventListener('click', () => { userPaused = !film.paused; if (film.paused) play(); else film.pause(); });
-        film.addEventListener('playing', update);
-        film.addEventListener('pause', update);
-        const showPoster = () => { film.hidden = true; toggle.hidden = true; };
-        film.addEventListener('error', showPoster);
-        film.querySelector('source').addEventListener('error', showPoster);
-        const observer = new IntersectionObserver(entries => { if (!entries[0].isIntersecting || document.hidden) film.pause(); else if (!userPaused) play(); });
-        observer.observe(film.closest('section'));
-        document.addEventListener('visibilitychange', () => { if (document.hidden) film.pause(); else if (!userPaused && film.closest('section').getBoundingClientRect().bottom > 0) play(); });
-        reduced.addEventListener('change', () => { if (reduced.matches) { userPaused = true; film.pause(); } });
-        update();
+        const pauseIntroClock = () => {
+            clearTimeout(introTimer);
+            if (introClock !== null) introElapsed += performance.now() - introClock;
+            introClock = null;
+        };
+        const startIntroClock = () => {
+            if (introStarted || introClock !== null) return;
+            introClock = performance.now();
+            introTimer = setTimeout(() => {
+                pauseIntroClock();
+                if (allowed()) revealIntro();
+            }, Math.max(0, 5000 - introElapsed));
+        };
+        copy.inert = hero.classList.contains('is-intro-pending');
+        let visible = false;
+        let leaving = false;
+        let failed = false;
+        let pending = false;
+        const allowed = () => visible && !leaving && !failed && !document.hidden
+            && !reduced.matches && !connection?.saveData
+            && (!photoFilm || film.dataset.restoPlayback === 'playing');
+        const sync = () => {
+            if (photoFilm) {
+                if (film.dataset.restoPlayback) hero.setAttribute('data-intro-managed', '');
+                if (allowed()) startIntroClock();
+                else pauseIntroClock();
+                if (reduced.matches || connection?.saveData || film.dataset.restoPlayback === 'static') revealIntro(true);
+                return;
+            }
+            if (!allowed()) {
+                pauseIntroClock();
+                film.pause();
+                hero.classList.remove('is-film-playing');
+                if (reduced.matches || connection?.saveData) revealIntro(true);
+                return;
+            }
+            if (!source.src) {
+                source.src = source.dataset.videoSrc;
+                film.load();
+            }
+            if (pending || !film.paused) return;
+            pending = true;
+            film.play().catch(error => {
+                if (error.name === 'AbortError' && allowed()) requestAnimationFrame(sync);
+                else if (error.name !== 'AbortError') revealIntro(true);
+                // Autoplay can be denied by device policy; the poster stays visible.
+            }).finally(() => { pending = false; });
+        };
+        if (photoFilm) {
+            film.addEventListener('resto-film-playback', sync);
+        } else {
+            film.muted = true;
+            film.defaultMuted = true;
+            film.loop = true;
+            film.addEventListener('playing', () => {
+                if (!allowed()) { sync(); return; }
+                hero.classList.add('is-film-ready', 'is-film-playing');
+                startIntroClock();
+            });
+            film.addEventListener('pause', () => { pauseIntroClock(); hero.classList.remove('is-film-playing'); });
+            film.addEventListener('waiting', pauseIntroClock);
+            const showPoster = () => {
+                failed = true;
+                film.pause();
+                hero.classList.remove('is-film-ready', 'is-film-playing');
+                revealIntro(true);
+            };
+            film.addEventListener('error', showPoster);
+            source.addEventListener('error', showPoster);
+        }
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(entries => {
+                visible = entries[0].isIntersecting;
+                sync();
+            }, { threshold: 0 }).observe(hero);
+        } else { visible = true; sync(); }
+        document.addEventListener('visibilitychange', sync);
+        reduced.addEventListener('change', sync);
+        connection?.addEventListener('change', sync);
+        addEventListener('pagehide', () => { leaving = true; sync(); });
+        addEventListener('pageshow', () => { leaving = false; sync(); });
+        // Retry only after a real user gesture when autoplay was denied.
+        addEventListener('pointerdown', sync, { passive: true });
+        addEventListener('keydown', sync);
     }
 });

@@ -26,13 +26,13 @@ class VisitorRevisionTest extends TestCase
         ]);
     }
 
-    public function test_booking_accepts_quantities_above_the_previous_limits_for_people_and_vehicles(): void
+    public function test_booking_accepts_large_quantities_without_artificial_limits(): void
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
-        $person = Tiket::create(['nama_tiket' => 'Dewasa', 'harga' => 15000, 'kategori' => 'perorangan', 'status' => 'aktif']);
-        $vehicle = Tiket::create(['nama_tiket' => 'Motor', 'harga' => 5000, 'kategori' => 'kendaraan', 'status' => 'aktif']);
+        $person1 = Tiket::create(['nama_tiket' => 'Dewasa', 'harga' => 15000, 'kategori' => 'perorangan', 'status' => 'aktif']);
+        $person2 = Tiket::create(['nama_tiket' => 'Anak', 'harga' => 5000, 'kategori' => 'perorangan', 'status' => 'aktif']);
         $this->actingAs($user)->post(route('wisatawan.pemesanan.store'), [
-            'tgl_kunjungan' => now()->addDay()->toDateString(), 'tickets' => [$person->id_tiket => 101, $vehicle->id_tiket => 123],
+            'tgl_kunjungan' => now()->addDay()->toDateString(), 'tickets' => [$person1->id_tiket => 101, $person2->id_tiket => 123],
         ])->assertRedirect(route('wisatawan.pemesanan.data-diri'))->assertSessionHasNoErrors();
         $this->assertSame(224, count(session('pemesanan_flow.detailRows')));
         $this->assertSame(2130000, session('pemesanan_flow.total_harga'));

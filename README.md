@@ -706,6 +706,8 @@ Browser -> route web/auth
 
 Controller/service juga memanggil filesystem untuk upload, mailer untuk email, dan DomPDF untuk laporan. Halaman dirender server; aplikasi ini bukan Next.js atau SPA React. Alpine/JavaScript menambahkan interaksi pada halaman.
 
+Layout publik, autentikasi, dan pengelola memuat CSS Tailwind serta Alpine dari build Vite (`resources/css/app.css` dan `resources/js/ui.js`). Token tema berada di `tailwind.config.js`; jalankan `npm run build` setelah perubahan frontend dan sebelum menjalankan versi tanpa server Vite. Entry UI memuat Alpine tanpa bootstrap Axios/Lodash.
+
 ### 15.3 Hak akses
 
 | Pelaku | Akses utama |

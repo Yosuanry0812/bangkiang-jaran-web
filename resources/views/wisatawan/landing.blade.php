@@ -10,6 +10,7 @@
     $fallbackPhoto = asset('images/sejarah-bangkiang-waterfall.webp');
     $heroVideoPath = ltrim((string) config('tourism.hero_video'), '/');
     $hasHeroVideo = $heroVideoPath && ! str_contains($heroVideoPath, '..') && preg_match('/\.(mp4|webm)$/i', $heroVideoPath) && is_file(public_path($heroVideoPath));
+    $heroPoster = $heroVideoPath === 'videos/hero-bangkiang.mp4' && is_file(public_path('videos/hero-bangkiang.webp')) ? asset('videos/hero-bangkiang.webp') : $fallbackPhoto;
     $usableGallery = $galeri->filter(fn ($item) => ! preg_match('/(?:^|\/)(?:galeri-\d+|placeholder\d*)\.(?:jpe?g|png|webp)$/i', (string) $item->file))->values();
     $photoAt = function (int $index) use ($usableGallery, $fallbackPhoto) {
         if ($usableGallery->isEmpty()) return ['url' => $fallbackPhoto, 'caption' => 'Air Terjun Bangkiang Jaran'];
@@ -54,11 +55,24 @@
 @endphp
 
 <div class="bj-home bj-home--journey">
-    <section id="hero-section" class="bj-home-hero bj-home-hero--cinema" data-bj-hero aria-labelledby="home-hero-title">
+    <section id="hero-section" class="bj-home-hero bj-home-hero--cinema {{ $hasHeroVideo ? 'bj-home-hero--film' : '' }}" data-bj-hero @if($hasHeroVideo) data-hero-intro @endif aria-labelledby="home-hero-title">
+        @if($hasHeroVideo)
+        <script>
+            // Hide the copy before first paint; keep it available if the enhancement fails.
+            (() => {
+                const hero = document.currentScript.parentElement;
+                if (matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) return;
+                hero.classList.add('is-intro-pending');
+                setTimeout(() => {
+                    if (!hero.hasAttribute('data-intro-managed')) hero.classList.remove('is-intro-pending');
+                }, 12000);
+            })();
+        </script>
+        @endif
         <div class="bj-home-hero__media swiper" data-bj-hero-swiper aria-hidden="true">
             <div class="swiper-wrapper">
-            @if($usableGallery->isEmpty())
-                <div class="bj-home-hero__slide swiper-slide is-active" data-bj-hero-slide data-caption="Air Terjun Bangkiang Jaran"><img src="{{ $fallbackPhoto }}" alt="" fetchpriority="high"></div>
+            @if($hasHeroVideo || $usableGallery->isEmpty())
+                <div class="bj-home-hero__slide swiper-slide is-active" data-bj-hero-slide data-caption="Air Terjun Bangkiang Jaran"><img src="{{ $hasHeroVideo ? $heroPoster : $fallbackPhoto }}" alt="" fetchpriority="high"></div>
             @else
                 @foreach($usableGallery->take(6) as $index => $media)
                     <div class="bj-home-hero__slide swiper-slide {{ $index === 0 ? 'is-active' : '' }}" data-bj-hero-slide data-caption="{{ $media->keterangan ?: 'Air Terjun Bangkiang Jaran' }}">
@@ -69,15 +83,16 @@
             </div>
         </div>
         @if($hasHeroVideo)
-        <video class="bj-hero-film" data-hero-film muted loop playsinline preload="none" poster="{{ $fallbackPhoto }}" aria-hidden="true"><source data-video-src="{{ asset($heroVideoPath) }}" type="{{ str_ends_with(strtolower($heroVideoPath), '.webm') ? 'video/webm' : 'video/mp4' }}"></video>
+        <div class="bj-hero-film-frame" aria-hidden="true">
+            <video class="bj-hero-film" data-hero-film autoplay muted loop playsinline preload="none" poster="{{ $heroPoster }}" tabindex="-1" disablepictureinpicture disableremoteplayback><source data-video-src="{{ asset($heroVideoPath) }}" type="{{ str_ends_with(strtolower($heroVideoPath), '.webm') ? 'video/webm' : 'video/mp4' }}"></video>
+        </div>
         @endif
         <div class="bj-home-hero__shade" aria-hidden="true"></div>
-        <button class="bj-title-motion-toggle" type="button" data-hero-title-toggle hidden aria-pressed="false" aria-label="{{ $isEnglish ? 'Pause heading motion' : 'Jeda gerak judul' }}" data-play-label="{{ $isEnglish ? 'Play heading motion' : 'Putar gerak judul' }}" data-pause-label="{{ $isEnglish ? 'Pause heading motion' : 'Jeda gerak judul' }}"><span class="material-symbols-outlined" aria-hidden="true">pause</span></button>
         <div class="bj-home-wrap bj-home-hero__content">
             <div class="bj-home-hero__copy">
                 <p class="bj-home-kicker bj-reveal">{{ $isEnglish ? 'Bakbakan Village · Gianyar, Bali' : 'Desa Bakbakan · Gianyar, Bali' }}</p>
-                <div class="bj-hero-title-motion" data-hero-title-motion>
-                <h1 id="home-hero-title" class="bj-home-title bj-reveal" data-bj-split>
+                <div class="bj-hero-title-motion">
+                <h1 id="home-hero-title" class="bj-home-title bj-reveal" @if($hasHeroVideo) data-hero-typewriter @else data-bj-split @endif>
                     @if($isEnglish)
                         A little closer<br>to the waterfall.
                     @else
@@ -93,10 +108,8 @@
                 </div>
             </div>
 
+            @if(! $hasHeroVideo && $usableGallery->count() > 1)
             <div class="bj-home-hero__bottom bj-reveal">
-                @if($hasHeroVideo)
-                    <button type="button" class="bj-film-toggle" data-film-toggle aria-label="{{ $isEnglish ? 'Play background video' : 'Putar video latar' }}" data-play-label="{{ $isEnglish ? 'Play background video' : 'Putar video latar' }}" data-pause-label="{{ $isEnglish ? 'Pause background video' : 'Jeda video latar' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">play_arrow</span><span data-film-label>{{ $isEnglish ? 'Play video' : 'Putar video' }}</span></button>
-                @elseif($usableGallery->count() > 1)
                     <div class="bj-home-hero__controls ml-auto" aria-label="{{ $isEnglish ? 'Hero photos' : 'Foto pembuka' }}">
                         <span class="bj-home-hero__caption" data-bj-hero-caption>{{ $usableGallery->first()->keterangan ?: 'Air Terjun Bangkiang Jaran' }}</span>
                         <span class="bj-home-hero__count"><strong data-bj-hero-current>01</strong> / {{ str_pad(min($usableGallery->count(), 6), 2, '0', STR_PAD_LEFT) }}</span>
@@ -104,8 +117,8 @@
                         <button type="button" data-bj-hero-prev aria-label="{{ $isEnglish ? 'Previous photo' : 'Foto sebelumnya' }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_back</span></button>
                         <button type="button" data-bj-hero-next aria-label="{{ $isEnglish ? 'Next photo' : 'Foto berikutnya' }}"><span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
                     </div>
-                @endif
             </div>
+            @endif
         </div>
         <a class="bj-home-hero__scroll" href="#kisah" aria-label="{{ $isEnglish ? 'Scroll to explore' : 'Gulir untuk menjelajah' }}"><span>{{ $isEnglish ? 'Scroll' : 'Gulir' }}</span><i aria-hidden="true"></i></a>
     </section>
@@ -135,7 +148,7 @@
                     @php($photo = $photoAt($index + 4))
                     <article class="bj-home-story {{ $index % 2 ? 'bj-home-story--reverse' : '' }}">
                         @if($index === 0 || $usableGallery->count() > 1)
-                        <figure class="bj-home-story__media bj-reveal" data-bj-parallax><img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" loading="lazy"><span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span></figure>
+                        <figure class="bj-home-story__media bj-reveal" data-bj-parallax><img src="{{ $photo['url'] }}" alt="{{ $photo['caption'] }}" width="1200" height="800" loading="lazy" decoding="async"><span>{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>@include('partials.photo-link', ['photoUrl' => $photo['url'], 'photoCaption' => $photo['caption']])</figure>
                         @endif
                         <div class="bj-home-story__copy bj-reveal"><p class="bj-home-kicker">{{ $eyebrow }}</p><h3>{{ $title }}</h3><p>{{ $copy }}</p><a class="bj-home-text-link" href="#lokasi">{{ $isEnglish ? 'Prepare your visit' : 'Siapkan perjalanan Anda' }}</a></div>
                     </article>

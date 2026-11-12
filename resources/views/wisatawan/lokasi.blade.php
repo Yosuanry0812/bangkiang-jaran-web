@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="mt-lg flex justify-center border-t border-outline-variant/30 pt-md">
-                    <a href="https://www.google.com/maps?q=-8.511979,115.328486" target="_blank"
+                    <a href="{{ config('tourism.maps_url') }}" target="_blank" rel="noopener noreferrer"
                        class="bg-primary-container text-white font-body text-label-md px-8 py-4 rounded-xl flex items-center gap-sm hover:-translate-y-1 transition-transform shadow-sm group">
                         <span class="material-symbols-outlined group-hover:animate-pulse">map</span>
                         {{ __('messages.open_in_gmaps') }}

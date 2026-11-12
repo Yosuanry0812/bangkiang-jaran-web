@@ -61,13 +61,12 @@
                     </div>
                     <div class="bj-booking-tickets">
                         @forelse($tiketList as $index => $ticket)
-                            @php($isVehicle = $ticket->kategori === 'kendaraan')
                             <article class="bj-booking-ticket bj-reveal" :class="qty({{ $ticket->id_tiket }}) > 0 ? 'is-selected' : ''">
-                                <div class="bj-booking-ticket__stub"><span class="material-symbols-outlined" aria-hidden="true">{{ $isVehicle ? 'directions_car' : 'confirmation_number' }}</span><small>Bangkiang<br>Jaran</small></div>
+                                <div class="bj-booking-ticket__stub"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><small>Bangkiang<br>Jaran</small></div>
                                 <div class="bj-booking-ticket__copy">
-                                    <div class="bj-booking-ticket__title"><h3>{{ $ticket->nama_tiket }}</h3><span>{{ $ticket->kategori ?? ($isEnglish ? 'Individual' : 'Perorangan') }}</span></div>
-                                    <p>{{ $isVehicle ? ($isEnglish ? 'Official vehicle access for your selected visit date.' : 'Akses kendaraan resmi pada tanggal kunjungan terpilih.') : ($isEnglish ? 'Waterfall, natural pool, and public facility access included.' : 'Termasuk akses air terjun, kolam alami, dan fasilitas umum.') }}</p>
-                                    <strong>Rp {{ number_format($ticket->harga, 0, ',', '.') }} <small>/ {{ $isVehicle ? ($isEnglish ? 'vehicle' : 'kendaraan') : ($isEnglish ? 'person' : 'orang') }}</small></strong>
+                                    <div class="bj-booking-ticket__title"><h3>{{ $ticket->nama_tiket }}</h3><span>{{ $isEnglish ? 'Individual' : 'Perorangan' }}</span></div>
+                                    <p>{{ $isEnglish ? 'Waterfall, natural pool, and public facility access included.' : 'Termasuk akses air terjun, kolam alami, dan fasilitas umum.' }}</p>
+                                    <strong>Rp {{ number_format($ticket->harga, 0, ',', '.') }} <small>/ {{ $isEnglish ? 'person' : 'orang' }}</small></strong>
                                 </div>
                                 <div class="bj-booking-stepper" role="group" aria-label="{{ $isEnglish ? 'Quantity for' : 'Jumlah untuk' }} {{ $ticket->nama_tiket }}">
                                     <button type="button" @click="changeQuantity({{ $ticket->id_tiket }}, -1, $el)" :disabled="qty({{ $ticket->id_tiket }}) === 0" aria-label="{{ $isEnglish ? 'Reduce' : 'Kurangi' }} {{ $ticket->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">remove</span></button>

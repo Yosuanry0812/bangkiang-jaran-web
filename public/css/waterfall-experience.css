@@ -39,8 +39,6 @@ body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero .bj-home-button--gho
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__bottom { bottom: 28px; }
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__controls :is(.bj-home-hero__count, .bj-home-hero__count strong) { color: #fff; }
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__controls button { background: rgba(10,44,33,.75); border-color: #cfe7dd; color: #fff; }
-.bj-film-toggle { display: flex; gap: 10px; align-items: center; min-height: 44px; padding: 10px 16px; border: 1px solid #d7eae3; border-radius: 10px; color: #fff; background: rgba(6,31,26,.5); margin-left: auto; font-size: .85rem; }
-.bj-film-toggle:hover { background: #174d43; }
 .bj-intro-deck { min-width: 0; perspective: 1200px; }
 .bj-intro-deck .bj-photo-deck--single { position: relative; padding: 12px; }
 .bj-intro-deck .bj-photo-deck--single::before, .bj-intro-deck .bj-photo-deck--single::after { content: ""; position: absolute; inset: 12px; background: #cbe6df; border: 1px solid #a2cfc1; border-radius: 24px; transform: rotate(-5deg) translateZ(-25px); z-index: 0; }

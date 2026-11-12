@@ -100,10 +100,8 @@
                         <p class="text-sm font-medium text-gray-800 mt-0.5">{{ $detail->nama_tiket }}</p>
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-wider text-gray-400">
-                            {{ $detail->plat_kendaraan ? 'Plat Kendaraan' : 'Pengunjung' }}
-                        </p>
-                        <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ $detail->plat_kendaraan ?? $detail->nama_pengunjung ?? '-' }}</p>
+                        <p class="text-[10px] uppercase tracking-wider text-gray-400">Pengunjung</p>
+                        <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ $detail->nama_pengunjung ?? '-' }}</p>
                     </div>
                     <div>
                         <p class="text-[10px] uppercase tracking-wider text-gray-400">Tanggal</p>

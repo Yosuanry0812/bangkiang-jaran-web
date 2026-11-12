@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const saveData = navigator.connection?.saveData === true;
     const walls = [];
     const stack = document.querySelector('[data-overlap-stack]');
-    const panels = stack ? [...stack.querySelectorAll('[data-overlap-panel]')].map(element => ({ element, start: 0, height: 0, top: 0 })) : [];
+    const panels = stack ? [...stack.querySelectorAll('[data-overlap-panel]')].map(element => ({ element, start: 0, height: 0, top: 0, transform: '', walls: [] })) : [];
     let layout = { end: 0, height: innerHeight, mobile: innerWidth < 768, nav: 88 };
     let frame = null;
     let measureFrame = null;
@@ -14,8 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let velocity = 0;
     let leaving = false;
     let keyboardMode = false;
+    let photoOpen = false;
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-    const allowsMotion = () => !reduced.matches && !saveData;
+    const allowsMotion = () => !reduced.matches && !navigator.connection?.saveData;
+    const resetPanels = () => panels.forEach(panel => {
+        panel.element.style.removeProperty('transform');
+        panel.transform = '';
+    });
 
     const imageFallback = image => {
         const fail = () => { image.hidden = true; image.nextElementSibling.hidden = false; };
@@ -27,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const syncWall = wall => {
         const enabled = allowsMotion() && wall.animations.length > 0;
         const reading = wall.paused || wall.focused;
-        const active = enabled && wall.visible && !wall.covered && !reading && !document.hidden && !leaving;
+        const active = enabled && wall.visible && !wall.covered && !reading && !photoOpen && !document.hidden && !leaving;
         wall.element.classList.toggle('is-static-view', reading);
         wall.element.dataset.columnsMotion = enabled ? (active ? 'running' : 'paused') : 'static';
         wall.animations.forEach(animation => active ? animation.play() : animation.pause());
@@ -54,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const gap = count === 2 ? 10 : 14;
         const width = (wall.viewport.clientWidth - gap * (count - 1)) / count;
         const rows = Math.max(3, Math.ceil(wall.viewport.clientHeight / (width * .75 + gap)) + 1);
+        const fragment = document.createDocumentFragment();
+        const tracks = [];
         for (let column = 0; column < count; column += 1) {
             const lane = document.createElement('div');
             const track = document.createElement('div');
@@ -65,17 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const photo = wall.photos[(row * count + column) % wall.photos.length].cloneNode(true);
                 const image = photo.querySelector('img');
                 image.alt = '';
+                photo.querySelector('[data-photo-open]')?.setAttribute('tabindex', '-1');
                 imageFallback(image);
                 set.append(photo);
             }
             track.append(set);
             lane.append(track);
-            wall.lanes.append(lane);
-            // CSS height excludes the outer section's scroll-driven scale.
-            const distance = parseFloat(getComputedStyle(set).height) + gap;
+            fragment.append(lane);
             const repeat = set.cloneNode(true);
             repeat.querySelectorAll('img').forEach(imageFallback);
             track.append(repeat);
+            tracks.push({ lane, track, set, column });
+        }
+        wall.lanes.append(fragment);
+        // Build every lane before measuring, so reads do not alternate with DOM writes.
+        const distances = tracks.map(({ set }) => parseFloat(getComputedStyle(set).height) + gap);
+        wall.coverage = Math.min(...distances);
+        wall.width = wall.viewport.clientWidth;
+        wall.columns = count;
+        tracks.forEach(({ lane, track, column }, index) => {
+            const distance = distances[index];
             const speed = count === 2 ? [8, 10][column] : [10, 13, 11][column];
             const duration = distance / speed * 1000;
             const animation = track.animate([{ transform: 'translate3d(0,0,0)' }, { transform: `translate3d(0,${-distance}px,0)` }], { duration, iterations: Infinity, easing: 'linear', direction: column % 2 ? 'reverse' : 'normal' });
@@ -83,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             animation.currentTime = (progress[column] ?? column * .19) * duration;
             lane.dataset.columnDirection = column % 2 ? 'down' : 'up';
             wall.animations.push(animation);
-        }
+        });
         syncWall(wall);
     };
 
@@ -99,24 +114,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const photos = [...element.querySelectorAll('[data-columns-source] figure')];
         photos.forEach(photo => imageFallback(photo.querySelector('img')));
         if (!photos.length) return;
-        const wall = { element, photos, viewport: element.querySelector('[data-columns-viewport]'), lanes: element.querySelector('[data-columns-lanes]'), controls: element.querySelector('[data-columns-controls]'), button: element.querySelector('[data-columns-pause]'), animations: [], paused: false, focused: false, visible: false, covered: false, size: '' };
+        const wall = { element, photos, viewport: element.querySelector('[data-columns-viewport]'), lanes: element.querySelector('[data-columns-lanes]'), controls: element.querySelector('[data-columns-controls]'), button: element.querySelector('[data-columns-pause]'), animations: [], paused: false, focused: false, visible: false, covered: false, width: 0, coverage: 0, columns: 0, resizeFrame: null };
         walls.push(wall);
-        buildWall(wall);
+        // The animated copies remain hidden from assistive technology. Keep
+        // pointer activation from switching to the keyboard's static gallery.
+        wall.lanes.addEventListener('pointerdown', event => {
+            if (event.target.closest('[data-photo-open]')) event.preventDefault();
+        });
         wall.button.addEventListener('click', () => { wall.paused = !wall.paused; syncWall(wall); });
         wall.viewport.addEventListener('focusin', () => { wall.focused = true; syncWall(wall); });
         wall.viewport.addEventListener('focusout', () => { wall.focused = false; syncWall(wall); });
         wallObserver.observe(element);
         new ResizeObserver(() => {
-            const size = `${wall.viewport.clientWidth}:${wall.viewport.clientHeight}:${innerWidth < 768}`;
-            if (size === wall.size) return;
-            wall.size = size;
-            requestAnimationFrame(() => buildWall(wall));
+            if (!allowsMotion() || wall.resizeFrame) return;
+            const needsBuild = () => Math.abs(wall.viewport.clientWidth - wall.width) >= 1
+                || wall.columns !== (innerWidth < 768 ? 2 : 3)
+                || wall.viewport.clientHeight > wall.coverage;
+            // Browser chrome/keyboard height changes can reuse tracks that still cover the viewport.
+            if (!needsBuild()) return;
+            wall.resizeFrame = requestAnimationFrame(() => {
+                wall.resizeFrame = null;
+                if (allowsMotion() && needsBuild()) buildWall(wall);
+            });
         }).observe(wall.viewport);
     });
+    panels.forEach(panel => { panel.walls = walls.filter(wall => panel.element.contains(wall.element)); });
 
     const paintPanels = () => {
-        if (!stack || !allowsMotion() || stack.classList.contains('is-reading')) return;
-        const y = scrollY;
+        if (!stack || !allowsMotion() || photoOpen || stack.classList.contains('is-reading')) return;
+        const y = Math.max(0, scrollY);
         const topOf = panel => Math.min(Math.max(panel.start - y, panel.top), layout.end - y - panel.height);
         panels.forEach((panel, index) => {
             const next = panels[index + 1];
@@ -124,9 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const progress = next ? clamp((top + panel.height - topOf(next)) / Math.min(panel.height, layout.height - layout.nav), 0, 1) : 0;
             const visible = top < layout.height && top + panel.height > 0;
             const drift = visible ? clamp(velocity * (layout.mobile ? .0015 : .0035), layout.mobile ? -3 : -7, layout.mobile ? 3 : 7) * (1 - progress) - progress * (layout.mobile ? 5 : 12) : 0;
-            panel.element.style.setProperty('--panel-drift', `${drift.toFixed(2)}px`);
-            panel.element.style.setProperty('--panel-scale', (1 - progress * (layout.mobile ? .006 : .016)).toFixed(4));
-            walls.filter(wall => panel.element.contains(wall.element)).forEach(wall => {
+            const transform = visible ? `translate3d(0,${drift.toFixed(2)}px,0) scale(${(1 - progress * (layout.mobile ? .006 : .016)).toFixed(4)})` : '';
+            if (transform !== panel.transform) {
+                // Direct transforms avoid recalculating inherited custom properties on every descendant.
+                if (transform) panel.element.style.transform = transform;
+                else panel.element.style.removeProperty('transform');
+                panel.transform = transform;
+            }
+            panel.walls.forEach(wall => {
                 const covered = progress > .995;
                 if (covered !== wall.covered) { wall.covered = covered; syncWall(wall); }
             });
@@ -149,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const measure = () => {
         measureFrame = null;
         if (!stack) return;
-        layout = { end: 0, height: innerHeight, mobile: innerWidth < 768, nav: Math.min(100, document.getElementById('main-nav')?.offsetHeight || 88) + 8 };
+        layout = { end: 0, height: innerHeight, mobile: innerWidth < 768, nav: (document.getElementById('nav-bar')?.offsetHeight || 80) + 8 };
         let start = stack.getBoundingClientRect().top + scrollY;
         const heights = panels.map(panel => panel.element.offsetHeight);
         panels.forEach((panel, index) => {
@@ -170,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stack.addEventListener('focusin', event => {
             if (!keyboardMode && !event.target.matches(':focus-visible')) return;
             stack.classList.add('is-reading');
+            resetPanels();
             walls.forEach(wall => { wall.covered = false; syncWall(wall); });
         });
         stack.addEventListener('focusout', () => window.setTimeout(() => {
@@ -186,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addEventListener('keydown', event => {
             if (event.key !== 'Tab') return;
             keyboardMode = true;
-            if (stack.contains(document.activeElement)) stack.classList.add('is-reading');
+            if (stack.contains(document.activeElement)) { stack.classList.add('is-reading'); resetPanels(); }
         });
         addEventListener('pointerdown', () => {
             keyboardMode = false;
@@ -201,11 +233,19 @@ document.addEventListener('DOMContentLoaded', () => {
         frame = null;
         targetVelocity = 0;
         velocity = 0;
+        resetPanels();
         stack?.classList.toggle('is-overlapping', allowsMotion());
         walls.forEach(buildWall);
         requestMeasure();
     };
     reduced.addEventListener('change', updatePreference);
+    navigator.connection?.addEventListener('change', updatePreference);
+    document.addEventListener('bj-photo-viewer-change', event => {
+        photoOpen = event.detail.open;
+        walls.forEach(syncWall);
+        if (photoOpen && frame) { cancelAnimationFrame(frame); frame = null; }
+        if (!photoOpen) { previousScroll = scrollY; scrollTime = performance.now(); requestMeasure(); }
+    });
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && frame) { cancelAnimationFrame(frame); frame = null; }
         walls.forEach(syncWall);

@@ -40,6 +40,7 @@ class ExampleTest extends TestCase
 
     public function test_homepage_uses_uploaded_photos_for_hero(): void
     {
+        config(['tourism.hero_video' => null]);
         Galeri::create(['file' => 'wisata/foto-satu.webp', 'keterangan' => 'Aliran air', 'tipe' => 'wisata']);
         Galeri::create(['file' => 'wisata/foto-dua.webp', 'keterangan' => 'Jalur masuk', 'tipe' => 'wisata']);
         Galeri::create(['file' => 'wisata/foto-tiga.webp', 'keterangan' => 'Pemandangan lembah', 'tipe' => 'wisata']);
@@ -53,6 +54,63 @@ class ExampleTest extends TestCase
 
         $response = $this->get('/')->assertSee('bj-photo-collage--3', false)->assertSee('Tepian air');
         $this->assertSame(3, substr_count($response->getContent(), 'class="bj-photo-collage__photo bj-photo-collage__photo--'));
+    }
+
+    public function test_hero_video_loops_without_playback_controls_or_a_background_slideshow(): void
+    {
+        $path = 'videos/test-hero-'.bin2hex(random_bytes(6)).'.mp4';
+        file_put_contents(public_path($path), 'hero fixture');
+        config(['tourism.hero_video' => $path]);
+        Galeri::create(['file' => 'wisata/foto.webp', 'keterangan' => 'Aliran air', 'tipe' => 'wisata']);
+
+        try {
+            foreach (['id', 'en'] as $locale) {
+                $this->withSession(['locale' => $locale]);
+                $response = $this->get('/')->assertOk()
+                    ->assertSee('autoplay muted loop playsinline', false)
+                    ->assertSee('hero-film.css', false)
+                    ->assertSee('data-hero-intro', false)
+                    ->assertSee('data-hero-typewriter', false)
+                    ->assertSee('data-video-src="'.asset($path).'"', false)
+                    ->assertDontSee('data-film-toggle', false)
+                    ->assertDontSee('data-hero-title-toggle', false)
+                    ->assertDontSee('data-bj-hero-next', false);
+                $dom = new \DOMDocument;
+                @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+                $xpath = new \DOMXPath($dom);
+                $this->assertSame(1, $xpath->query('//*[@data-bj-hero-slide]')->length);
+                $this->assertSame(0, $xpath->query('//video[@controls]')->length);
+            }
+        } finally {
+            unlink(public_path($path));
+        }
+    }
+
+    public function test_missing_hero_video_preserves_the_photo_fallback(): void
+    {
+        config(['tourism.hero_video' => 'videos/missing-hero.mp4']);
+        $this->get('/')->assertOk()
+            ->assertDontSee('data-hero-film', false)
+            ->assertSee('images/sejarah-bangkiang-waterfall.webp', false)
+            ->assertDontSee('data-hero-title-toggle', false);
+    }
+
+    public function test_landing_and_restaurant_navigation_are_initially_hidden_until_after_the_hero(): void
+    {
+        $dom = new \DOMDocument;
+        foreach (['/', '/restoran'] as $path) {
+            @$dom->loadHTML('<?xml encoding="UTF-8">'.$this->get($path)->assertOk()->getContent());
+            $nav = $dom->getElementById('main-nav');
+            $this->assertTrue($nav->hasAttribute('data-nav-after-hero'));
+            $this->assertTrue($nav->hasAttribute('inert'));
+            $this->assertSame('true', $nav->getAttribute('aria-hidden'));
+            $this->assertStringContainsString('nav-awaiting-hero', $nav->getAttribute('class'));
+        }
+
+        @$dom->loadHTML('<?xml encoding="UTF-8">'.$this->get('/tiket')->assertOk()->getContent());
+        $nav = $dom->getElementById('main-nav');
+        $this->assertFalse($nav->hasAttribute('data-nav-after-hero'));
+        $this->assertFalse($nav->hasAttribute('inert'));
     }
 
     public function test_public_layout_loads_the_typography_and_motion_system(): void
@@ -86,6 +144,39 @@ class ExampleTest extends TestCase
             ->assertSee('data-columns-pause', false)
             ->assertSee('Ruang makan')
             ->assertSee('Hidangan lokal');
+    }
+
+    public function test_public_photo_links_open_originals_with_localized_captions(): void
+    {
+        Galeri::create(['file' => 'wisata/air-terjun.webp', 'keterangan' => 'Air & pepohonan', 'keterangan_en' => 'Water & trees', 'tipe' => 'wisata']);
+        Galeri::create(['file' => 'restoran/meja-makan.webp', 'keterangan' => 'Meja "bersama"', 'keterangan_en' => 'Shared table', 'tipe' => 'restoran']);
+
+        foreach (['id', 'en'] as $locale) {
+            $this->withSession(['locale' => $locale]);
+            foreach (['/' => 'wisata/air-terjun.webp', '/restoran' => 'restoran/meja-makan.webp'] as $url => $file) {
+                $response = $this->get($url)->assertOk()
+                    ->assertSee('photo-viewer.js', false)
+                    ->assertSee('id="bj-photo-viewer"', false)
+                    ->assertSee($locale === 'en' ? 'Close photo' : 'Tutup foto')
+                    ->assertDontSee('data-photo-zoom', false)
+                    ->assertDontSee('data-photo-original', false)
+                    ->assertDontSee('bj-photo-viewer__toolbar', false);
+                $dom = new \DOMDocument;
+                @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+                $xpath = new \DOMXPath($dom);
+                $links = $xpath->query('//a[@data-photo-open]');
+                $this->assertSame($url === '/' ? 3 : 1, $links->length);
+                foreach ($links as $link) {
+                    $this->assertSame(asset('storage/'.$file), $link->getAttribute('href'));
+                    $this->assertSame('dialog', $link->getAttribute('aria-haspopup'));
+                    $this->assertNotSame('', $link->getAttribute('data-photo-caption'));
+                }
+                // The modal must not request a photo until the visitor opens it.
+                $this->assertSame(0, $xpath->query('//dialog[@id="bj-photo-viewer"]//img[@src]')->length);
+            }
+        }
+
+        $this->get('/login')->assertDontSee('photo-viewer.js', false);
     }
 
     public function test_ticket_page_presents_clear_ticket_profiles_and_estimator(): void

@@ -687,7 +687,7 @@ return [
     'step_visitor_data' => 'Visitor Data',
     'step_payment' => 'Payment',
     'visitor_data_title' => 'Complete Visitor Data',
-    'visitor_data_desc' => 'Fill in the name of each visitor & vehicle plate',
+    'visitor_data_desc' => 'Fill in the name of each visitor who will be joining',
     'input_vehicle_plate' => 'Enter vehicle plate number',
     'input_full_name' => 'Enter visitor full name',
     'vehicle_plate' => 'Vehicle Plate Number',

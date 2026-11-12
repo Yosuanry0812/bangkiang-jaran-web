@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
+@layer components {
+    .heading-xl { @apply font-serif text-5xl md:text-7xl leading-[1.08] tracking-tight text-deep; }
+    .heading-lg { @apply font-serif text-3xl md:text-5xl leading-[1.12] tracking-tight text-deep; }
+    .heading-md { @apply font-serif text-2xl md:text-3xl leading-[1.2] tracking-tight text-deep; }
+    .body-large { @apply font-sans text-[17px] md:text-[19px] leading-relaxed text-gray-500; }
+    .body-base { @apply font-sans text-[15px] leading-relaxed text-gray-500; }
+    .label-sm { @apply font-sans text-[13px] font-medium uppercase tracking-[0.1em] text-forest/60; }
+}
 @tailwind utilities;
+
+/* Keep the existing guest/admin theme differences with the shared build. */
+.bj-guest .rounded-2xl { border-radius: 1.5rem; }
+.bj-admin .font-serif { font-family: 'DM Sans', system-ui, sans-serif; }

@@ -19,12 +19,12 @@ class DocumentedFeatureFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function ticket(string $category = 'perorangan', int $price = 15000): Tiket
+    private function ticket(string $name = 'Pengunjung Uji', int $price = 15000): Tiket
     {
         return Tiket::create([
-            'nama_tiket' => $category === 'kendaraan' ? 'Motor Uji' : 'Pengunjung Uji',
-            'nama_tiket_en' => $category === 'kendaraan' ? 'Test Motorbike' : 'Test Visitor',
-            'harga' => $price, 'kategori' => $category, 'status' => 'aktif',
+            'nama_tiket' => $name,
+            'nama_tiket_en' => 'Test Visitor',
+            'harga' => $price, 'kategori' => 'perorangan', 'status' => 'aktif',
         ]);
     }
 
@@ -35,12 +35,12 @@ class DocumentedFeatureFlowTest extends TestCase
         config(['payment.methods' => [['id' => 'BCA']]]);
         $visitor = User::factory()->create(['role' => 'wisatawan']);
         $manager = User::factory()->create(['role' => 'pengelola']);
-        $person = $this->ticket();
-        $vehicle = $this->ticket('kendaraan', 5000);
+        $person1 = $this->ticket('Dewasa Uji', 20000);
+        $person2 = $this->ticket('Anak Uji', 15000);
 
         $this->actingAs($visitor)->post(route('wisatawan.pemesanan.store'), [
             'tgl_kunjungan' => now()->toDateString(),
-            'tickets' => [$person->id_tiket => 2, $vehicle->id_tiket => 1],
+            'tickets' => [$person1->id_tiket => 1, $person2->id_tiket => 1],
             'total_harga' => 1,
         ])->assertRedirect(route('wisatawan.pemesanan.data-diri'))->assertSessionHasNoErrors();
         $this->assertDatabaseCount('pemesanan', 0);
@@ -48,15 +48,15 @@ class DocumentedFeatureFlowTest extends TestCase
         $this->get(route('wisatawan.pemesanan.data-diri'))->assertOk();
         $this->post(route('wisatawan.pemesanan.store-data-diri'), [
             'nama_0' => 'Pengunjung Satu', 'gender_0' => 'L',
-            'nama_1' => 'Pengunjung Dua', 'gender_1' => 'P', 'plat_2' => 'DK 1234 QA',
+            'nama_1' => 'Pengunjung Dua', 'gender_1' => 'P',
         ])->assertSessionHasNoErrors()->assertRedirect();
 
         $booking = Pemesanan::with('detailPemesanan')->sole();
         $this->assertSame('pending', $booking->status);
         $this->assertEquals(35000, $booking->total_harga);
-        $this->assertCount(3, $booking->detailPemesanan);
-        $this->assertCount(3, $booking->detailPemesanan->pluck('kode_tiket')->unique());
-        $this->assertSame('DK 1234 QA', $booking->detailPemesanan->last()->plat_kendaraan);
+        $this->assertCount(2, $booking->detailPemesanan);
+        $this->assertCount(2, $booking->detailPemesanan->pluck('kode_tiket')->unique());
+        $this->assertSame('Pengunjung Dua', $booking->detailPemesanan->last()->nama_pengunjung);
         Mail::assertSent(PemesananBerhasil::class);
         $this->get(route('wisatawan.pemesanan.riwayat'))->assertOk()->assertSee($booking->kode_booking);
         $this->post(route('wisatawan.pembayaran.store', $booking->id_pemesanan), [

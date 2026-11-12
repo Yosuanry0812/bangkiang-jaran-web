@@ -41,14 +41,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Kategori Tiket</label>
-                    <select name="kategori" required
-                        class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-                        <option value="perorangan" {{ old('kategori', $tiket->kategori ?? '') == 'perorangan' ? 'selected' : '' }}>Perorangan</option>
-                        <option value="kendaraan"  {{ old('kategori', $tiket->kategori ?? '') == 'kendaraan' ? 'selected' : '' }}>Kendaraan</option>
-                    </select>
-                    <p class="text-xs text-stone mt-1">Perorangan = 1 tiket per orang, Kendaraan = 1 tiket per plat.</p>
-                    @error('kategori') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Kategori Tiket</label>
+                    <input type="text" value="Perorangan (Tiket Pengunjung)" disabled
+                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-stone-100 text-gray-600 cursor-not-allowed">
+                    <input type="hidden" name="kategori" value="perorangan">
+                    <p class="text-xs text-stone mt-1">Semua tiket adalah tiket akses masuk perorangan.</p>
                 </div>
 
                 <div>

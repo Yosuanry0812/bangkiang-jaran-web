@@ -12,7 +12,7 @@
         <tbody>
         @forelse($tiket as $t)
         <tr>
-            <td data-label="{{ __('messages.th_ticket_name') }}"><strong>{{ $t->nama_tiket }}</strong><small>{{ $t->kategori === 'kendaraan' ? 'Kendaraan' : 'Tiket pengunjung' }}</small></td>
+            <td data-label="{{ __('messages.th_ticket_name') }}"><strong>{{ $t->nama_tiket }}</strong><small>Tiket pengunjung</small></td>
             <td data-label="{{ __('messages.th_price') }}" class="admin-money">Rp {{ number_format($t->harga, 0, ',', '.') }}</td>
             <td data-label="{{ __('messages.th_total_sold') }}">{{ $t->total_terjual ?? 0 }} tiket</td>
             <td data-label="{{ __('messages.th_status') }}"><span class="admin-status {{ $t->status === 'aktif' ? '' : 'admin-status--neutral' }}">{{ $t->status === 'aktif' ? __('messages.active') : __('messages.inactive') }}</span></td>

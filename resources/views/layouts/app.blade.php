@@ -11,45 +11,11 @@
     <link rel="preload" as="image" href="{{ asset('images/sejarah-bangkiang-waterfall.webp') }}" fetchpriority="high">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@20..48,100..700,0..1&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite(['resources/css/app.css', 'resources/js/ui.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@14.3.0/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.27/dist/lenis.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        forest:   '#1B3A2D',
-                        leaf:     '#2D5940',
-                        moss:     '#4A7C59',
-                        sage:     '#7FAF8A',
-                        mist:     '#C8DDD0',
-                        ivory:    '#F7F3EE',
-                        warm:     '#EDE8E1',
-                        gold:     '#C9A96E',
-                        sand:     '#D4C5A9',
-                        charcoal: '#1C1C1C',
-                        ink:      '#2C2C2C',
-                        stone:    '#6B6B6B',
-                        pebble:   '#A0A0A0',
-                        cream:    '#F7F3EE',
-                        deep:     '#1B3A2D',
-                    },
-                    fontFamily: {
-                        serif: ['Playfair Display', 'Georgia', 'serif'],
-                        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-                    },
-                    spacing: {
-                        'gutter': '24px',
-                        'section': '96px',
-                    },
-                }
-            }
-        }
-    </script>
     <style>
         @view-transition { navigation: auto; }
         /* Lock horizontal scroll at root — prevents swipe left/right on mobile */
@@ -70,6 +36,7 @@
             will-change: transform;
         }
         #main-nav.nav-hidden   { transform: translate3d(0,-110%,0); }
+        #main-nav.nav-awaiting-hero { visibility: hidden; pointer-events: none; }
 
         /* dark mode — over hero images */
         #main-nav.nav-dark-clear  { background: transparent; border-color: transparent; box-shadow: none; }
@@ -154,12 +121,6 @@
         .divider-leaf { height:1px; background:linear-gradient(to right,transparent,rgba(75,83,99,0.12),transparent); }
         .divider-gold { height:1px; background:linear-gradient(to right,transparent,rgba(156,163,175,0.15),transparent); }
 
-        .heading-xl { @apply font-serif text-5xl md:text-7xl leading-[1.08] tracking-tight text-deep; }
-        .heading-lg { @apply font-serif text-3xl md:text-5xl leading-[1.12] tracking-tight text-deep; }
-        .heading-md { @apply font-serif text-2xl md:text-3xl leading-[1.2] tracking-tight text-deep; }
-        .body-large { @apply font-sans text-[17px] md:text-[19px] leading-relaxed text-gray-500; }
-        .body-base  { @apply font-sans text-[15px] leading-relaxed text-gray-500; }
-        .label-sm   { @apply font-sans text-[13px] font-medium uppercase tracking-[0.1em] text-forest/60; }
     </style>
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
@@ -176,9 +137,12 @@
     <link rel="stylesheet" href="{{ asset('css/waterfall-experience.css') . '?v=' . filemtime(public_path('css/waterfall-experience.css')) }}">
     @if (Route::is('landing', 'restoran'))
     <link rel="stylesheet" href="{{ asset('css/home-flow.css') . '?v=' . filemtime(public_path('css/home-flow.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/photo-viewer.css') . '?v=' . filemtime(public_path('css/photo-viewer.css')) }}">
     @endif
     <link rel="stylesheet" href="{{ asset('css/section-refinement.css') . '?v=' . filemtime(public_path('css/section-refinement.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/page-transitions.css') . '?v=' . filemtime(public_path('css/page-transitions.css')) }}">
+    @if (Route::is('landing', 'restoran'))<link rel="stylesheet" href="{{ asset('css/hero-film.css') . '?v=' . filemtime(public_path('css/hero-film.css')) }}">@endif
+    @if (Route::is('restoran'))<link rel="stylesheet" href="{{ asset('css/restaurant-film.css') . '?v=' . filemtime(public_path('css/restaurant-film.css')) }}">@endif
 </head>
 <body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-public bj-nature {{ Route::is('landing', 'restoran', 'tiket.index') ? 'bj-marketing' : '' }} bg-ivory text-ink font-sans antialiased min-h-screen flex flex-col overflow-x-clip {{ Route::is('profile.*') ? 'bj-account' : '' }}">
     <a class="bj-skip-link" href="#main-content">{{ app()->getLocale() === 'id' ? 'Langsung ke konten' : 'Skip to content' }}</a>
@@ -188,7 +152,8 @@
     {{-- data-nav="light" → over ivory pages (always light)     --}}
     <header id="main-nav"
             data-nav="{{ $navMode ?? (View::hasSection('nav-mode') ? View::getSection('nav-mode') : 'light') }}"
-            class="fixed top-0 left-0 right-0 z-50 border-b border-transparent"
+            @if (Route::is('landing', 'restoran')) data-nav-after-hero inert aria-hidden="true" @endif
+            class="fixed top-0 left-0 right-0 z-50 border-b border-transparent {{ Route::is('landing', 'restoran') ? 'nav-hidden nav-awaiting-hero' : '' }}"
             aria-label="Navigasi utama">
         <div id="nav-bar" class="max-w-7xl mx-auto px-gutter">
             <div class="flex items-center justify-between h-12 md:h-[68px]">
@@ -385,6 +350,7 @@
 
         /* ── Determine page mode ── */
         const mode = nav.dataset.nav || 'light';   // 'dark' | 'light'
+        const afterHero = nav.hasAttribute('data-nav-after-hero');
 
         /* ── Token sets ── */
         const DARK = {
@@ -417,7 +383,7 @@
             registerColor:  '#ffffff',
             menuBtnColor:   '#1B3A2D',
         };
-        /* hero pages (landing): transparent over hero → light after scrolling past */
+        /* Hero tokens remain available; landing navigation is hidden until the hero ends. */
         const HERO = {
             clear:  'nav-transparent',
             tinted: 'nav-transparent',
@@ -493,6 +459,22 @@
         function update() {
             const curr  = Math.max(0, Math.min(window.scrollY, document.documentElement.scrollHeight - innerHeight));
             const delta = curr - lastY;
+            if (afterHero) {
+                // Landing navigation stays visible outside the hero in either scroll direction.
+                const overHero = curr < heroBoundary;
+                if (overHero && menuOpen) { closeMenu(); return; }
+                hidden = overHero;
+                scrollTravel = 0;
+                nav.classList.toggle('nav-awaiting-hero', overHero);
+                nav.inert = overHero;
+                nav.setAttribute('aria-hidden', String(overHero));
+                if (overHero && nav.contains(document.activeElement)) document.activeElement.blur();
+                setNav(overHero ? 'nav-hidden' : LIGHT.solid);
+                if (!overHero) applyTokens(LIGHT);
+                lastY = curr;
+                ticking = false;
+                return;
+            }
             if (menuOpen || curr <= navHeight) {
                 hidden = false; scrollTravel = 0;
             } else if (Math.abs(delta) > .5) {
@@ -523,7 +505,8 @@
             const measureNav = () => {
                 // Measure the bar alone: the open dropdown must not inflate its own offset.
                 navHeight = document.getElementById('nav-bar').offsetHeight + (parseFloat(getComputedStyle(nav).paddingTop) || 0);
-                heroBoundary = document.getElementById('hero-section')?.offsetHeight || 0;
+                const hero = document.getElementById('hero-section');
+                heroBoundary = hero ? hero.getBoundingClientRect().bottom + window.scrollY : 0;
                 document.documentElement.style.setProperty('--bj-nav-height', navHeight + 'px');
                 update();
             };
@@ -588,8 +571,11 @@
     <script defer src="{{ asset('js/waterfall-experience.js') . '?v=' . filemtime(public_path('js/waterfall-experience.js')) }}"></script>
     @if (Route::is('landing', 'restoran'))
     <script defer src="{{ asset('js/home-flow.js') . '?v=' . filemtime(public_path('js/home-flow.js')) }}"></script>
+    @include('partials.photo-viewer')
+    <script defer src="{{ asset('js/photo-viewer.js') . '?v=' . filemtime(public_path('js/photo-viewer.js')) }}"></script>
     @endif
     <script defer src="{{ asset('js/section-refinement.js') . '?v=' . filemtime(public_path('js/section-refinement.js')) }}"></script>
     @stack('scripts')
+    @if (Route::is('restoran'))<script defer src="{{ asset('js/restaurant-film.js') . '?v=' . filemtime(public_path('js/restaurant-film.js')) }}"></script>@endif
 </body>
 </html>

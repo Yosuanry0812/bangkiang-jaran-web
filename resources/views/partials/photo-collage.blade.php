@@ -4,6 +4,7 @@
         <figure class="bj-photo-collage__photo bj-photo-collage__photo--{{ $collageIndex + 1 }}">
             <img src="{{ $collagePhoto['url'] }}" alt="{{ $collagePhoto['caption'] }}" width="706" height="1020" loading="lazy" decoding="async">
             <p hidden>{{ app()->getLocale() === 'en' ? 'This photo could not be loaded.' : 'Foto ini belum dapat dimuat.' }}</p>
+            @include('partials.photo-link', ['photoUrl' => $collagePhoto['url'], 'photoCaption' => $collagePhoto['caption']])
         </figure>
     @endforeach
 </div>

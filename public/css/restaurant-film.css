@@ -1,0 +1,17 @@
+/* Two reusable photo layers: camera drift underneath a continuous dissolve. */
+body.bj-nature .bj-resto-full-hero .bj-resto-film { inset: 0; width: 100%; isolation: isolate; }
+body.bj-nature .bj-resto-full-hero .bj-resto-film::after { z-index: 2; pointer-events: none; }
+body.bj-nature .bj-resto-film .bj-resto-film__frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 42%;
+    opacity: 0;
+}
+body.bj-nature .bj-resto-film .bj-resto-film__frame:first-child { opacity: 1; }
+body.bj-nature .bj-resto-film.is-enhanced .bj-resto-film__frame { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) {
+    body.bj-nature .bj-resto-film.is-enhanced .bj-resto-film__frame { will-change: auto; }
+}

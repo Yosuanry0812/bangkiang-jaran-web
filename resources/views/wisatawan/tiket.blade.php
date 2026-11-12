@@ -25,7 +25,7 @@
         ['Bagaimana cara membayar?', 'Pilih bank atau e-wallet yang tersedia di halaman pembayaran, lalu unggah bukti transfer. Pembayaran diperiksa secara manual oleh pengelola.'],
         ['Apakah unggah bukti langsung membuat pembayaran berhasil?', 'Tidak. Pesanan tetap menunggu verifikasi sampai pengelola menyetujui bukti pembayaran.'],
         ['Bagaimana jika bukti pembayaran ditolak?', 'Buka detail pesanan, periksa metode pembayaran dan unggah kembali bukti yang benar.'],
-        ['Bisa memakai tiket yang sama dua kali?', 'Setiap pengunjung atau kendaraan mendapat kode tiket. Tiket yang sudah dipakai untuk masuk tidak dapat dipakai untuk masuk kembali.'],
+        ['Bisa memakai tiket yang sama dua kali?', 'Setiap pengunjung mendapat kode tiket. Tiket yang sudah dipakai untuk masuk tidak dapat dipakai untuk masuk kembali.'],
     ];
 @endphp
 <div class="bj-ticket-editorial bj-ticket-shop">
@@ -44,8 +44,8 @@
                         <label class="bj-ticket-choice">
                             <input type="radio" name="ticket_choice" value="{{ $ticket->id_tiket }}" data-ticket-choice data-price="{{ $ticket->harga }}" data-name="{{ $ticket->nama_tiket }}" data-booking-url="{{ $bookingUrlFor($ticket) }}" @checked($index === 0)>
                             <span class="bj-ticket-choice__photo"><img src="{{ $ticketPhoto }}" alt="" loading="lazy" width="706" height="1020"></span>
-                            <span class="bj-ticket-choice__body"><small>Bangkiang Jaran</small><strong>{{ $ticket->nama_tiket }}</strong><span>{{ $ticket->kategori === 'kendaraan' ? ($isEnglish ? 'Vehicle admission' : 'Akses kendaraan') : ($isEnglish ? 'Visitor admission' : 'Akses pengunjung') }}</span></span>
-                            <span class="bj-ticket-choice__price">Rp {{ number_format($ticket->harga, 0, ',', '.') }}<small>/ {{ $ticket->kategori === 'kendaraan' ? ($isEnglish ? 'vehicle' : 'kendaraan') : ($isEnglish ? 'person' : 'orang') }}</small><span class="bj-choice-check material-symbols-outlined" aria-hidden="true">check</span></span>
+                            <span class="bj-ticket-choice__body"><small>Bangkiang Jaran</small><strong>{{ $ticket->nama_tiket }}</strong><span>{{ $isEnglish ? 'Visitor admission' : 'Akses pengunjung' }}</span></span>
+                            <span class="bj-ticket-choice__price">Rp {{ number_format($ticket->harga, 0, ',', '.') }}<small>/ {{ $isEnglish ? 'person' : 'orang' }}</small><span class="bj-choice-check material-symbols-outlined" aria-hidden="true">check</span></span>
                         </label>
                         <a class="bj-pass-detail" href="{{ route('tiket.detail', $ticket->id_tiket) }}">{{ $isEnglish ? 'View details' : 'Lihat detail' }}<span class="sr-only"> {{ $ticket->nama_tiket }}</span><span class="material-symbols-outlined" aria-hidden="true">north_east</span></a>
                     </div>

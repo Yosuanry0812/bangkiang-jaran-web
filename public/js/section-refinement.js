@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const destination = planner.dataset.destination;
         const placeId = planner.dataset.placeId;
         const map = planner.querySelector('[data-bj-route-map]');
+        const defaultMap = map.src;
         const open = planner.querySelector('[data-route-open]');
         const selection = planner.querySelector('[data-route-selection]');
         const status = planner.querySelector('[data-route-status]');
@@ -26,8 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             selection.textContent = button.dataset.routeLabel;
             const route = new URL('https://www.google.com/maps/dir/');
-            route.search = new URLSearchParams({ api: '1', origin, destination, destination_place_id: placeId, travelmode: 'driving' });
+            route.search = new URLSearchParams({ api: '1', destination, destination_place_id: placeId, travelmode: 'driving', dir_action: 'navigate' });
+            // Let Maps use its live location for navigation, rather than a fixed GPS snapshot.
+            if (!button.hasAttribute('data-route-current')) route.searchParams.set('origin', origin);
             open.href = route.href;
+            if (!origin) {
+                map.src = defaultMap;
+                return;
+            }
             // Named POI prevents reverse geocoding from selecting a nearby temple.
             const embed = new URL('https://www.google.com/maps');
             embed.search = new URLSearchParams({ saddr: origin, daddr: destination, output: 'embed' });
@@ -38,9 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
             release();
             if (!button.hasAttribute('data-route-current')) {
                 select(button, button.dataset.routeOrigin);
-                message(english ? 'Open Google Maps for turn-by-turn directions.' : 'Buka Google Maps untuk petunjuk perjalanan lengkap.');
+                message(english ? 'Open Google Maps to view the route from this starting point.' : 'Buka Google Maps untuk melihat rute dari titik keberangkatan ini.');
                 return;
             }
+            // Keep the current-location link usable even if this site's GPS request fails.
+            select(button);
             if (!window.isSecureContext || !navigator.geolocation) {
                 message(english ? 'Device location is unavailable here. Use HTTPS or choose a starting city.' : 'Lokasi perangkat tidak tersedia. Gunakan HTTPS atau pilih kota keberangkatan.', true);
                 return;
@@ -83,36 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
         }));
     });
-
-    const title = document.querySelector('[data-hero-title-motion]');
-    const titleButton = document.querySelector('[data-hero-title-toggle]');
-    if (title && titleButton && Element.prototype.animate) {
-        let paused = false;
-        let visible = false;
-        let animation;
-        const sync = () => {
-            titleButton.hidden = reduced.matches || navigator.connection?.saveData === true;
-            if (!animation || titleButton.hidden || paused || !visible || document.hidden) animation?.pause();
-            else animation.play();
-            titleButton.setAttribute('aria-pressed', String(paused));
-            titleButton.setAttribute('aria-label', paused ? titleButton.dataset.playLabel : titleButton.dataset.pauseLabel);
-            titleButton.querySelector('span').textContent = paused ? 'play_arrow' : 'pause';
-        };
-        const setup = () => {
-            animation?.cancel();
-            animation = null;
-            if (!reduced.matches && !navigator.connection?.saveData) {
-                animation = title.animate([{ transform: 'translate3d(0,0,0)' }, { transform: `translate3d(${innerWidth < 768 ? 4 : 9}px,0,0)` }], { duration: 7000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
-                animation.pause();
-            }
-            sync();
-        };
-        titleButton.addEventListener('click', () => { paused = !paused; sync(); });
-        new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); }).observe(title.closest('section'));
-        document.addEventListener('visibilitychange', sync);
-        reduced.addEventListener('change', setup);
-        setup();
-    }
 
     const watcher = document.querySelector('[data-booking-watch], [data-bookings-watch]');
     if (watcher) {

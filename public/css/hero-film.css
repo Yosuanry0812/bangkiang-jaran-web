@@ -1,0 +1,107 @@
+/* Quiet camera drift, with daylight visible beyond the copy's shaded edge. */
+.bj-home-hero--film .bj-hero-film-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+}
+.bj-home-hero--film .bj-home-hero__slide.is-active img {
+    animation: none;
+    filter: none;
+    transform: none;
+}
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__media img {
+    object-fit: contain;
+    opacity: 1;
+    transition: opacity 900ms ease;
+}
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film.is-film-ready .bj-home-hero__media img { opacity: 0; }
+.bj-home-hero--film .bj-hero-film {
+    object-fit: contain;
+    object-position: center;
+    opacity: 0;
+    transition: opacity 900ms ease;
+    animation: bj-film-drift 24s ease-in-out infinite alternate;
+    animation-play-state: paused;
+}
+.bj-home-hero--film.is-film-ready .bj-hero-film {
+    opacity: 1;
+}
+.bj-home-hero--film.is-film-playing .bj-hero-film {
+    animation-play-state: running;
+}
+body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__shade {
+    background: linear-gradient(90deg, rgba(5,30,24,.66), rgba(5,30,24,.26) 48%, rgba(5,30,24,.04) 78%),
+        linear-gradient(0deg, rgba(5,30,24,.32), transparent 38%, transparent 80%, rgba(5,30,24,.24));
+}
+.bj-home-hero--film .bj-home-hero__copy {
+    text-shadow: 0 2px 18px rgba(5,30,24,.4);
+}
+@keyframes bj-film-drift {
+    from { transform: scale(.985); }
+    to { transform: scale(1); }
+}
+/* A landscape film gets its own full-width area on portrait screens. The copy
+   follows underneath so it cannot obscure the waterfall on phones or tablets. */
+@media (max-width: 1023px) and (orientation: portrait) {
+    .bj-home-hero--film { --bj-hero-media-height: calc(100vw * 9 / 16); }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__media {
+        top: var(--bj-safe-top, 0px);
+        bottom: auto;
+        height: var(--bj-hero-media-height);
+    }
+    .bj-home-hero--film .bj-hero-film-frame {
+        top: var(--bj-safe-top, 0px);
+        bottom: auto;
+        height: var(--bj-hero-media-height);
+    }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__content {
+        padding-top: calc(var(--bj-hero-media-height) + var(--bj-safe-top, 0px) + 32px);
+        padding-bottom: max(64px, calc(32px + var(--bj-safe-bottom, 0px)));
+        justify-content: flex-start;
+    }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__shade {
+        background: linear-gradient(0deg, rgba(5,30,24,.7), rgba(5,30,24,.2) 60%, transparent);
+    }
+    .bj-home-hero--film .bj-home-hero__copy { margin-bottom: 0; }
+}
+/* Reserve the final text layout while the opening shot plays. */
+[data-hero-intro].is-intro-pending :is(.bj-home-hero__copy, .bj-home-hero__scroll, .bj-resto-hero-copy) {
+    visibility: hidden;
+}
+.bj-type-word { display: inline-block; white-space: nowrap; }
+.bj-type-letter { display: inline-block; }
+.is-intro-typing .bj-type-letter {
+    animation: bj-letter-in 180ms ease-out both;
+    animation-delay: calc(120ms + var(--letter-index) * 22ms);
+}
+.is-intro-typing :is(.bj-home-kicker, .bj-resto-kicker) {
+    animation: bj-intro-in 550ms cubic-bezier(.22,1,.36,1) both;
+}
+.is-intro-typing :is(.bj-editorial-destination, .bj-home-hero__lead, .bj-home-hero__actions, .bj-home-hero__scroll, .bj-resto-lead, .bj-resto-actions) {
+    animation: bj-intro-in 650ms cubic-bezier(.22,1,.36,1) both;
+    animation-delay: var(--type-duration);
+}
+.is-intro-typing :is(.bj-home-hero__lead, .bj-resto-lead) { animation-delay: calc(var(--type-duration) + 100ms); }
+.is-intro-typing :is(.bj-home-hero__actions, .bj-resto-actions) { animation-delay: calc(var(--type-duration) + 200ms); }
+@keyframes bj-letter-in {
+    from { opacity: 0; transform: translate3d(0,.12em,0); }
+    to { opacity: 1; transform: translate3d(0,0,0); }
+}
+@keyframes bj-intro-in {
+    from { opacity: 0; transform: translate3d(0,12px,0); }
+    to { opacity: 1; transform: translate3d(0,0,0); }
+}
+@media (max-width: 767px) {
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__shade {
+        background: linear-gradient(90deg, rgba(5,30,24,.57), rgba(5,30,24,.2)),
+            linear-gradient(0deg, rgba(5,30,24,.35), transparent 70%);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .bj-home-hero--film .bj-hero-film { animation: none; transition: none; }
+    body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero--film .bj-home-hero__media img { transition: none; }
+    [data-hero-intro] :is(.bj-type-letter, .bj-home-kicker, .bj-editorial-destination, .bj-home-hero__lead, .bj-home-hero__actions, .bj-home-hero__scroll, .bj-resto-kicker, .bj-resto-lead, .bj-resto-actions) { animation: none; }
+    [data-hero-intro].is-intro-pending :is(.bj-home-hero__copy, .bj-home-hero__scroll, .bj-resto-hero-copy) { visibility: visible; }
+}

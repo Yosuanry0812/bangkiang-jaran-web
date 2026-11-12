@@ -58,11 +58,7 @@
                 {{-- Ticket type badge --}}
                 <div class="flex items-center justify-between px-5 py-3 bg-gray-50 border-b border-gray-100">
                     <div class="flex items-center gap-2">
-                        @if($item->plat_kendaraan)
-                            <span class="material-symbols-outlined text-forest text-sm">directions_car</span>
-                        @else
-                            <span class="material-symbols-outlined text-forest text-sm">person</span>
-                        @endif
+                        <span class="material-symbols-outlined text-forest text-sm">person</span>
                         <span class="font-sans text-xs font-medium text-ink">{{ $item->nama_tiket }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
@@ -93,12 +89,8 @@
                                 <p class="font-mono text-sm font-bold text-forest tracking-wider mt-0.5">{{ $item->kode_tiket }}</p>
                             </div>
                             <div>
-                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">
-                                    {{ $item->plat_kendaraan ? __('messages.vehicle_plate') : __('messages.visitor_name') }}
-                                </p>
-                                <p class="font-sans text-sm font-medium text-ink mt-0.5">
-                                    {{ $item->plat_kendaraan ?? $item->nama_pengunjung ?? '-' }}
-                                </p>
+                                <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.visitor_name') }}</p>
+                                <p class="font-sans text-sm font-medium text-ink mt-0.5">{{ $item->nama_pengunjung ?? '-' }}</p>
                             </div>
                             <div>
                                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.price') }}</p>

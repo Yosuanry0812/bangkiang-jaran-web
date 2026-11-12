@@ -7,8 +7,6 @@ body.bj-nature.bj-marketing .bj-home--journey .bj-home-hero__content {
 }
 body.bj-nature.bj-marketing .bj-home--journey .bj-home-title { font-size: clamp(2.6rem, 6.4vw, 6.1rem); }
 .bj-hero-title-motion { max-width: 100%; }
-.bj-title-motion-toggle { position: absolute; z-index: 4; top: calc(var(--bj-nav-height, 80px) + 12px); right: 20px; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #d9eee2; border-radius: 50%; color: #fff; background: #123c32b3; }
-.bj-title-motion-toggle[hidden] { display: none; }
 
 body.bj-nature.bj-marketing .bj-home--journey #galeri,
 body.bj-nature .bj-resto-gallery {

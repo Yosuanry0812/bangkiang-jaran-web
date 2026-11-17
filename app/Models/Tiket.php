@@ -11,6 +11,7 @@ class Tiket extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'tiket';
+
     protected $primaryKey = 'id_tiket';
 
     protected $fillable = [
@@ -26,10 +27,16 @@ class Tiket extends Model
      */
     public function getNamaTiketAttribute()
     {
-        if (app()->getLocale() === 'en' && !empty($this->attributes['nama_tiket_en'])) {
+        if (app()->getLocale() === 'en' && ! empty($this->attributes['nama_tiket_en'])) {
             return $this->attributes['nama_tiket_en'];
         }
+
         return $this->attributes['nama_tiket'] ?? null;
+    }
+
+    public function details()
+    {
+        return $this->hasMany(DetailPemesanan::class, 'id_tiket');
     }
 
     public function pemesanan()

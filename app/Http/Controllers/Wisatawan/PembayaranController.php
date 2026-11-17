@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Wisatawan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pemesanan;
 use App\Models\Pembayaran;
+use App\Models\Pemesanan;
+use App\Services\BookingLifecycle;
+use App\Services\VisitQuota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,11 @@ class PembayaranController extends Controller
         $pemesanan = Pemesanan::with('tiket')
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
+
+        app(BookingLifecycle::class)->refresh($pemesanan);
+        if ($pemesanan->status !== 'pending') {
+            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan);
+        }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
@@ -35,6 +42,11 @@ class PembayaranController extends Controller
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
 
+        app(BookingLifecycle::class)->refresh($pemesanan);
+        if ($pemesanan->status !== 'pending') {
+            return back()->with('error', __('operations.ticket_unavailable'));
+        }
+
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return back()->with('error', 'Pembayaran sudah pernah diajukan.');
         }
@@ -45,17 +57,17 @@ class PembayaranController extends Controller
         }
 
         $request->validate([
-            'metode'      => ['required', 'string', Rule::in($availableMethods)],
+            'metode' => ['required', 'string', Rule::in($availableMethods)],
             'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], [
-            'metode.required'       => 'Pilih metode pembayaran.',
-            'bukti_bayar.required'  => 'Upload bukti transfer.',
-            'bukti_bayar.mimes'     => 'Format file harus: jpg, jpeg, png, atau pdf.',
-            'bukti_bayar.max'       => 'Ukuran file maksimal 5MB.',
+            'metode.required' => 'Pilih metode pembayaran.',
+            'bukti_bayar.required' => 'Upload bukti transfer.',
+            'bukti_bayar.mimes' => 'Format file harus: jpg, jpeg, png, atau pdf.',
+            'bukti_bayar.max' => 'Ukuran file maksimal 5MB.',
         ]);
 
         // Handle file upload aman
-        if (!$request->hasFile('bukti_bayar')) {
+        if (! $request->hasFile('bukti_bayar')) {
             return back()->withErrors(['bukti_bayar' => 'File bukti pembayaran tidak ditemukan.'])->withInput();
         }
 
@@ -63,30 +75,35 @@ class PembayaranController extends Controller
 
         // Validasi MIME type asli
         $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
-        if (!in_array($file->getMimeType(), $allowedMimes)) {
+        if (! in_array($file->getMimeType(), $allowedMimes)) {
             return back()->withErrors(['bukti_bayar' => 'Tipe file tidak valid. Gunakan JPG, PNG, atau PDF.'])->withInput();
         }
 
         // Rename dengan nama acak
-        $path = $file->store('bukti', 'public');
+        $path = $file->store('bukti', 'private');
 
-        if (!$path) {
+        if (! $path) {
             return back()->withErrors(['bukti_bayar' => 'Gagal menyimpan file. Coba lagi.'])->withInput();
         }
 
         $oldPath = null;
+        $oldDisk = 'public';
         try {
-            $saved = DB::transaction(function () use ($id_pemesanan, $request, $path, &$oldPath) {
+            $saved = DB::transaction(function () use ($id_pemesanan, $request, $path, $pemesanan, &$oldPath, &$oldDisk) {
+                app(VisitQuota::class)->lock($pemesanan->tgl_kunjungan);
                 $booking = Pemesanan::where('id_user', Auth::id())->whereKey($id_pemesanan)->lockForUpdate()->firstOrFail();
                 $payment = Pembayaran::where('id_pemesanan', $booking->id_pemesanan)->lockForUpdate()->first();
-                if ($booking->status !== 'pending' || ($payment && $payment->status !== 'ditolak')) {
+                app(BookingLifecycle::class)->expire($booking);
+                if ($booking->status !== 'pending' || $booking->isOverdue() || ($payment && $payment->status !== 'ditolak')) {
                     return false;
                 }
                 $oldPath = $payment?->bukti_bayar;
+                $oldDisk = $payment?->proof_disk === 'private' ? 'private' : 'public';
                 $attributes = [
                     'total' => $booking->total_harga,
                     'metode' => $request->metode,
                     'bukti_bayar' => $path,
+                    'proof_disk' => 'private', 'rejection_reason' => null, 'verified_at' => null,
                     'status' => 'pending',
                     'tgl_bayar' => now()->toDateString(),
                 ];
@@ -95,19 +112,22 @@ class PembayaranController extends Controller
                 } else {
                     Pembayaran::create(['id_pemesanan' => $booking->id_pemesanan] + $attributes);
                 }
+                $booking->recordEvent('proof_submitted');
+
                 return true;
             });
         } catch (\Throwable $e) {
-            Storage::disk('public')->delete($path);
+            Storage::disk('private')->delete($path);
             throw $e;
         }
-        if (!$saved) {
-            Storage::disk('public')->delete($path);
+        if (! $saved) {
+            Storage::disk('private')->delete($path);
+
             return back()->with('error', 'Pembayaran tidak dapat diajukan untuk status pemesanan ini.');
         }
 
         if ($oldPath && $oldPath !== $path) {
-            Storage::disk('public')->delete($oldPath);
+            Storage::disk($oldDisk)->delete($oldPath);
         }
 
         return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)

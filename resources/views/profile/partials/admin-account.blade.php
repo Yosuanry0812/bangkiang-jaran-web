@@ -31,6 +31,8 @@
             <div class="admin-panel-head"><div><h2>Atur kata sandi</h2><p>Tambahkan kata sandi untuk masuk menggunakan email.</p></div></div>
             <form method="POST" action="{{ route('profile.set-password') }}" class="admin-profile-form">
                 @csrf
+                @if(Auth::user()->password)<label class="block text-sm">{{ __('operations.current_password') }}<input type="password" name="current_password" autocomplete="current-password" required class="block w-full rounded-xl border-gray-300 mt-2"></label>@error('current_password')<p role="alert">{{ $message }}</p>@enderror
+                @endif
                 <div class="admin-profile-fields"><div><label for="account-password" class="admin-field">Kata sandi baru<input id="account-password" type="password" name="password" autocomplete="new-password" minlength="8" required></label>@error('password')<p class="admin-error mt-2">{{ $message }}</p>@enderror</div><label for="account-confirmation" class="admin-field">Konfirmasi kata sandi<input id="account-confirmation" type="password" name="password_confirmation" autocomplete="new-password" required></label></div>
                 <div class="admin-profile-actions"><button type="submit" class="admin-btn">Simpan kata sandi</button></div>
             </form>

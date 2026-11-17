@@ -2,6 +2,10 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('pemesanan:expire')->everyMinute()->withoutOverlapping();
+Schedule::command('tiket:auto-checkout')->hourly()->withoutOverlapping();
 
 /*
 |--------------------------------------------------------------------------

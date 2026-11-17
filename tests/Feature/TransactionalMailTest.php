@@ -9,6 +9,7 @@ use App\Models\Tiket;
 use App\Models\User;
 use App\Support\WindowsProcessDriver;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Factory;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -46,10 +47,10 @@ class TransactionalMailTest extends TestCase
             'jumlah' => 1, 'total_harga' => 15000, 'status' => 'pending', 'kode_booking' => 'BJ-MAIL-TEST',
         ]);
         Pembayaran::create(['id_pemesanan' => $booking->id_pemesanan, 'total' => 15000, 'metode' => 'BCA', 'status' => 'pending']);
-        $this->actingAs($manager)->post(route('pengelola.verifikasi.validasi', $booking->id_pemesanan), ['action' => 'ditolak'])
+        $this->actingAs($manager)->post(route('pengelola.verifikasi.validasi', $booking->id_pemesanan), ['action' => 'ditolak', 'rejection_reason' => 'Bukti transfer belum terbaca jelas.'])
             ->assertSessionHas('success');
         $this->assertSame('ditolak', $booking->fresh()->pembayaran->status);
-        Mail::assertQueued(PembayaranDitolak::class, fn ($mail) => $mail->connection === 'background' && $mail->hasTo($user->email));
+        Mail::assertQueued(PembayaranDitolak::class, fn ($mail) => $mail->connection === 'database' && $mail->hasTo($user->email));
         Mail::assertNothingSent();
     }
 
@@ -63,12 +64,13 @@ class TransactionalMailTest extends TestCase
         try {
             $callback();
             $this->fail('A failed launcher must be reported.');
-        } catch (\Illuminate\Process\Exceptions\ProcessFailedException) {
+        } catch (ProcessFailedException) {
             $factory->assertRan(function ($process) {
                 $script = mb_convert_encoding(base64_decode(end($process->command)), 'UTF-8', 'UTF-16LE');
+
                 return $process->command[0] === 'powershell.exe'
                     && str_contains($script, 'Start-Process -WindowStyle Hidden')
-                    && !str_contains($script, '-Wait')
+                    && ! str_contains($script, '-Wait')
                     && isset($process->environment['LARAVEL_INVOKABLE_CLOSURE']);
             });
         }

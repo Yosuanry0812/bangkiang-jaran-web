@@ -49,7 +49,7 @@
                     @endphp
                     {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
                 </td>
-                <td>{{ $t->created_at ? \Carbon\Carbon::parse($t->created_at)->format('d/m/Y') : '-' }}</td>
+                <td>{{ $t->tgl_bayar ? \Carbon\Carbon::parse($t->tgl_bayar)->format('d/m/Y') : '-' }}</td>
                 <td>{{ $t->metode ?? '-' }}</td>
                 <td>Rp {{ number_format($t->total, 0, ',', '.') }}</td>
             </tr>

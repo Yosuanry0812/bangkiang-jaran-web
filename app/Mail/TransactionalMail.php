@@ -16,10 +16,19 @@ abstract class TransactionalMail extends Mailable implements ShouldQueue
 
     public $pemesanan;
 
+    public $tries = 5;
+
+    public $timeout = 60;
+
+    public function backoff(): array
+    {
+        return [60, 300, 900, 1800];
+    }
+
     public function __construct(Pemesanan $pemesanan)
     {
         $this->pemesanan = $pemesanan;
-        $this->onConnection(config('queue.transactional_connection', 'background'));
+        $this->onConnection(config('queue.transactional_connection', 'database'));
         $this->onQueue('mail');
         $this->afterCommit();
     }

@@ -47,8 +47,10 @@
     </div>
     </form>
 </div>
+<div class="bj-operations"><p class="bj-quota-status" role="status" data-quota-status="{{ route('kunjungan.kuota') }}" data-loading="{{ __('operations.quota_loading') }}" data-unlimited="{{ __('operations.quota_unlimited') }}" data-remaining="{{ __('operations.quota_remaining') }}" data-error="{{ __('operations.quota_full') }}"></p></div>
 @endsection
 @push('scripts')
+<script defer src="{{ asset('js/booking-operations.js') }}"></script>
 <script>
 function offlineOrder(prices, names, previous) {
     const tickets = {};

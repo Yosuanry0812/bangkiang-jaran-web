@@ -214,8 +214,8 @@
                         <button type="button" data-route-origin="Canggu, Bali" data-route-label="Canggu" data-route-subtitle="{{ $isEnglish ? 'From Canggu' : 'Dari Canggu' }}" aria-pressed="false"><span class="material-symbols-outlined" aria-hidden="true">surfing</span><span><strong>Canggu</strong><small>{{ $isEnglish ? 'From Canggu' : 'Dari Canggu' }}</small></span><i class="material-symbols-outlined" aria-hidden="true">radio_button_unchecked</i></button>
                     </div>
                     <div class="bj-home-route__map bj-reveal">
-                        <div class="bj-home-route__map-frame"><iframe title="{{ $isEnglish ? 'Route to Bangkiang Jaran Waterfall' : 'Rute menuju Air Terjun Bangkiang Jaran' }}" data-bj-route-map loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{ config('tourism.maps_embed') }}"></iframe><div class="bj-home-route__destination"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><small>{{ $isEnglish ? 'Destination' : 'Tujuan' }}</small><strong>Bangkiang Jaran Waterfall</strong></span></div></div>
-                        <div class="bj-home-route__map-foot"><p><span>{{ $isEnglish ? 'Starting point' : 'Titik awal' }}</span><strong data-route-selection>{{ $isEnglish ? 'Choose a starting point' : 'Pilih titik awal' }}</strong></p><a data-route-open href="{{ config('tourism.maps_url') }}" target="_blank" rel="noopener noreferrer">{{ $isEnglish ? 'Open in Google Maps' : 'Buka di Google Maps' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a></div>
+                        <div class="bj-home-route__map-frame"><iframe title="{{ $isEnglish ? 'Route to Bangkiang Jaran Waterfall' : 'Rute menuju Air Terjun Bangkiang Jaran' }}" data-bj-route-map loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{ $destination->values()['maps_embed'] }}"></iframe><div class="bj-home-route__destination"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><small>{{ $isEnglish ? 'Destination' : 'Tujuan' }}</small><strong>Bangkiang Jaran Waterfall</strong></span></div></div>
+                        <div class="bj-home-route__map-foot"><p><span>{{ $isEnglish ? 'Starting point' : 'Titik awal' }}</span><strong data-route-selection>{{ $isEnglish ? 'Choose a starting point' : 'Pilih titik awal' }}</strong></p><a data-route-open href="{{ $destination->values()['maps_url'] }}" target="_blank" rel="noopener noreferrer">{{ $isEnglish ? 'Open in Google Maps' : 'Buka di Google Maps' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a></div>
                     </div>
                 </div>
                 <p class="bj-route-status" data-route-status role="status" aria-live="polite">{{ $isEnglish ? 'Your location is requested only when you choose My location.' : 'Lokasi perangkat hanya diminta ketika Anda memilih Lokasi saya.' }}</p>
@@ -224,4 +224,5 @@
     </div>
 
 </div>
+@include('partials.destination-details')
 @endsection

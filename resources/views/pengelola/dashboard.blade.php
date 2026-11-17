@@ -14,14 +14,20 @@
     </div>
 </section>
 <dl class="admin-metrics" aria-label="Ringkasan operasional">
-    <div><dt><span class="material-symbols-outlined" aria-hidden="true">groups</span>Pengunjung hari ini</dt><dd>{{ $pengunjungHariIni ?? 0 }}</dd><small>Orang terkonfirmasi</small></div>
+    <div><dt><span class="material-symbols-outlined" aria-hidden="true">groups</span>{{ __('operations.paid_tickets') }}</dt><dd>{{ $pengunjungHariIni ?? 0 }}</dd><small>Tanggal kunjungan hari ini</small></div>
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">payments</span>Pendapatan bulan ini</dt><dd>Rp{{ number_format($pendapatanBulanIni ?? 0, 0, ',', '.') }}</dd><small>Pembayaran yang sudah valid</small></div>
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">pending_actions</span>Perlu verifikasi</dt><dd>{{ $pemesananPending ?? 0 }}</dd><small><a href="{{ route('pengelola.verifikasi.index') }}" class="underline underline-offset-4">Tinjau pembayaran</a></small></div>
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">person</span>Wisatawan terdaftar</dt><dd>{{ $totalWisatawan ?? 0 }}</dd><small>Total akun wisatawan</small></div>
 </dl>
+<dl class="bj-operational-metrics" aria-label="{{ __('operations.today_visits') }}">
+<div><dt>{{ __('operations.ordered_tickets') }}</dt><dd>{{ $terpesanHariIni }}</dd></div>
+<div><dt>{{ __('operations.arrivals') }}</dt><dd>{{ $scanHariIni }}</dd></div>
+<div><dt>{{ __('operations.departures') }}</dt><dd>{{ $keluarHariIni }}</dd></div>
+<div><dt><a href="{{ route('pengelola.onsite.index') }}">{{ __('operations.onsite') }}</a></dt><dd>{{ $diLokasi }}</dd></div>
+</dl>
 <div class="admin-dashboard-grid">
     <section class="admin-panel">
-        <div class="admin-panel-head"><div><h2 id="recent-bookings-title">Pemesanan terbaru</h2><p>Lima transaksi terakhir yang masuk</p></div><a class="admin-text-action" href="{{ route('pengelola.verifikasi.index') }}">Lihat pemesanan<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
+        <div class="admin-panel-head"><div><h2 id="recent-bookings-title">Pemesanan terbaru</h2><p>Lima transaksi terakhir yang masuk</p></div><a class="admin-text-action" href="{{ route('pengelola.pesanan.index') }}">Lihat pemesanan<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
         <div class="admin-table-wrap">
             <table class="admin-table admin-table--responsive" aria-labelledby="recent-bookings-title">
                 <thead><tr><th scope="col">Pemesanan</th><th scope="col">Tiket</th><th scope="col">Status</th><th scope="col">Tanggal</th></tr></thead>

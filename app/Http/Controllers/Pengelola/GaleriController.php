@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pengelola;
 use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
 use App\Models\Galeri;
+use App\Services\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,6 +20,7 @@ class GaleriController extends Controller
         }
 
         $galeri = $query->paginate(20);
+
         return view('pengelola.galeri.index', compact('galeri'));
     }
 
@@ -30,17 +32,17 @@ class GaleriController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'file'           => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'keterangan'     => ['nullable', 'string', 'max:255'],
-            'keterangan_en'  => ['nullable', 'string', 'max:255'],
-            'tipe'           => ['required', 'in:wisata,restoran'],
+            'file' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'keterangan' => ['nullable', 'string', 'max:255'],
+            'keterangan_en' => ['nullable', 'string', 'max:255'],
+            'tipe' => ['required', 'in:wisata,restoran'],
         ];
 
         $messages = [
             'file.required' => 'File wajib diupload.',
-            'file.image'    => 'File harus berupa gambar.',
-            'file.mimes'    => 'Format foto: jpg, jpeg, png.',
-            'file.max'      => 'Ukuran maksimal 5MB.',
+            'file.image' => 'File harus berupa gambar.',
+            'file.mimes' => 'Format foto: jpg, jpeg, png.',
+            'file.max' => 'Ukuran maksimal 5MB.',
             'tipe.required' => 'Pilih tipe galeri.',
         ];
 
@@ -49,20 +51,22 @@ class GaleriController extends Controller
         // Validasi MIME type server-side
         $file = $request->file('file');
         $allowedMimes = ['image/jpeg', 'image/png'];
-        if (!in_array($file->getMimeType(), $allowedMimes)) {
+        if (! in_array($file->getMimeType(), $allowedMimes)) {
             return back()->withErrors(['file' => 'Tipe file foto tidak valid.'])->withInput();
         }
 
-        $filename = 'galeri_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = 'galeri_'.uniqid().'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('public/galeri', $filename);
         $pathDisplay = str_replace('public/', '', $path);
 
         Galeri::create([
-            'file'           => $pathDisplay,
-            'keterangan'     => $request->keterangan,
-            'keterangan_en'  => $request->keterangan_en,
-            'tipe'           => $request->tipe,
+            'file' => $pathDisplay,
+            'keterangan' => $request->keterangan,
+            'keterangan_en' => $request->keterangan_en,
+            'tipe' => $request->tipe,
         ]);
+
+        AuditTrail::record('Tambah galeri', $pathDisplay);
 
         return redirect()->route('pengelola.galeri.index')->with('success', 'Foto berhasil ditambahkan.');
     }
@@ -71,9 +75,9 @@ class GaleriController extends Controller
     {
         $galeri = Galeri::findOrFail($id);
         if ($galeri->file) {
-            Storage::delete('public/' . $galeri->file);
+            Storage::delete('public/'.$galeri->file);
         }
-        ActivityLogger::log('Hapus galeri', 'File: ' . $galeri->file);
+        ActivityLogger::log('Hapus galeri', 'File: '.$galeri->file);
         $galeri->delete();
 
         return redirect()->route('pengelola.galeri.index')->with('success', 'Data berhasil dihapus.');

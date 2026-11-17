@@ -115,11 +115,11 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-2">{{ __('messages.payment_proof') }}</p>
                 @if ($pemesanan->pembayaran->bukti_bayar)
-                    <a href="{{ asset('storage/' . $pemesanan->pembayaran->bukti_bayar) }}" target="_blank" rel="noopener noreferrer">
+                    <a href="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" target="_blank" rel="noopener noreferrer">
                         @if(strtolower(pathinfo($pemesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) === 'pdf')
                         <span class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm text-forest"><span class="material-symbols-outlined">picture_as_pdf</span> Buka bukti pembayaran PDF</span>
                         @else
-                        <img src="{{ asset('storage/' . $pemesanan->pembayaran->bukti_bayar) }}" alt="{{ __('messages.payment_proof') }}"
+                        <img src="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" alt="{{ __('messages.payment_proof') }}"
                             class="max-h-48 rounded-xl border border-gray-300-200 cursor-pointer hover:opacity-90 transition">
                         @endif
                     </a>
@@ -130,7 +130,7 @@
         </div>
     </div>
 
-    @if ($pemesanan->pembayaran->status == 'pending')
+    @if ($pemesanan->pembayaran?->status == 'pending' && $pemesanan->status === 'pending')
     <div class="flex flex-wrap gap-3">
         <form method="POST" action="{{ route('pengelola.verifikasi.validasi', $pemesanan->id_pemesanan) }}" class="w-full sm:w-auto">
             @csrf
@@ -143,6 +143,10 @@
         <form method="POST" action="{{ route('pengelola.verifikasi.validasi', $pemesanan->id_pemesanan) }}" class="w-full sm:w-auto" onsubmit="return confirm('{{ __('messages.reject_confirm') }}')">
             @csrf
             <input type="hidden" name="action" value="ditolak">
+            <label for="rejection-reason" class="block text-sm font-medium mb-2">{{ __('operations.rejection_reason') }}</label>
+            <textarea id="rejection-reason" name="rejection_reason" minlength="5" maxlength="1000" required rows="3" class="w-full rounded-xl border-gray-300 mb-2" aria-describedby="rejection-help">{{ old('rejection_reason') }}</textarea>
+            <p id="rejection-help" class="text-sm mb-3">{{ __('operations.rejection_help') }}</p>
+            @error('rejection_reason')<p role="alert">{{ $message }}</p>@enderror
             <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center justify-center gap-2 transition-all">
                 <span class="material-symbols-outlined text-base">cancel</span>
                 {{ __('messages.reject') }}
@@ -159,4 +163,5 @@
     </div>
     @endif
 </div>
+@include('partials.booking-lifecycle')
 @endsection

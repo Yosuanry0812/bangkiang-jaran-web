@@ -3,6 +3,7 @@
 namespace Tests\Feature\Pengelola;
 
 use App\Models\DetailPemesanan;
+use App\Models\Pembayaran;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Models\User;
@@ -44,6 +45,9 @@ class ScanTiketTest extends TestCase
             'kode_booking' => $kodeBooking,
         ]);
 
+        if ($statusPemesanan === 'selesai') {
+            Pembayaran::create(['id_pemesanan' => $pemesanan->id_pemesanan, 'total' => 20000, 'metode' => 'Tunai', 'status' => 'valid']);
+        }
         DetailPemesanan::create([
             'id_pemesanan' => $pemesanan->id_pemesanan,
             'id_tiket' => $tiket->id_tiket,

@@ -1,0 +1,35 @@
+name: Application checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'
+      MAIL_MAILER: array
+      SESSION_DRIVER: array
+      CACHE_DRIVER: array
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, gd, zip, xml, mbstring
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: cp .env.example .env
+      - run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - run: php artisan key:generate
+      - run: npm ci
+      - run: npm run build
+      - run: php artisan view:cache
+      - run: php artisan view:clear
+      - run: php artisan test --compact
+      - run: composer audit --locked --no-dev
+      - run: npm audit --audit-level=moderate

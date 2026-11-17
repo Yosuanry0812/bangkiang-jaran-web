@@ -21,6 +21,7 @@ class PembayaranUlangTest extends TestCase
             ['id' => 'BCA', 'name' => 'Bank BCA', 'type' => 'bank', 'logo' => 'bca.jpg', 'number' => '123456789', 'account_name' => 'Test Operator'],
         ]);
         Storage::fake('public');
+        Storage::fake('private');
         $user = User::factory()->create();
         $tiket = Tiket::create(['nama_tiket' => 'Tiket Masuk', 'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif']);
         $booking = Pemesanan::create([
@@ -56,7 +57,7 @@ class PembayaranUlangTest extends TestCase
         $payment->refresh();
         $this->assertSame('pending', $payment->status);
         $this->assertNotSame('bukti/lama.jpg', $payment->bukti_bayar);
-        Storage::disk('public')->assertExists($payment->bukti_bayar);
+        Storage::disk('private')->assertExists($payment->bukti_bayar);
         Storage::disk('public')->assertMissing('bukti/lama.jpg');
         $this->assertSame(1, Pembayaran::count());
     }
@@ -65,6 +66,7 @@ class PembayaranUlangTest extends TestCase
     {
         config()->set('payment.methods', []);
         Storage::fake('public');
+        Storage::fake('private');
         $user = User::factory()->create();
         $tiket = Tiket::create(['nama_tiket' => 'Tiket Masuk', 'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif']);
         $booking = Pemesanan::create([

@@ -362,7 +362,7 @@ README tidak memuat rekening/kredensial. Simpan bukti asli untuk klarifikasi den
 | Berkas | Wajib pada pengajuan |
 | Metode | Harus termasuk metode yang tersedia pada server |
 | MIME server | `image/jpeg`, `image/png`, `application/pdf` |
-| Penyimpanan | Disk `public`, direktori `bukti/`, nama acak |
+| Penyimpanan | Disk `private`, direktori `bukti/`, nama acak; endpoint pemilik/pengelola |
 
 Unggah berhasil membuat pembayaran `pending`; pesanan tetap `pending`. Pratinjau dan keberhasilan upload tidak menetapkan lunas.
 
@@ -425,12 +425,12 @@ Nilai `diproses`/`dibatalkan` terdapat pada skema, tetapi tidak membuktikan ada 
 1. Setelah diterima, buka detail pesanan.
 2. Periksa tanggal/identitas setiap unit.
 3. Siapkan QR atau kode tiket ketika datang.
-4. Gunakan cetak/unduh untuk membuka dialog cetak browser.
-5. Pilih simpan PDF di browser bila fasilitas tersebut tersedia.
+4. Gunakan Unduh PDF untuk mengambil dokumen dari server atau Cetak untuk dialog cetak browser.
+5. Download hanya tersedia setelah pembayaran valid, bagi pemilik atau pengelola.
 
-E-ticket memakai `window.print()` dan gaya cetak, berbeda dari endpoint PDF laporan. Browser tidak selalu langsung mengunduh PDF secara otomatis.
+E-ticket menyediakan endpoint PDF DomPDF dan opsi `window.print()` dengan gaya cetak.
 
-Gambar QR menggunakan layanan eksternal `api.qrserver.com` dan memuat URL verifikasi. Pemuatan bergantung internet dan layanan tersebut; ketersediaannya pada semua perangkat tidak dibuktikan suite aplikasi.
+QR SVG dibuat lokal menggunakan BaconQrCode dan memuat URL verifikasi. QR ditampilkan setelah pembayaran valid; tidak menghubungi pembuat QR eksternal.
 
 ### 9.4 Status tiap detail
 
@@ -469,7 +469,7 @@ Server menolak bila kode tidak ditemukan, detail bukan `aktif`, pesanan bukan `s
 
 Jika diterima, detail menjadi `digunakan` dan `check_in_at` diisi. Check-in kedua ditolak. Perubahan menggunakan transaksi dan penguncian tiket.
 
-Controller scan memeriksa status **pesanan** sebagai syarat lunas; tidak memeriksa ulang record pembayaran seperti `isApproved()` wisatawan. Alur persetujuan normal mengubah pesanan dan pembayaran bersama. Jangan mengklaim scan memeriksa mutasi bank atau pembayaran secara terpisah.
+Controller scan memeriksa pesanan selesai dan pembayaran valid melalui aturan persetujuan yang sama dengan e-ticket. Konfirmasi mutasi bank tetap manual oleh pengelola.
 
 ### 10.4 Check-out
 
@@ -479,7 +479,7 @@ Cari kode yang sudah masuk, lalu pilih check-out. Server mensyaratkan detail `di
 
 `php artisan tiket:auto-checkout` mengisi waktu keluar untuk detail dengan check-in **lebih dari 24 jam** yang belum check-out. Perintah ini teruji pada fixture.
 
-Pada verifikasi, `php artisan schedule:list` menghasilkan `No scheduled tasks have been defined.` Definisi di Kernel lama belum terlihat pada scheduler aktif. **Belum dapat dinyatakan auto-checkout berjalan otomatis setiap jam.** Aktivasi jadwal perlu pekerjaan terpisah.
+Jadwal aktif terdaftar pada `routes/console.php`: expiry setiap menit dan auto-checkout setiap jam, dengan pencegahan overlap. Proses scheduler host tetap harus dijalankan.
 
 **Media:** gambar hasil publik, kode salah, scanner/kamera, check-in/out, penolakan, dan video petugas pada perangkat nyata akan ditambahkan nanti.
 
@@ -522,15 +522,16 @@ QRIS loket adalah label pencatatan, bukan QR dinamis atau konfirmasi penyedia. T
 
 | Ringkasan | Dasar controller |
 | --- | --- |
-| Pengunjung hari ini | Agregat `jumlah` pesanan selesai dengan kunjungan hari ini |
+| Tiket terbayar hari ini | Agregat `jumlah` pesanan selesai, pembayaran valid dan kunjungan hari ini |
 | Pendapatan bulan ini | Total pembayaran valid berdasarkan bulan/tahun `tgl_bayar` |
 | Menunggu verifikasi | Pesanan dengan pembayaran pending |
 | Total wisatawan | Akun role wisatawan |
-| Scan hari ini | Detail digunakan dengan tanggal `updated_at` hari ini |
-| Grafik komposisi | Jumlah pesanan selesai dikelompokkan menurut tiket utama |
+| Masuk/keluar hari ini | Detail terbayar berdasarkan `check_in_at`/`check_out_at` hari ini |
+| Masih di lokasi | Detail terbayar sudah masuk dan belum keluar |
+| Grafik komposisi | Seluruh detail tiket pesanan terbayar dikelompokkan menurut nama tiket |
 | Pesanan terbaru | Lima pesanan terbaru |
 
-Pengunjung merupakan unit pesanan dan dapat mencakup kendaraan, bukan jumlah orang yang fisik masuk. Grafik memakai tiket utama, bukan seluruh detail pesanan campuran. Scan menurut `updated_at` juga bukan pengukuran terpisah arus masuk/keluar.
+Angka terpesan/terbayar memakai unit tiket, termasuk kendaraan bila dijual sebagai tiket. Masuk/keluar memakai timestamp detail; interpretasi jumlah manusia perlu memperhatikan jenis tiket yang dipindai.
 
 ### 12.2 Kelola Tiket
 
@@ -577,11 +578,11 @@ Menu menyediakan flow loket dan daftar transaksi selesai milik pencatat yang log
 
 Periode berdasarkan `tgl_kunjungan`. Offline dikenali dari kode `BJ-OFF-`; online adalah yang tidak berawalan itu.
 
-Controller menjumlahkan `jumlah` hasil filter tanpa syarat tambahan selesai/check-in. Rekap ini memuat unit pesanan, termasuk kemungkinan kendaraan dan pesanan belum selesai; bukan bukti semuanya datang.
+Laporan memisahkan tiket terbayar dan check-in/check-out aktual. Pesanan pending dan pembayaran tidak valid tidak masuk rekap terbayar. Unit kendaraan tetap perlu dibedakan saat menafsirkan jumlah orang.
 
 ### 12.8 Laporan transaksi
 
-Langkah periode/filter/ekspor serupa. Laporan hanya mengambil pembayaran `valid`, memakai `tgl_bayar`, dan menjumlahkan total pembayaran hasil filter. Kedua laporan memiliki tampilan web serta PDF server DomPDF dengan A4 landscape.
+Langkah periode/filter/ekspor serupa. Laporan mengambil pembayaran `valid` dengan pesanan selesai berdasarkan `tgl_bayar`. Kedua laporan menyediakan web berpaginasi, PDF DomPDF A4 landscape, dan CSV seluruh hasil filter untuk Excel.
 
 Test lama memeriksa PDF kosong; tambahan memeriksa isi/filter online-offline pada transaksi loket. Seluruh variasi laporan berisi data nyata belum diaudit hasil cetaknya.
 
@@ -617,7 +618,7 @@ Teks memakai `lang/id/messages.php`, `lang/en/messages.php`, serta beberapa pili
 
 Adanya template lain seperti `WelcomeMail` tidak membuktikan email itu selalu dikirim saat daftar. SMTP/pengirim harus benar untuk pengiriman nyata. Test fake tidak membuktikan inbox, spam, reputasi domain, atau latensi penyedia.
 
-Email pesanan, persetujuan, dan penolakan memakai `TransactionalMail` dengan `TRANSACTIONAL_MAIL_QUEUE=background`. Proses PHP terpisah mengirim email setelah respons HTTP, sehingga booking/verifikasi tidak menunggu SMTP. OTP dan reset password tetap mengikuti mekanisme langsung. Windows memakai peluncur `Start-Process -WindowStyle Hidden`; Linux memakai driver background Laravel. PHP CLI dan izin membuat proses harus tersedia. Driver ini tidak memerlukan worker/tabel antrean, tetapi tidak menyediakan penyimpanan antrean atau retry yang tahan restart. Kegagalan pengiriman dicatat tanpa isi email/kredensial. Untuk antrean persisten, siapkan backend dan worker terlebih dahulu sebelum mengganti `TRANSACTIONAL_MAIL_QUEUE`. Rujukan: [antrean Laravel](https://laravel.com/framework/docs/queues#deferred-dispatching).
+Email pesanan, persetujuan, dan penolakan memakai `TransactionalMail` dengan koneksi `database`, queue `mail`, setelah commit, maksimal 5 percobaan. Worker terawasi wajib dijalankan; OTP/reset tetap langsung. Ringkasan antrean tersedia di pengaturan pengelola. Lihat bagian 25 untuk worker dan environment lama.
 
 ### 13.3 Polling status
 
@@ -688,8 +689,8 @@ Template menampilkan video hanya bila path aman, ekstensi MP4/WebM, dan berkas l
 | Auth dasar | Breeze `^2.4`, disesuaikan aplikasi |
 | OAuth | Socialite `^5.28` |
 | Token API | Sanctum `^4.3`; bukan bukti UI kelola token tersedia |
-| Build | Vite `^4.0.0`, `laravel-vite-plugin ^0.7.2` |
-| PDF | `barryvdh/laravel-dompdf ^3.1` |
+| Build | Vite `^8.3.8`, `laravel-vite-plugin ^3.2.1`; Node 24 pada lingkungan QA/Docker |
+| PDF / QR lokal | `barryvdh/laravel-dompdf ^3.1` / `bacon/bacon-qr-code ^3.0` |
 | HTTP client | Guzzle `^7.2` |
 | Database lokal | MySQL/MariaDB sesuai environment proyek |
 | Database test | SQLite in-memory dari `phpunit.xml` |
@@ -783,7 +784,7 @@ Migrasi akun lama tidak memberi bukti OTP palsu. `AccountRegistrationMethodTest`
 | Lokasi | Isi |
 | --- | --- |
 | `storage/app/public/galeri/` | Foto unggahan |
-| `storage/app/public/bukti/` | Bukti pembayaran |
+| `storage/app/private/bukti/` | Bukti baru; direktori public lama hanya untuk migrasi |
 | `public/storage` | Tautan publik ke unggahan |
 | `public/images/`, `public/videos/` | Aset statis foto/video bila tersedia |
 | `public/build/` | Hasil Vite |
@@ -940,7 +941,7 @@ Tabel menyebut nama, bukan nilai rahasia.
 | Session/cache | `SESSION_DRIVER`, `SESSION_LIFETIME`, `CACHE_DRIVER` |
 | Filesystem | `FILESYSTEM_DISK`; beberapa controller menyebut disk `public` eksplisit |
 | Email | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_ENCRYPTION`, `MAIL_FROM_ADDRESS`, `MAIL_FROM_NAME` |
-| Antrean email transaksi | `TRANSACTIONAL_MAIL_QUEUE`, default `background`; terpisah dari `QUEUE_CONNECTION` |
+| Antrean email transaksi | `TRANSACTIONAL_MAIL_QUEUE`, default `database`; terpisah dari `QUEUE_CONNECTION` |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` |
 | Penerima | `PAYMENT_ACCOUNT_NAME` |
 | Bank | `PAYMENT_BCA_NUMBER`, `PAYMENT_BRI_NUMBER`, `PAYMENT_MANDIRI_NUMBER` |
@@ -996,7 +997,7 @@ Pekerjaan dokumentasi ini tidak menjalankan migrasi/seed pada MySQL pengguna, tr
 | Browser enam halaman x lima preset | 30 kombinasi tanpa overflow horizontal/gambar selesai dimuat yang rusak |
 | Scheduler | Tidak ada jadwal aktif terdaftar |
 
-PHPUnit masih memberi peringatan schema XML deprecated yang sudah ada. Hasil lulus tidak berarti semua lingkungan bebas peringatan.
+Catatan tersebut hasil sesi lama. Pada 2026-11-17 schema PHPUnit diperbarui; suite terakhir menghasilkan **146 passed (1076 assertions)** tanpa peringatan schema deprecated.
 
 Preset browser: 320, 375, 768, 1024, 1440 piksel. `window.innerWidth` Agentty berturut-turut **321, 376, 769, 1025, 1442** pada sesi ini; ini pemeriksaan preset, bukan klaim angka ukur persis sama. Halaman: `/`, `/restoran`, `/tiket`, `/login`, `/register`, `/forgot-password`.
 
@@ -1074,7 +1075,7 @@ Gunakan `view:cache` untuk kompilasi Blade dan `view:clear` untuk membersihkan c
 
 ### 21.2 Backup
 
-`scripts/backup-db.bat` mengasumsikan path MySQL XAMPP dan database lokal tertentu. Tidak dijalankan pada sesi ini dan tidak otomatis cocok semua konfigurasi.
+`scripts/backup-db.bat` menjalankan `php artisan tourism:backup` menggunakan koneksi dari konfigurasi aplikasi. Arsip database serta berkas bukti/galeri disimpan di `storage/app/private/backups` dan diperiksa dengan checksum. Untuk MySQL, binary `mysqldump`/`mysql` berasal dari PATH atau `MYSQLDUMP_BINARY`/`MYSQL_BINARY`. Backup nyata tetap memerlukan koneksi database yang aktif.
 
 Simpan backup SQL serta unggahan di lokasi aman di luar publik. Kredensial berasal dari environment/konfigurasi klien aman, bukan password command line/README. Uji restore pada lingkungan terpisah.
 
@@ -1082,21 +1083,21 @@ Simpan backup SQL serta unggahan di lokasi aman di luar publik. Kredensial beras
 
 `ActivityLogger` mencatat aktivitas dan meneruskan login sukses/gagal ke model terpisah bila penyimpanan berhasil. Metadata dapat memuat input login/identitas, IP, user-agent, dan metode; perlakukan sebagai data pribadi.
 
-Ini bukan audit trail semua aksi. Menu log khusus tidak terdaftar. Saat diagnosis, jangan menyalin data sensitif/kredensial dari log ke dokumen.
+Menu `/pengelola/aktivitas` menampilkan riwayat tindakan dengan pelaku dan waktu. Pembuatan/perubahan tiket, galeri, verifikasi pembayaran, scan, pengaturan, kuota, dan loket dicatat. Saat diagnosis, jangan menyalin data sensitif/kredensial dari log ke dokumen.
 
 ### 21.4 Scheduler
 
-Perintah auto-checkout tersedia, tetapi jadwal belum terdaftar saat verifikasi. Sebelum mengandalkan otomatisasi, pasang jadwal melalui mekanisme bootstrap aktif, periksa `schedule:list`, lalu siapkan pemanggilan scheduler host. Aktivasi tidak dilakukan saat penulisan README.
+Jadwal aktif pada `routes/console.php`: `pemesanan:expire` setiap menit dan `tiket:auto-checkout` setiap jam, keduanya memakai pencegahan overlap. `php artisan schedule:list` memverifikasi pendaftarannya. Host tetap harus menjalankan `php artisan schedule:run` setiap menit atau `schedule:work` untuk pengembangan; pendaftaran jadwal bukan bukti proses host sudah aktif.
 
 ### 21.5 Docker
 
-`docker/Dockerfile` memakai build aset Node 20 dan runtime PHP 8.3 Apache dengan Composer/ekstensi terkait. Entrypoint membuat storage link, menjalankan migrasi `--force`, lalu cache konfigurasi/route/view.
+`docker/Dockerfile` memakai build aset Node 24 dan runtime PHP 8.3 Apache dengan Composer/ekstensi terkait. Entrypoint membuat storage link, menjalankan migrasi `--force`, lalu cache konfigurasi/route/view.
 
 Karena startup menjalankan migrasi, tinjau efeknya dan arahkan hanya ke database yang disiapkan. Build/run Docker belum diuji dalam sesi ini; keberadaan Dockerfile bukan bukti image lolos pada mesin pengguna.
 
 ### 21.6 Demo dan produksi
 
-`start-demo.bat` dan `npm run tunnel` tersedia untuk demo/ngrok. Tunnel dapat membuka server lokal ke jaringan publik; tidak dijalankan pada pekerjaan ini.
+`start-demo.bat` dan `npm run tunnel` tersedia untuk demo/ngrok. Script tunnel membutuhkan CLI ngrok resmi pada PATH; paket npm ngrok beta yang terkena advisory sudah dilepas. Instalasi/autentikasi CLI disiapkan terpisah hanya bila demo diperlukan. `npm run tunnel` membutuhkan CLI ngrok resmi pada PATH; paket npm ngrok beta yang terkena advisory sudah dilepas. CLI dan autentikasinya disiapkan terpisah, lalu diuji hanya bila demo memang diperlukan. Tunnel dapat membuka server lokal ke jaringan publik; tidak dijalankan pada pekerjaan ini.
 
 Produksi memerlukan URL/HTTPS, debug sesuai, database, SMTP, storage persisten, session/cache, akun pengelola, dan tujuan pembayaran resmi. Panduan ini bukan catatan bahwa konfigurasi produksi tersebut sudah diterapkan.
 
@@ -1121,13 +1122,13 @@ Produksi memerlukan URL/HTTPS, debug sesuai, database, SMTP, storage persisten, 
 | Bukti ditolak format/ukuran | Pakai JPG/JPEG/PNG/PDF valid dalam batas |
 | Upload sukses belum lunas | Tunggu keputusan pengelola |
 | Pembayaran ditolak | Buka pembayaran dan unggah pengganti |
-| QR tak muncul | Periksa layanan/internet; siapkan kode teks |
+| QR tak muncul | Pastikan pembayaran valid; QR dibuat lokal, kode teks tetap tersedia |
 | Publik valid tetapi belum boleh masuk | Check-in tetap meminta tanggal hari ini |
 | Check-in ditolak | Periksa kode, tanggal, pesanan selesai, detail aktif |
 | Check-out ditolak | Harus sudah masuk, belum keluar, tanggal hari ini |
-| Auto-checkout tak berjalan periodik | Scheduler belum memiliki jadwal aktif |
+| Auto-checkout tak berjalan periodik | Periksa proses scheduler host; jadwal sudah terdaftar |
 | Notifikasi tidak seketika | Polling; periksa koneksi/session |
-| Angka pengunjung berbeda dari lapangan | Agregat unit pesanan bukan hitung orang fisik |
+| Angka pengunjung berbeda dari lapangan | Bedakan tiket terbayar, check-in aktual dan unit kendaraan |
 | Foto tidak tampil | Periksa berkas/path/storage link/tipe/filter placeholder |
 | Video tidak tampil | Periksa berkas MP4/WebM dan path `TOURISM_HERO_VIDEO` |
 | Error database | Pastikan MySQL proyek aktif dan environment cocok |
@@ -1138,15 +1139,14 @@ Produksi memerlukan URL/HTTPS, debug sesuai, database, SMTP, storage persisten, 
 Belum boleh dinyatakan tersedia hanya berdasarkan teks/berkas lama:
 
 - QRIS online, gateway, konfirmasi bank atau refund otomatis;
-- pembatalan mandiri melalui menu wisatawan;
 - reservasi meja, keranjang makanan, stok/checkout makanan;
-- kuota harian dan pengurangan stok tiket;
+- stok per jenis tiket terpisah dari kuota kunjungan per tanggal yang sudah tersedia;
 - upload video Galeri, edit/update galeri, CRUD wisatawan;
 - loket tanpa internet/PWA dan sinkronisasi;
 - aplikasi native, push notification, WebSocket aktif;
 - galeri/lokasi publik tersendiri dari view tidak dirutekan;
 - email sambutan setiap daftar hanya karena template ada;
-- job auto-checkout/kedaluwarsa yang sudah aktif periodik;
+- proses scheduler/worker pada host yang sudah aktif hanya berdasarkan keberadaan definisi jadwal;
 - menu aktif untuk setiap endpoint Breeze tersimpan.
 
 Tindak lanjut dapat meliputi foto/video asli, media panduan, uji layanan/perangkat nyata, scheduler, serta peninjauan perbedaan metrik/alur online-offline. Ini batas dan peluang lanjutan, bukan klaim implementasi.
@@ -1171,8 +1171,48 @@ Tindak lanjut dapat meliputi foto/video asli, media panduan, uji layanan/perangk
 | Rute/video | [config/tourism.php](config/tourism.php), `public/js/section-refinement.js`, `public/js/site.js` |
 | Bahasa | `lang/id/messages.php`, `lang/en/messages.php` |
 | Model/migrasi | `app/Models/`, `database/migrations/` |
-| Aset | `resources/css/app.css`, `resources/js/app.js`, `vite.config.js`, `public/css/` |
+| Aset | `resources/css/app.css`, `resources/js/app.js`, `vite.config.mjs`, `public/css/` |
 | Pengujian panduan | [DocumentedFeatureFlowTest.php](tests/Feature/DocumentedFeatureFlowTest.php), [phpunit.xml](phpunit.xml) |
 | Operasional | `docker/`, `scripts/backup-db.bat` |
 
 Setelah pengembangan berikutnya, periksa route/controller/view aktif, jalankan uji terkait, dan perbarui tanggal/bukti bagian yang berubah. Nama berkas, tampilan lama, dan rencana fitur tidak cukup untuk menyatakan suatu alur sudah berhasil.
+
+
+## 25. Fitur operasional tambahan (2026-11-17)
+
+Tetap menggunakan dua peran dan pembayaran transfer manual. Payment gateway, kalender tutup, pengumuman kondisi destinasi, reschedule, pengingat kunjungan email, serta pembagian peran baru tidak ditambahkan.
+
+### Wisatawan
+
+- Pesanan baru mempunyai tenggat default 120 menit, dibatasi akhir tanggal kunjungan. Pengelola dapat mengubah tenggat pesanan baru melalui pengaturan (15-1440 menit). Draft pemilihan tiket berlaku 60 menit; harga/tiket/tanggal divalidasi lagi saat checkout.
+- Riwayat memiliki pencarian kode/nama pengunjung, filter tanggal/status, dan pagination. Endpoint status hanya mengembalikan pesanan milik pengguna dalam kelompok terbatas.
+- Detail/pembayaran menampilkan timeline, countdown dan alasan penolakan. Bukti yang sedang diperiksa mempertahankan pesanan/kuota meskipun tenggat lewat. Penolakan memberi kesempatan unggah ulang dengan tenggat baru; tanggal kunjungan tetap harus berlaku.
+- Pembatalan mandiri tersedia sebelum lunas dan saat tidak ada bukti yang sedang diperiksa. Pembatalan/expiry melepaskan kuota.
+- E-ticket PDF dan QR dibuat lokal. Download membutuhkan pemilik/pengelola dan pembayaran valid. Halaman verifikasi publik menampilkan status minimal, tanpa nama atau kode booking.
+- Hapus akun melakukan anonymisasi dan soft delete; transaksi, pembayaran dan rincian tiket tidak ikut terhapus. Penggantian password Google yang sudah mempunyai password memerlukan password saat ini.
+
+### Pengelola
+
+| Halaman | Fungsi |
+| --- | --- |
+| `/pengelola/pesanan` | Pencarian/filter semua pesanan online/offline |
+| `/pengelola/di-lokasi` | Pengunjung yang masuk dan belum keluar |
+| `/pengelola/kuota` | Kapasitas per tanggal; kosong berarti tanpa batas, angka 0 ditolak |
+| `/pengelola/aktivitas` | Riwayat tindakan dan pelaku |
+| `/pengelola/pengaturan` | Jam, alamat, kontak, peta, aturan ID/EN, tenggat pesanan baru dan ringkasan antrean email |
+
+Dashboard membedakan terpesan, terbayar, masuk, keluar dan masih di lokasi. Komposisi tiket dihitung dari detail pesanan. Laporan kunjungan membedakan tiket terbayar dari check-in aktual; laporan transaksi menggunakan tanggal pembayaran valid. PDF tetap tersedia; CSV UTF-8 yang dapat dibuka di Excel mencakup semua hasil filter, dengan perlindungan formula spreadsheet.
+
+### Penerapan database dan layanan
+
+Perubahan schema tersedia di `database/migrations/2026_11_17_000001_add_booking_operations.php`. Terapkan melalui alur persetujuan database Agentty pada koneksi proyek yang telah diverifikasi; jangan menggunakan database lain atau `migrate:fresh` pada data pengguna.
+
+Bukti baru disimpan di disk `private`. Untuk berkas lama, `php artisan pembayaran:privatize-proofs` hanya menginventarisasi; `--apply` memindahkan berkas serta mengubah metadata dan memerlukan penerapan yang disetujui. Salinan diverifikasi sebelum berkas publik dihapus. Pengulangan dapat melanjutkan cleanup yang terputus. Apache menolak URL `/storage/bukti/` melalui `.htaccess`; pada Nginx siapkan aturan penolakan setara. Akses sah memakai endpoint `payment.proof`.
+
+Email transaksi sekarang memakai antrean `database`, queue `mail`, setelah commit, dengan maksimal 5 percobaan. Jalankan worker terawasi, misalnya `php artisan queue:work database --queue=mail --tries=5 --timeout=60`; contoh Supervisor ada di `docker/mail-worker.conf`. OTP/reset tetap langsung; tidak ada reminder kunjungan baru. Sesuaikan environment lama yang secara eksplisit masih memilih koneksi background; rahasia tetap berada pada environment.
+
+Backup dapat diverifikasi dengan `php artisan tourism:backup --verify=<arsip.zip>`. Restore menolak database yang sudah berisi tabel dan folder tujuan yang berisi berkas; koneksi tujuan, folder baru, dan `--confirm-empty-target` wajib diberikan. Restore nyata membutuhkan target terpisah dan persetujuan perubahan database. Periksa storage persisten, izin, ruang cadangan dan proses host sebelum dipakai. Docker image, SMTP/inbox, serta backup/restore MySQL nyata belum dibuktikan hanya oleh tes SQLite.
+
+CI tersedia pada `.github/workflows/ci.yml` untuk build, Blade, suite dan audit dependency. Menambahkan workflow tidak berarti run GitHub Actions sudah terjadi.
+
+QA 2026-11-17: **146 passed (1076 assertions)**, 80 kombinasi layout dan 35 pemeriksaan ulang lulus; audit Composer/npm 0. Backup MySQL asli dan unggahan berhasil diverifikasi, tetapi restore MySQL belum diuji. Koneksi Laravel lokal berhasil; migration operasional masih pending karena Agentty mensyaratkan password terisi pada koneksi MySQL yang saat ini memakai password kosong. Kode dengan schema baru belum siap dipakai pada database asli sebelum migrasi disetujui. Worker/scheduler host dan SMTP nyata belum diaktifkan dalam QA.

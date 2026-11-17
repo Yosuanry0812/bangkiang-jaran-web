@@ -6,8 +6,10 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -48,11 +50,12 @@ class ProfileController extends Controller
         $user = $request->user();
 
         // Only for users who registered via Google
-        if (!$user->google_id) {
+        if (! $user->google_id) {
             abort(403, 'Hanya pengguna Google yang bisa akses ini.');
         }
 
         $request->validate([
+            'current_password' => $user->password ? ['required', 'current_password'] : ['nullable'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
@@ -76,7 +79,15 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            $user->forceFill([
+                'name' => 'Akun dihapus', 'username' => 'deleted_'.Str::random(24),
+                'email' => 'deleted-'.Str::uuid().'@example.invalid',
+                'phone' => null, 'google_id' => null, 'remember_token' => null,
+            ])->save();
+            $user->tokens()->delete();
+            $user->delete();
+        });
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

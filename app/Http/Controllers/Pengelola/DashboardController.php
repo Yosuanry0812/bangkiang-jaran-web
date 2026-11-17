@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Pengelola;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pemesanan;
-use App\Models\Pembayaran;
-use App\Models\User;
 use App\Models\DetailPemesanan;
-use Illuminate\Http\Request;
+use App\Models\Pembayaran;
+use App\Models\Pemesanan;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -17,10 +16,9 @@ class DashboardController extends Controller
         $today = now()->toDateString();
 
         $pengunjungHariIni = Pemesanan::where('tgl_kunjungan', $today)
-            ->where('status', 'selesai')
-            ->sum('jumlah');
+            ->approved()->sum('jumlah');
 
-        $pendapatanBulanIni = Pembayaran::where('status', 'valid')
+        $pendapatanBulanIni = Pembayaran::where('status', 'valid')->whereHas('pemesanan', fn ($q) => $q->where('status', 'selesai'))
             ->whereMonth('tgl_bayar', now()->month)
             ->whereYear('tgl_bayar', now()->year)
             ->sum('total');
@@ -32,21 +30,15 @@ class DashboardController extends Controller
         $totalWisatawan = User::where('role', 'wisatawan')->count();
 
         // Grafik kunjungan — komposisi per tiket (pie)
-        $grafik = Pemesanan::select(
-                'id_tiket',
-                DB::raw('SUM(jumlah) as total')
-            )
-            ->where('status', 'selesai')
-            ->groupBy('id_tiket')
-            ->with('tiket:id_tiket,nama_tiket')
-            ->get();
-
-        $grafikLabels = $grafik->pluck('tiket.nama_tiket')->toArray();
-        $grafikData = $grafik->pluck('total')->map(fn($v) => (int)$v)->toArray();
-
-        $scanHariIni = DetailPemesanan::where('status_tiket', 'digunakan')
-            ->whereDate('updated_at', $today)
-            ->count();
+        $grafik = DetailPemesanan::whereHas('pemesanan', fn ($q) => $q->approved())
+            ->select('nama_tiket', DB::raw('COUNT(*) as total'))->groupBy('nama_tiket')->get();
+        $grafikLabels = $grafik->pluck('nama_tiket')->all();
+        $grafikData = $grafik->pluck('total')->map(fn ($n) => (int) $n)->all();
+        $arrivals = DetailPemesanan::whereHas('pemesanan', fn ($q) => $q->approved());
+        $scanHariIni = (clone $arrivals)->whereDate('check_in_at', $today)->count();
+        $keluarHariIni = (clone $arrivals)->whereDate('check_out_at', $today)->count();
+        $diLokasi = (clone $arrivals)->whereNotNull('check_in_at')->whereNull('check_out_at')->count();
+        $terpesanHariIni = Pemesanan::where('tgl_kunjungan', $today)->holdingCapacity()->sum('jumlah');
 
         $pemesananTerbaru = Pemesanan::with(['user', 'tiket', 'detailPemesanan'])
             ->orderBy('created_at', 'desc')
@@ -61,7 +53,7 @@ class DashboardController extends Controller
             'grafikLabels',
             'grafikData',
             'pemesananTerbaru',
-            'scanHariIni'
+            'scanHariIni', 'keluarHariIni', 'diLokasi', 'terpesanHariIni'
         ));
     }
 }

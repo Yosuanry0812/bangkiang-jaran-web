@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pengelola;
 use App\Http\Controllers\Controller;
 use App\Models\DetailPemesanan;
 use App\Models\Pemesanan;
+use App\Services\AuditTrail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +25,7 @@ class ScanController extends Controller
         return DetailPemesanan::with(['pemesanan.user', 'pemesanan.tiket'])
             ->whereHas('pemesanan', function ($q) use ($today) {
                 $q->where('tgl_kunjungan', $today)
-                  ->where('status', 'selesai');
+                    ->approved();
             })
             ->orderBy('created_at', 'desc')
             ->get();
@@ -42,9 +43,9 @@ class ScanController extends Controller
             ->where('kode_tiket', $kode)
             ->first();
 
-        if (!$detail) {
+        if (! $detail) {
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Tiket dengan kode "' . $kode . '" tidak ditemukan.');
+                ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
         }
 
         $pemesanan = $detail->pemesanan;
@@ -53,7 +54,7 @@ class ScanController extends Controller
         $sudahDigunakan = $detail->status_tiket === 'digunakan';
         $kadaluarsa = $detail->status_tiket === 'kadaluarsa';
         $pemesananDibatalkan = $pemesanan->status === 'dibatalkan';
-        $belumLunas = $pemesanan->status !== 'selesai';
+        $belumLunas = ! $pemesanan->isApproved();
         $bukanHariIni = $pemesanan->tgl_kunjungan !== now()->toDateString();
 
         $ticketsHariIni = $this->getTodayTickets();
@@ -79,45 +80,57 @@ class ScanController extends Controller
         try {
             $detail = DetailPemesanan::where('kode_tiket', $kode)->lockForUpdate()->first();
 
-            if (!$detail) {
+            if (! $detail) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket dengan kode "' . $kode . '" tidak ditemukan.');
+                    ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
             }
 
             if ($detail->status_tiket !== 'aktif') {
                 $statusLabel = $detail->status_tiket === 'digunakan' ? 'sudah digunakan' : $detail->status_tiket;
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini ' . $statusLabel . '. Tidak bisa digunakan lagi.');
+                    ->with('error', 'Tiket ini '.$statusLabel.'. Tidak bisa digunakan lagi.');
             }
 
             // Cek pemesanan harus selesai (lunas)
             $pemesanan = $detail->pemesanan;
-            if ($pemesanan->status !== 'selesai') {
+            if (! $pemesanan->isApproved()) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket belum lunas. Status pemesanan: ' . $pemesanan->status . '.');
+                    ->with('error', 'Tiket belum lunas. Status pemesanan: '.$pemesanan->status.'.');
             }
 
             // Hanya tiket dengan kunjungan HARI INI yang bisa check-in
             if ($pemesanan->tgl_kunjungan !== now()->toDateString()) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini untuk kunjungan ' . $pemesanan->tgl_kunjungan . '. Hanya tiket hari ini (' . now()->format('d/m/Y') . ') yang bisa di-scan.');
+                    ->with('error', 'Tiket ini untuk kunjungan '.$pemesanan->tgl_kunjungan.'. Hanya tiket hari ini ('.now()->format('d/m/Y').') yang bisa di-scan.');
             }
 
+            if (! $detail->canCheckIn()) {
+                DB::rollBack();
+
+                return back()->with('error', __('operations.ticket_unavailable'));
+            }
             $detail->update([
                 'status_tiket' => 'digunakan',
-                'check_in_at'  => now(),
+                'check_in_at' => now(),
             ]);
 
+            $detail->pemesanan->recordEvent($request->routeIs('pengelola.scan.checkout') ? 'checked_out' : 'checked_in', $detail->kode_tiket);
+            AuditTrail::record($request->routeIs('pengelola.scan.checkout') ? 'Check-out' : 'Check-in', $detail->kode_tiket);
             DB::commit();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('success', 'Tiket ' . $kode . ' berhasil discan. Pengunjung dipersilakan masuk.');
+                ->with('success', 'Tiket '.$kode.' berhasil discan. Pengunjung dipersilakan masuk.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->route('pengelola.scan.index')
                 ->with('error', 'Gagal memproses tiket. Silakan coba lagi.');
         }
@@ -135,20 +148,23 @@ class ScanController extends Controller
         try {
             $detail = DetailPemesanan::where('kode_tiket', $kode)->lockForUpdate()->first();
 
-            if (!$detail) {
+            if (! $detail) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket dengan kode "' . $kode . '" tidak ditemukan.');
+                    ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
             }
 
             if ($detail->status_tiket !== 'digunakan') {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
                     ->with('error', 'Tiket harus sudah check-in sebelum check-out.');
             }
 
             if ($detail->check_out_at) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
                     ->with('error', 'Tiket ini sudah check-out sebelumnya.');
             }
@@ -156,20 +172,24 @@ class ScanController extends Controller
             // Hanya tiket dengan kunjungan HARI INI yang bisa check-out
             if ($detail->pemesanan->tgl_kunjungan !== now()->toDateString()) {
                 DB::rollBack();
+
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini untuk kunjungan ' . $detail->pemesanan->tgl_kunjungan . '. Hanya tiket hari ini (' . now()->format('d/m/Y') . ') yang bisa di-scan.');
+                    ->with('error', 'Tiket ini untuk kunjungan '.$detail->pemesanan->tgl_kunjungan.'. Hanya tiket hari ini ('.now()->format('d/m/Y').') yang bisa di-scan.');
             }
 
             $detail->update([
                 'check_out_at' => now(),
             ]);
 
+            $detail->pemesanan->recordEvent($request->routeIs('pengelola.scan.checkout') ? 'checked_out' : 'checked_in', $detail->kode_tiket);
+            AuditTrail::record($request->routeIs('pengelola.scan.checkout') ? 'Check-out' : 'Check-in', $detail->kode_tiket);
             DB::commit();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('success', 'Tiket ' . $kode . ' berhasil check-out. Terima kasih.');
+                ->with('success', 'Tiket '.$kode.' berhasil check-out. Terima kasih.');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return redirect()->route('pengelola.scan.index')
                 ->with('error', 'Gagal check-out. Silakan coba lagi.');
         }

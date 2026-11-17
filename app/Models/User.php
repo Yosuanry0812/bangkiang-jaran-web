@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, \Illuminate\Database\Eloquent\SoftDeletes, Notifiable;
 
     protected $fillable = [
         'name',
@@ -55,7 +55,7 @@ class User extends Authenticatable
 
     public function emailVerificationLabel(): string
     {
-        if (!$this->hasVerifiedEmail()) {
+        if (! $this->hasVerifiedEmail()) {
             return 'Belum diverifikasi';
         }
 

@@ -23,9 +23,10 @@
     <div class="max-w-2xl mx-auto">
 
 
+        <h1 class="font-sans text-2xl font-semibold mb-6">{{ __('operations.booking_details') }}</h1>
         {{-- Order info header --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6" data-aos="fade-up">
-            <div class="bg-forest px-5 py-4 flex items-center justify-between">
+            <div class="bj-booking-summarybar bg-forest px-5 py-4 flex items-center justify-between">
                 <div>
                     <p class="font-sans text-[10px] uppercase tracking-[0.15em] text-white/40">{{ __('messages.booking_code') }}</p>
                     <p class="font-mono text-lg font-bold text-white tracking-wider">{{ $pemesanan->kode_booking }}</p>
@@ -62,29 +63,30 @@
                         <span class="font-sans text-xs font-medium text-ink">{{ $item->nama_tiket }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $item->status_tiket === 'aktif' ? 'bg-green-500' : 'bg-gray-300' }}"></span>
-                        <span class="font-sans text-[10px] uppercase tracking-wider {{ $item->status_tiket === 'aktif' ? 'text-green-600' : 'text-gray-400' }}">
-                            {{ $item->status_tiket === 'aktif' ? __('messages.status_aktif') : ucfirst($item->status_tiket) }}
+                        <span class="w-1.5 h-1.5 rounded-full {{ $item->canCheckIn() ? 'bg-green-500' : 'bg-gray-300' }}"></span>
+                        <span class="font-sans text-[10px] uppercase tracking-wider {{ $item->canCheckIn() ? 'text-green-600' : 'text-gray-400' }}">
+                            {{ __('operations.badge_'.$item->verificationState()) }}
                         </span>
                     </div>
                 </div>
 
                 {{-- Content --}}
-                <div class="p-5 flex items-start gap-5">
+                <div class="bj-ticket-row p-5 flex items-start gap-5">
                     {{-- QR code --}}
-                    <div class="w-32 h-32 bg-white rounded-xl border border-gray-200 flex items-center justify-center flex-shrink-0 p-1">
-                        @php $qrUrl = request()->getSchemeAndHttpHost() . '/tiket/verifikasi/' . $item->kode_tiket; @endphp
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data={{ urlencode($qrUrl) }}"
+                    <div class="bj-ticket-qr w-32 h-32 bg-white rounded-xl border border-gray-200 flex items-center justify-center flex-shrink-0 p-1">
+                        @if($pemesanan->isApproved())
+                        <img src="{{ app(\App\Services\TicketQr::class)->dataUri($item->kode_tiket) }}"
                              alt="QR {{ $item->kode_tiket }}"
                              class="w-full h-full object-contain"
                              loading="lazy"
                              onerror="this.parentElement.innerHTML='<span class=\'material-symbols-outlined text-gray-300\' style=\'font-size:40px;\'>qr_code</span>'">
+                        @else<span class="text-sm px-3 text-center">{{ __('operations.qr_pending') }}</span>@endif
                     </div>
 
                     {{-- Info --}}
-                    <div class="min-w-0 flex-1">
-                        <div class="grid grid-cols-2 gap-y-2.5 gap-x-4">
-                            <div>
+                    <div class="bj-ticket-info min-w-0 flex-1">
+                        <div class="bj-ticket-meta grid grid-cols-2 gap-y-2.5 gap-x-4">
+                            <div class="bj-ticket-code">
                                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble">{{ __('messages.ticket_code') }}</p>
                                 <p class="font-mono text-sm font-bold text-forest tracking-wider mt-0.5">{{ $item->kode_tiket }}</p>
                             </div>
@@ -137,4 +139,5 @@
         </div>
     </div>
 </div>
+@include('partials.booking-lifecycle')
 @endsection

@@ -43,6 +43,7 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/booking-operations.css') . '?v=' . filemtime(public_path('css/booking-operations.css')) }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
@@ -62,7 +63,7 @@
     {{-- ── SIDEBAR ── --}}
     <aside id="sidebar" :inert="!isDesktop && !sidebarOpen" :aria-hidden="!isDesktop && !sidebarOpen" aria-label="Menu pengelola"
            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-           class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col lg:translate-x-0 lg:static lg:inset-auto">
+           class="fixed inset-y-0 left-0 z-40 w-60 flex flex-col -translate-x-full lg:translate-x-0 lg:static lg:inset-auto">
 
         {{-- Logo --}}
         <div class="admin-brand flex items-center justify-between flex-shrink-0"
@@ -127,6 +128,10 @@
                 <span class="material-symbols-outlined">group</span>
                 Pengguna
             </a>
+
+            @foreach(['pesanan.index' => ['receipt_long', 'all_bookings'], 'onsite.index' => ['groups', 'onsite'], 'quotas.index' => ['confirmation_number', 'quotas'], 'audit.index' => ['history', 'audit'], 'settings.edit' => ['settings', 'settings']] as $target => $entry)
+            <a href="{{ route('pengelola.'.$target) }}" class="nav-link {{ request()->routeIs('pengelola.'.$target) ? 'active' : '' }}"><span class="material-symbols-outlined" aria-hidden="true">{{ $entry[0] }}</span>{{ __('operations.'.$entry[1]) }}</a>
+            @endforeach
         </nav>
 
         {{-- Footer --}}
@@ -146,10 +151,10 @@
                 <span class="material-symbols-outlined">manage_accounts</span>
                 Profil Saya
             </a>
-            <a href="{{ route('logout.get') }}" class="nav-link text-xs mt-0.5 hover:!bg-red-900/20 hover:!text-red-400">
+            <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="nav-link text-xs mt-0.5 hover:!bg-red-900/20 hover:!text-red-400">
                 <span class="material-symbols-outlined">logout</span>
                 Keluar
-            </a>
+            </button></form>
         </div>
     </aside>
 
@@ -243,11 +248,11 @@
                             Profil Saya
                         </a>
                         <div class="my-1 border-t border-slate-100"></div>
-                        <a href="{{ route('logout.get') }}"
+                        <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit"
                            class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors">
                             <span class="material-symbols-outlined" style="font-size:15px">logout</span>
                             Keluar
-                        </a>
+                        </button></form>
                     </div>
                 </div>
             </div>

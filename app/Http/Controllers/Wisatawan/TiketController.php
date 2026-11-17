@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Wisatawan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tiket;
 use App\Models\DetailPemesanan;
 use App\Models\Galeri;
+use App\Models\Tiket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +18,7 @@ class TiketController extends Controller
             ->latest()
             ->get()
             ->filter(fn (Galeri $photo) => Storage::disk('public')->exists($photo->file)
-                && !str_starts_with($photo->file, 'galeri/galeri-'))
+                && ! str_starts_with($photo->file, 'galeri/galeri-'))
             ->values();
 
         return view('wisatawan.tiket', compact('tikets', 'galeriWisata'));
@@ -27,6 +27,7 @@ class TiketController extends Controller
     public function detail($id)
     {
         $tiket = Tiket::aktif()->findOrFail($id);
+
         return view('wisatawan.tiket-detail', compact('tiket'));
     }
 
@@ -41,17 +42,17 @@ class TiketController extends Controller
             ->where('kode_tiket', $kode)
             ->first();
 
-        if (!$detail) {
+        if (! $detail) {
             return view('wisatawan.tiket-verifikasi', [
                 'found' => false,
-                'kode'  => $kode,
+                'kode' => $kode,
                 'detail' => null,
                 'pemesanan' => null,
             ]);
         }
 
         $pemesanan = $detail->pemesanan;
-        $valid = $pemesanan->status === 'selesai' && $detail->status_tiket === 'aktif';
+        $valid = $detail->canCheckIn();
 
         return view('wisatawan.tiket-verifikasi', compact('detail', 'pemesanan', 'kode', 'valid') + ['found' => true]);
     }

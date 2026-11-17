@@ -6,6 +6,7 @@ use App\Models\Pembayaran;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -40,16 +41,17 @@ class TransactionIntegrityTest extends TestCase
         ]);
         $url = route('pengelola.verifikasi.validasi', $booking->id_pemesanan);
         $this->actingAs($admin)->post($url, ['action' => 'valid'])->assertSessionHas('success');
-        $this->post($url, ['action' => 'ditolak'])->assertSessionHas('error');
+        $this->post($url, ['action' => 'ditolak', 'rejection_reason' => 'Bukti transfer belum terbaca jelas.'])->assertSessionHas('error');
         $this->assertSame('valid', $payment->fresh()->status);
         $this->assertSame('selesai', $booking->fresh()->status);
     }
+
     public function test_google_id_must_be_unique_but_null_is_allowed(): void
     {
         User::factory()->create(['google_id' => null]);
         User::factory()->create(['google_id' => null]);
         User::factory()->create(['google_id' => 'google-id']);
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         User::factory()->create(['google_id' => 'google-id']);
     }
 
@@ -64,7 +66,7 @@ class TransactionIntegrityTest extends TestCase
         ]);
         $data = ['id_pemesanan' => $booking->id_pemesanan, 'total' => 20000, 'metode' => 'BCA', 'status' => 'pending'];
         Pembayaran::create($data);
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         Pembayaran::create($data);
     }
 }

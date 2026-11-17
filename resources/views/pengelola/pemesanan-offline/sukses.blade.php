@@ -11,7 +11,7 @@
         <span class="material-symbols-outlined text-emerald-600" style="font-size:32px">check</span>
     </div>
 
-    <h2 class="font-serif text-[26px] text-slate-900 mb-2">Pemesanan Offline Berhasil</h2>
+    <h1 class="font-serif text-[26px] text-slate-900 mb-2">Pemesanan Offline Berhasil</h1>
     <p class="font-sans text-[13px] text-slate-400 mb-8">Tiket sudah aktif dan siap digunakan</p>
 
     {{-- Booking info card --}}
@@ -94,4 +94,5 @@
     </div>
 
 </div>
+@include('partials.booking-lifecycle')
 @endsection

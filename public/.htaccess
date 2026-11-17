@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Legacy receipts must only be served through the authorized application endpoint.
+    RewriteRule ^storage/+bukti(?:/+|$) - [F,L,NC]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

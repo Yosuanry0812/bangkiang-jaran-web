@@ -210,6 +210,8 @@
 
             <form method="POST" action="{{ route('profile.set-password') }}" class="space-y-4">
                 @csrf
+                @if(Auth::user()->password)<label class="block text-sm">{{ __('operations.current_password') }}<input type="password" name="current_password" autocomplete="current-password" required class="block w-full rounded-xl border-gray-300 mt-2"></label>@error('current_password')<p role="alert">{{ $message }}</p>@enderror
+                @endif
                 <div>
                     <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Kata Sandi Baru</label>
                     <div class="relative group">

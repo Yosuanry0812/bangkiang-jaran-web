@@ -76,7 +76,7 @@
             $totalCheckOut += $k->detailPemesanan->whereNotNull('check_out_at')->count();
         }
     @endphp
-    <div class="total">{{ __('messages.total_visitors_label') }}: {{ $total ?? 0 }}</div>
+    <div class="total">{{ __('operations.paid_tickets') }}: {{ $terbayar ?? 0 }} | {{ __('operations.arrivals') }}: {{ $total ?? 0 }}</div>
     <div style="margin-top:5px;font-size:12px;color:#555;">
         <span>Jumlah Masuk: {{ $totalCheckIn }}</span> &nbsp;|&nbsp;
         <span>Jumlah Keluar: {{ $totalCheckOut }}</span>

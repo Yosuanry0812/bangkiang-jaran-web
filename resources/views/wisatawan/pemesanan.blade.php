@@ -139,5 +139,6 @@ function ticketBooking(prices, names, initialDate, preSelectedId, initialTickets
 }
 </script>
 @endpush
+<div class="bj-operations"><p class="bj-quota-status" role="status" data-quota-status="{{ route('kunjungan.kuota') }}" data-loading="{{ __('operations.quota_loading') }}" data-unlimited="{{ __('operations.quota_unlimited') }}" data-remaining="{{ __('operations.quota_remaining') }}" data-error="{{ __('operations.quota_full') }}"></p></div>
 @endsection
 

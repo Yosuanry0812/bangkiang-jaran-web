@@ -15,7 +15,7 @@ return [
 
     'default' => env('QUEUE_CONNECTION', 'sync'),
 
-    'transactional_connection' => env('TRANSACTIONAL_MAIL_QUEUE', 'background'),
+    'transactional_connection' => env('TRANSACTIONAL_MAIL_QUEUE', 'database'),
 
     /*
     |--------------------------------------------------------------------------

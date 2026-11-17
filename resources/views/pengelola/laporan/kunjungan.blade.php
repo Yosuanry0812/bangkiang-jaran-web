@@ -27,18 +27,18 @@
     <div class="bg-white rounded-2xl shadow-sm p-4">
         <form method="GET" action="{{ route('pengelola.laporan.kunjungan') }}" class="flex flex-wrap items-end gap-3">
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
-                <input type="date" name="periode_awal" value="{{ request('periode_awal') }}"
+                <label for="report-periode_awal" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
+                <input type="date" id="report-periode_awal" name="periode_awal" value="{{ request('periode_awal') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
-                <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
+                <label for="report-periode_akhir" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
+                <input type="date" id="report-periode_akhir" name="periode_akhir" value="{{ request('periode_akhir') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
-                <select name="tipe"
+                <label for="report-tipe" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
+                <select id="report-tipe" name="tipe"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
                     <option value="" {{ !$tipe ? 'selected' : '' }}>{{ __('messages.all') }}</option>
                     <option value="online" {{ $tipe === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
@@ -53,12 +53,8 @@
     </div>
 
     @php
-        $totalCheckIn = 0;
-        $totalCheckOut = 0;
-        foreach ($data ?? [] as $k) {
-            $totalCheckIn += $k->detailPemesanan->whereNotNull('check_in_at')->count();
-            $totalCheckOut += $k->detailPemesanan->whereNotNull('check_out_at')->count();
-        }
+        $totalCheckIn = $total;
+        $totalCheckOut = $keluar;
     @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center gap-4">
@@ -66,8 +62,8 @@
                 <span class="material-symbols-outlined text-2xl">groups</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">{{ __('messages.total_visitors_label') }}</p>
-                <p class="text-2xl font-bold text-emerald-900">{{ $total ?? 0 }}</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-emerald-600">{{ __('operations.paid_tickets') }}</p>
+                <p class="text-2xl font-bold text-emerald-900">{{ $terbayar ?? 0 }}</p>
             </div>
         </div>
         <div class="bg-sky-50 border border-sky-200 rounded-2xl p-5 flex items-center gap-4">
@@ -173,4 +169,7 @@
         {{ __('messages.back_to_reports') }}
     </a>
 </div>
+<div class="bj-operations bj-operations-actions"><a href="{{ route('pengelola.laporan.kunjungan', array_merge(request()->only(['periode_awal', 'periode_akhir', 'tipe']), ['export' => 'csv'])) }}">{{ __('operations.csv_export') }}</a></div>
+{{ $data->links() }}
+<p class="bj-operations">{{ __('operations.report_note') }}</p>
 @endsection

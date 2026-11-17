@@ -7,7 +7,35 @@ use Illuminate\Database\Eloquent\Model;
 class DetailPemesanan extends Model
 {
     protected $table = 'detail_pemesanan';
+
     protected $primaryKey = 'id_detail';
+
+    public function canCheckIn(): bool
+    {
+        return $this->status_tiket === 'aktif' && ! $this->check_in_at && ! $this->check_out_at
+            && $this->pemesanan?->isApproved() && $this->pemesanan->tgl_kunjungan === now()->toDateString();
+    }
+
+    public function verificationState(): string
+    {
+        if (! $this->pemesanan?->isApproved()) {
+            return 'not_approved';
+        }
+        if ($this->check_out_at) {
+            return 'checked_out';
+        }
+        if ($this->check_in_at || $this->status_tiket === 'digunakan') {
+            return 'checked_in';
+        }
+        if ($this->pemesanan->tgl_kunjungan < now()->toDateString()) {
+            return 'expired';
+        }
+        if ($this->status_tiket !== 'aktif') {
+            return 'inactive';
+        }
+
+        return $this->pemesanan->tgl_kunjungan > now()->toDateString() ? 'future_visit' : 'ready';
+    }
 
     protected $fillable = [
         'id_pemesanan',

@@ -22,7 +22,7 @@ class VisitorRevisionTest extends TestCase
 
         return Pemesanan::create([
             'id_user' => $user->id, 'id_tiket' => $ticket->id_tiket, 'tgl_kunjungan' => now()->addDay()->toDateString(),
-            'jumlah' => 1, 'total_harga' => 15000, 'status' => 'pending', 'kode_booking' => 'BJ-REV-' . $user->id,
+            'jumlah' => 1, 'total_harga' => 15000, 'status' => 'pending', 'kode_booking' => 'BJ-REV-'.$user->id,
         ]);
     }
 
@@ -41,6 +41,7 @@ class VisitorRevisionTest extends TestCase
     public function test_trial_payment_accepts_a_receipt_without_publishing_a_fake_account(): void
     {
         Storage::fake('public');
+        Storage::fake('private');
         $user = User::factory()->create(['role' => 'wisatawan']);
         $booking = $this->booking($user);
         config(['payment.methods' => [[
@@ -56,7 +57,7 @@ class VisitorRevisionTest extends TestCase
         $this->assertSame('pending', $payment->status);
         $this->assertSame('pending', $booking->fresh()->status);
         $this->assertFalse($booking->fresh()->isApproved());
-        Storage::disk('public')->assertExists($payment->bukti_bayar);
+        Storage::disk('private')->assertExists($payment->bukti_bayar);
     }
 
     public function test_only_admin_approval_changes_the_owned_status_endpoint_to_success(): void
@@ -95,10 +96,20 @@ class VisitorRevisionTest extends TestCase
         try {
             $configuration = require config_path('payment.php');
             $this->assertFalse($configuration['trial_mode']);
-            foreach ($configuration['methods'] as $method) $this->assertFalse($method['is_trial']);
+            foreach ($configuration['methods'] as $method) {
+                $this->assertFalse($method['is_trial']);
+            }
         } finally {
-            if ($originalEnv === null) unset($_ENV['APP_ENV']); else $_ENV['APP_ENV'] = $originalEnv;
-            if ($originalServer === null) unset($_SERVER['APP_ENV']); else $_SERVER['APP_ENV'] = $originalServer;
+            if ($originalEnv === null) {
+                unset($_ENV['APP_ENV']);
+            } else {
+                $_ENV['APP_ENV'] = $originalEnv;
+            }
+            if ($originalServer === null) {
+                unset($_SERVER['APP_ENV']);
+            } else {
+                $_SERVER['APP_ENV'] = $originalServer;
+            }
         }
     }
 }

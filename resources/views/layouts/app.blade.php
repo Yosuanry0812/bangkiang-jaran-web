@@ -122,6 +122,7 @@
         .divider-gold { height:1px; background:linear-gradient(to right,transparent,rgba(156,163,175,0.15),transparent); }
 
     </style>
+    <link rel="stylesheet" href="{{ asset('css/booking-operations.css') . '?v=' . filemtime(public_path('css/booking-operations.css')) }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('css/visual-refresh.css') }}">
@@ -204,11 +205,11 @@
                         </span>
                         <span class="max-w-[100px] truncate">{{ Auth::user()->username }}</span>
                     </a>
-                    <a href="{{ route('logout.get') }}"
+                    <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit"
                        id="nav-logout"
                        class="font-sans text-sm px-4 py-2 rounded-full border transition-all duration-200 hover:opacity-80">
                         {{ __('messages.logout') }}
-                    </a>
+                    </button></form>
                     @else
                     <a href="{{ route('login') }}"
                        class="nav-link font-sans text-sm px-4 py-2 rounded-full transition-all duration-200">
@@ -255,9 +256,9 @@
                 @endif
                 <a href="{{ route('profile.edit') }}"     class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">person</span>{{ Auth::user()->username }}</a>
                 <div class="pt-2 mt-1 border-t border-white/8 flex gap-2">
-                    <a href="{{ route('logout.get') }}" class="flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">
+                    <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="flex-1 flex items-center justify-center gap-2 font-sans text-sm text-white/70 border border-white/15 py-1.5 rounded-xl hover:bg-white/8 transition-all">
                         <span class="material-symbols-outlined text-base">logout</span>{{ __('messages.logout') }}
-                    </a>
+                    </button></form>
                     <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}"
                        class="inline-flex items-center justify-center gap-1 font-sans text-xs font-semibold text-white/70 border border-white/15 px-4 py-1.5 rounded-xl hover:text-white hover:bg-white/8 transition-all">
                         <span class="material-symbols-outlined text-[14px]">translate</span>
@@ -321,8 +322,8 @@
                 <div>
                     <h4 class="bj-footer-contact-title">{{ __('messages.contact_title') }}</h4>
                     <address class="bj-footer-contact">
-                        <a href="{{ config('tourism.maps_url') }}" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><strong>Desa Bakbakan</strong><small>Gianyar, Bali</small></span></a>
-                        <div><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span><small>{{ app()->getLocale() === 'en' ? 'Visiting hours' : 'Jam kunjungan' }}</small><strong>{{ __('messages.operating_hours') }}</strong></span></div>
+                        <a href="{{ $destination->values()['maps_url'] }}" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined" aria-hidden="true">location_on</span><span><strong>{{ $destination->localized('address') }}</strong></span></a>
+                        <div><span class="material-symbols-outlined" aria-hidden="true">schedule</span><span><small>{{ app()->getLocale() === 'en' ? 'Visiting hours' : 'Jam kunjungan' }}</small><strong>{{ $destination->localized('operating_hours') }}</strong></span></div>
                         <a class="bj-footer-contact-route" href="{{ route('landing') }}#lokasi">{{ app()->getLocale() === 'en' ? 'Plan your route' : 'Rencanakan rute kunjungan' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a>
                     </address>
                 </div>
@@ -576,6 +577,7 @@
     <script defer src="{{ asset('js/photo-viewer.js') . '?v=' . filemtime(public_path('js/photo-viewer.js')) }}"></script>
     @endif
     <script defer src="{{ asset('js/section-refinement.js') . '?v=' . filemtime(public_path('js/section-refinement.js')) }}"></script>
+    <script defer src="{{ asset('js/booking-operations.js') . '?v=' . filemtime(public_path('js/booking-operations.js')) }}"></script>
     @stack('scripts')
     @if (Route::is('restoran'))<script defer src="{{ asset('js/restaurant-film.js') . '?v=' . filemtime(public_path('js/restaurant-film.js')) }}"></script>@endif
 </body>

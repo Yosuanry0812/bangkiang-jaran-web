@@ -10,6 +10,7 @@ class Pembayaran extends Model
     use HasFactory;
 
     protected $table = 'pembayaran';
+
     protected $primaryKey = 'id_bayar';
 
     protected $fillable = [
@@ -19,7 +20,10 @@ class Pembayaran extends Model
         'bukti_bayar',
         'status',
         'tgl_bayar',
+        'rejection_reason', 'proof_disk', 'verified_at',
     ];
+
+    protected $casts = ['verified_at' => 'datetime'];
 
     public function pemesanan()
     {

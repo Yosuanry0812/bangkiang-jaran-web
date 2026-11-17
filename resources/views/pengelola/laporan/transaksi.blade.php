@@ -27,18 +27,18 @@
     <div class="bg-white rounded-2xl shadow-sm p-4">
         <form method="GET" action="{{ route('pengelola.laporan.transaksi') }}" class="flex flex-wrap items-end gap-3">
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
-                <input type="date" name="periode_awal" value="{{ request('periode_awal') }}"
+                <label for="report-periode_awal" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.start_period') }}</label>
+                <input type="date" id="report-periode_awal" name="periode_awal" value="{{ request('periode_awal') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
-                <input type="date" name="periode_akhir" value="{{ request('periode_akhir') }}"
+                <label for="report-periode_akhir" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.end_period') }}</label>
+                <input type="date" id="report-periode_akhir" name="periode_akhir" value="{{ request('periode_akhir') }}"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
             </div>
             <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
-                <select name="tipe"
+                <label for="report-tipe" class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('messages.report_type') }}</label>
+                <select id="report-tipe" name="tipe"
                     class="border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
                     <option value="" {{ !$tipe ? 'selected' : '' }}>{{ __('messages.all') }}</option>
                     <option value="online" {{ $tipe === 'online' ? 'selected' : '' }}>{{ __('messages.online') }}</option>
@@ -94,7 +94,7 @@
                             @endphp
                             {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
                         </td>
-                        <td class="py-3.5 px-4 text-gray-500-500 text-xs">{{ $t->created_at ? \Carbon\Carbon::parse($t->created_at)->format('d/m/Y') : '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-500 text-xs">{{ $t->tgl_bayar ? \Carbon\Carbon::parse($t->tgl_bayar)->format('d/m/Y') : '-' }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700">{{ $t->metode ?? '-' }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700 font-medium">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                     </tr>
@@ -111,4 +111,6 @@
         {{ __('messages.back_to_reports') }}
     </a>
 </div>
+<div class="bj-operations bj-operations-actions"><a href="{{ route('pengelola.laporan.transaksi', array_merge(request()->only(['periode_awal', 'periode_akhir', 'tipe']), ['export' => 'csv'])) }}">{{ __('operations.csv_export') }}</a></div>
+{{ $data->links() }}
 @endsection

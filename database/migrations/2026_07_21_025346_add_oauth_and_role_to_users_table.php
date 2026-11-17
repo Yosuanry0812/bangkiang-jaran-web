@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'google_id')) {
+            if (! Schema::hasColumn('users', 'google_id')) {
                 $table->string('google_id')->nullable();
             }
-            if (!Schema::hasColumn('users', 'role')) {
+            if (! Schema::hasColumn('users', 'role')) {
                 $table->string('role')->default('user');
             }
         });
@@ -27,7 +27,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['google_id', 'role']);
+            // The role column is owned by 2024_01_01_000001, not this migration.
+            $table->dropColumn('google_id');
         });
     }
 };

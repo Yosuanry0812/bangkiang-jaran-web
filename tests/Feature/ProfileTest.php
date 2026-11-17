@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -111,7 +112,7 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void
@@ -163,13 +164,13 @@ class ProfileTest extends TestCase
     public function test_google_account_origin_does_not_change_after_password_login(): void
     {
         $user = User::factory()->create([
-            'google_id' => 'google-password', 'registration_method' => 'google', 'email_verification_method' => 'google',
+            'password' => null, 'google_id' => 'google-password', 'registration_method' => 'google', 'email_verification_method' => 'google',
         ]);
         $this->actingAs($user)->post('/profile/set-password', [
             'password' => 'MyNewPassword123', 'password_confirmation' => 'MyNewPassword123',
         ])->assertSessionHasNoErrors();
         $this->post('/logout');
-        \Illuminate\Support\Facades\Auth::forgetGuards();
+        Auth::forgetGuards();
         $this->post('/login', ['login' => $user->username, 'password' => 'MyNewPassword123'])->assertSessionHasNoErrors();
         $this->assertAuthenticatedAs($user);
         $user->refresh();

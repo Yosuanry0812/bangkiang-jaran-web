@@ -11,6 +11,7 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
      * A basic test example.
      *
@@ -204,6 +205,7 @@ class ExampleTest extends TestCase
     public function test_marketing_excludes_demo_gallery_images_and_keeps_real_uploads(): void
     {
         Storage::fake('public');
+        Storage::fake('private');
         Tiket::create(['nama_tiket' => 'Tiket Dewasa', 'harga' => 20000, 'kategori' => 'perorangan', 'status' => 'aktif']);
         Storage::disk('public')->put('wisata/air-terjun.webp', 'test-photo');
         Galeri::create(['file' => 'galeri/galeri-01.jpg', 'keterangan' => 'Demo wisata', 'tipe' => 'wisata']);

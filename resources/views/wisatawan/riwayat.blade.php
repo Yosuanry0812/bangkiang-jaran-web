@@ -6,9 +6,9 @@
 @php
     $isEnglish = app()->getLocale() === 'en';
 @endphp
-<div class="bj-history" data-bookings-watch="{{ route('wisatawan.pemesanan.statuses') }}" data-status-tokens='@json($pemesanan->mapWithKeys(fn ($booking) => [$booking->id_pemesanan => $booking->statusToken()])->all())'>
+<div class="bj-history" data-bookings-watch="{{ route('wisatawan.pemesanan.statuses', ['ids' => $pemesanan->pluck('id_pemesanan')->implode(',')]) }}" data-status-tokens='@json($pemesanan->mapWithKeys(fn ($booking) => [$booking->id_pemesanan => $booking->statusToken()])->all())'>
     @php
-        $total = isset($pemesanan) ? $pemesanan->count() : 0;
+        $total = isset($pemesanan) ? $pemesanan->total() : 0;
         $pending = $pemesanan->filter(fn ($booking) => !$booking->isApproved() && $booking->status !== 'dibatalkan')->count();
         $selesai = $pemesanan->filter(fn ($booking) => $booking->isApproved())->count();
         $dibatalkan = isset($pemesanan) ? $pemesanan->where('status', 'dibatalkan')->count() : 0;
@@ -26,14 +26,9 @@
     </header>
 
     <div class="bj-history-main">
+        <div class="bj-operations">@include('partials.booking-filters')</div>
         <div class="bj-history-wrap">
             @if($total > 0)
-                <div class="bj-history-filters" role="group" aria-label="{{ $isEnglish ? 'Filter bookings' : 'Filter pemesanan' }}">
-                    <button type="button" data-history-filter="all" aria-pressed="true">{{ $isEnglish ? 'All' : 'Semua' }}<span>{{ $total }}</span></button>
-                    <button type="button" data-history-filter="pending" aria-pressed="false">{{ __('messages.pending') }}<span>{{ $pending }}</span></button>
-                    <button type="button" data-history-filter="selesai" aria-pressed="false">{{ __('messages.completed') }}<span>{{ $selesai }}</span></button>
-                    <button type="button" data-history-filter="dibatalkan" aria-pressed="false">{{ __('messages.cancelled') }}<span>{{ $dibatalkan }}</span></button>
-                </div>
 
                 <section class="bj-history-list" aria-labelledby="history-list-title">
                     <header class="bj-history-list__head bj-reveal"><div><h2 id="history-list-title">{{ $isEnglish ? 'Your bookings' : 'Daftar pemesanan' }}</h2></div><span role="status"><span data-history-count>{{ $total }}</span> {{ $isEnglish ? 'records' : 'catatan' }}</span></header>
@@ -46,7 +41,7 @@
                             $isRejected = $item->pembayaran?->status === 'ditolak';
                             $ticketSummary = $item->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->nama_tiket)->implode(', ');
                             $statusClass = $isCompleted ? 'is-complete' : ($isCancelled ? 'is-cancelled' : 'is-pending');
-                            $statusLabel = $isCompleted ? __('messages.completed') : ($isCancelled ? __('messages.cancelled') : ($isRejected ? ($isEnglish ? 'Payment proof declined' : 'Bukti bayar ditolak') : ($item->pembayaran ? __('messages.waiting_verification') : __('messages.pending'))));
+                            $statusLabel = $item->statusLabel();
                         @endphp
                         <article class="bj-history-card bj-reveal {{ $statusClass }}" data-history-status="{{ $isCompleted ? 'selesai' : ($isCancelled ? 'dibatalkan' : 'pending') }}" style="--history-order: {{ min($i, 6) }};">
                             <button type="button" class="bj-history-card__toggle" aria-expanded="false" aria-controls="history-detail-{{ $item->id_pemesanan }}" onclick="toggleHistoryDetails({{ $item->id_pemesanan }}, this)">
@@ -60,7 +55,7 @@
                             </button>
                             <div id="history-detail-{{ $item->id_pemesanan }}" class="bj-history-card__detail" hidden>
                                 @if($isCancelled)
-                                    <div class="bj-history-card__cancelled"><span class="material-symbols-outlined" aria-hidden="true">info</span><div><strong>{{ __('messages.reason_rejection') }}</strong><p>{{ __('messages.booking_cancelled') }}</p></div></div>
+                                    <div class="bj-history-card__cancelled"><span class="material-symbols-outlined" aria-hidden="true">info</span><div><strong>{{ __('messages.reason_rejection') }}</strong><p>{{ $item->closed_reason === 'expired' ? __('operations.expired') : __('messages.booking_cancelled') }}</p></div></div>
                                 @else
                                     <div class="bj-history-ticket-list"><p>{{ __('messages.ticket_list') }}</p><ul>@foreach($item->detailPemesanan as $detail)<li><span class="material-symbols-outlined" aria-hidden="true">person</span><p><strong>{{ $detail->nama_pengunjung ?? $detail->nama_tiket }}</strong><small>{{ $detail->nama_tiket }}</small></p><code>{{ $detail->kode_tiket }}</code></li>@endforeach</ul></div>
                                     <div class="bj-history-card__actions"><a href="{{ route('wisatawan.pemesanan.detail', $item->id_pemesanan) }}">{{ __('messages.view_eticket_btn') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></a>@if(!$item->pembayaran || $isRejected)<a class="is-primary" href="{{ route('wisatawan.pembayaran.create', $item->id_pemesanan) }}">{{ $isRejected ? ($isEnglish ? 'Upload payment proof again' : 'Unggah ulang bukti bayar') : __('messages.pay_btn') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>@endif</div>
@@ -68,6 +63,7 @@
                             </div>
                         </article>
                     @endforeach
+                    {{ $pemesanan->links() }}
                 </section>
             @else
                 <section class="bj-history-empty bj-reveal" aria-labelledby="history-empty-title"><span class="material-symbols-outlined" aria-hidden="true">water_drop</span><p>{{ $isEnglish ? 'Plan your next visit.' : 'Rencanakan kunjungan Anda.' }}</p><h2 id="history-empty-title">{{ __('messages.no_bookings') }}</h2><small>{{ __('messages.no_bookings_desc') }}</small><a href="{{ route('tiket.index') }}">{{ __('messages.book_now_from_history') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></section>

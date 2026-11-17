@@ -2,28 +2,32 @@
 
 namespace App\Http\Controllers\Pengelola;
 
-use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
-use App\Models\Pemesanan;
+use App\Http\Requests\BookingFilters;
+use App\Mail\PembayaranDitolak;
+use App\Mail\PembayaranValid;
 use App\Models\Pembayaran;
+use App\Models\Pemesanan;
+use App\Services\AuditTrail;
+use App\Services\DestinationSettings;
+use App\Services\VisitQuota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\PembayaranValid;
-use App\Mail\PembayaranDitolak;
 
 class VerifikasiController extends Controller
 {
-    public function index()
+    public function index(BookingFilters $request)
     {
         // Semua pemesanan yg sudah punya pembayaran.
         // Prioritas: belum diverifikasi (pembayaran pending) di atas, lalu sisanya — masing-masing urut terbaru.
         $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
+            ->filter($request->validated())
             ->join('pembayaran', 'pembayaran.id_pemesanan', '=', 'pemesanan.id_pemesanan')
             ->select('pemesanan.*')
             ->orderByRaw("CASE WHEN pembayaran.status = 'pending' THEN 0 ELSE 1 END")
             ->orderBy('pemesanan.created_at', 'desc')
-            ->paginate(20);
+            ->paginate(20)->withQueryString();
 
         return view('pengelola.verifikasi.index', compact('pemesanan'));
     }
@@ -43,10 +47,10 @@ class VerifikasiController extends Controller
                 return [
                     'id_pemesanan' => $b->pemesanan->id_pemesanan ?? null,
                     'kode_booking' => $b->pemesanan->kode_booking ?? '-',
-                    'nama_user'    => $b->pemesanan->user->name ?? '-',
-                    'total'        => $b->pemesanan->total_harga ?? 0,
-                    'metode'       => $b->metode,
-                    'waktu'        => $b->created_at?->diffForHumans(),
+                    'nama_user' => $b->pemesanan->user->name ?? '-',
+                    'total' => $b->pemesanan->total_harga ?? 0,
+                    'metode' => $b->metode,
+                    'waktu' => $b->created_at?->diffForHumans(),
                 ];
             });
 
@@ -61,22 +65,24 @@ class VerifikasiController extends Controller
                 return [
                     'id_pemesanan' => $p->id_pemesanan,
                     'kode_booking' => $p->kode_booking,
-                    'nama_user'    => $p->user->name ?? '-',
-                    'total'        => $p->total_harga,
-                    'waktu'        => $p->created_at?->diffForHumans(),
+                    'nama_user' => $p->user->name ?? '-',
+                    'total' => $p->total_harga,
+                    'waktu' => $p->created_at?->diffForHumans(),
                 ];
             });
 
         return response()->json([
-            'count'         => $verifikasi->count() + $pesananBaru->count(),
-            'verifikasi'    => $verifikasi,
-            'pesanan_baru'  => $pesananBaru,
+            'count' => Pembayaran::where('status', 'pending')->whereHas('pemesanan', fn ($q) => $q->where('status', 'pending'))->count()
+                + Pemesanan::where('status', 'pending')->doesntHave('pembayaran')->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))->count(),
+            'verifikasi' => $verifikasi,
+            'pesanan_baru' => $pesananBaru,
         ]);
     }
 
     public function show($id)
     {
         $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])->findOrFail($id);
+
         return view('pengelola.verifikasi.show', compact('pemesanan'));
     }
 
@@ -84,14 +90,18 @@ class VerifikasiController extends Controller
     {
         $request->validate([
             'action' => ['required', 'in:valid,ditolak'],
+            'rejection_reason' => ['required_if:action,ditolak', 'nullable', 'string', 'min:5', 'max:1000'],
         ]);
 
         DB::beginTransaction();
         try {
+            $date = Pemesanan::findOrFail($id)->tgl_kunjungan;
+            app(VisitQuota::class)->lock($date);
             $pemesanan = Pemesanan::whereKey($id)->lockForUpdate()->firstOrFail();
             $pembayaran = Pembayaran::where('id_pemesanan', $id)->lockForUpdate()->first();
-            if (!$pembayaran || $pembayaran->status !== 'pending' || $pemesanan->status !== 'pending') {
+            if (! $pembayaran || $pembayaran->status !== 'pending' || $pemesanan->status !== 'pending') {
                 DB::rollBack();
+
                 return back()->with('error', 'Pembayaran tidak sedang menunggu verifikasi.');
             }
             $pemesanan->setRelation('pembayaran', $pembayaran);
@@ -100,18 +110,20 @@ class VerifikasiController extends Controller
                 $pemesanan->pembayaran->update([
                     'status' => 'valid',
                     'tgl_bayar' => now()->toDateString(),
+                    'verified_at' => now(), 'rejection_reason' => null,
                 ]);
                 $pemesanan->update(['status' => 'selesai']);
 
-                DB::commit();
+                $pemesanan->recordEvent('payment_approved');
+                AuditTrail::record('Verifikasi pembayaran VALID', $pemesanan->kode_booking);
 
-                ActivityLogger::log('Verifikasi pembayaran VALID', 'Kode booking: ' . $pemesanan->kode_booking);
+                DB::commit();
 
                 // Kirim email notifikasi
                 try {
                     Mail::to($pemesanan->user->email)->send(new PembayaranValid($pemesanan));
                 } catch (\Exception $e) {
-                    \Log::warning('Gagal kirim email validasi: ' . $e->getMessage());
+                    \Log::warning('Mail enqueue failed.', ['exception_type' => get_class($e)]);
                 }
 
                 return redirect()->route('pengelola.verifikasi.index')
@@ -119,18 +131,20 @@ class VerifikasiController extends Controller
             } else {
                 $pemesanan->pembayaran->update([
                     'status' => 'ditolak',
+                    'rejection_reason' => $request->rejection_reason, 'verified_at' => now(),
                 ]);
-                $pemesanan->update(['status' => 'pending']);
+                $pemesanan->update(['status' => 'pending', 'expires_at' => now()->addMinutes((int) app(DestinationSettings::class)->values()['payment_minutes'])]);
+
+                $pemesanan->recordEvent('payment_rejected', $request->rejection_reason);
+                AuditTrail::record('Verifikasi pembayaran DITOLAK', $pemesanan->kode_booking);
 
                 DB::commit();
-
-                ActivityLogger::log('Verifikasi pembayaran DITOLAK', 'Kode booking: ' . $pemesanan->kode_booking);
 
                 // Kirim email notifikasi
                 try {
                     Mail::to($pemesanan->user->email)->send(new PembayaranDitolak($pemesanan));
                 } catch (\Exception $e) {
-                    \Log::warning('Gagal kirim email ditolak: ' . $e->getMessage());
+                    \Log::warning('Mail enqueue failed.', ['exception_type' => get_class($e)]);
                 }
 
                 return redirect()->route('pengelola.verifikasi.index')
@@ -139,6 +153,7 @@ class VerifikasiController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Verifikasi pembayaran gagal.', ['exception' => get_class($e)]);
+
             return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
         }
     }

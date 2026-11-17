@@ -38,7 +38,10 @@ use App\Http\Controllers\ProfileController;
 
 // ========== AUTHENTICATED WISATAWAN ROUTES ==========
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/google/username', [AuthController::class, 'createGoogleUsername'])->name('auth.google.username');
+Route::post('/auth/google/username', [AuthController::class, 'storeGoogleUsername'])->name('auth.google.username.store');
+Route::post('/auth/google/cancel', [AuthController::class, 'cancelGoogleRegistration'])->name('auth.google.cancel');
 
 Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisatawan.')->group(function () {
     // Pemesanan
@@ -51,6 +54,7 @@ Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisata
     Route::get('/pemesanan/status', [PemesananController::class, 'statuses'])->name('pemesanan.statuses');
     Route::get('/pemesanan/{id}/status', [PemesananController::class, 'status'])->name('pemesanan.status');
     Route::get('/pemesanan/{id}', [PemesananController::class, 'detailPemesanan'])->name('pemesanan.detail');
+    Route::post('/pemesanan/{id}/cancel', [PemesananController::class, 'cancel'])->name('pemesanan.cancel');
 
     // Pembayaran
     Route::get('/pembayaran/{id_pemesanan}', [PembayaranController::class, 'create'])->name('pembayaran.create');

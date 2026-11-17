@@ -99,7 +99,7 @@ class RegistrationTest extends TestCase
     {
         $this->post('/register', $this->registration());
         $old = $this->code();
-        $this->travel(10)->minutes();
+        $this->travel(305)->seconds();
         $this->from('/register/otp')->post('/register/otp', ['otp' => $old])->assertSessionHasErrors('otp');
         $this->post('/register/otp/resend')->assertSessionHas('status', 'otp-sent');
         $this->post('/register/otp', ['otp' => $this->code()])->assertSessionHasNoErrors();
@@ -222,12 +222,12 @@ class RegistrationTest extends TestCase
         $this->assertDatabaseCount('users', 0);
     }
 
-    public function test_resend_near_pending_expiry_still_grants_full_ten_minute_code_lifetime(): void
+    public function test_resend_near_pending_expiry_still_grants_full_five_minute_code_lifetime(): void
     {
         $this->post('/register', $this->registration());
         $this->travel(29)->minutes();
         $this->post('/register/otp/resend')->assertSessionHas('status', 'otp-sent');
-        $this->travel(9)->minutes();
+        $this->travel(4)->minutes();
         $this->post('/register/otp', ['otp' => $this->code()])->assertSessionHasNoErrors();
         $this->assertAuthenticated();
     }

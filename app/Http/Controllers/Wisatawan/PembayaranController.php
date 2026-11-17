@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Wisatawan;
 use App\Http\Controllers\Controller;
 use App\Models\Pemesanan;
 use App\Models\Pembayaran;
+use App\Services\BookingExpirationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,27 +14,42 @@ use Illuminate\Validation\Rule;
 
 class PembayaranController extends Controller
 {
-    public function create($id_pemesanan)
+    public function create(BookingExpirationService $expirationService, $id_pemesanan)
     {
-        $pemesanan = Pemesanan::with('tiket')
+        $expirationService->expire(Auth::id());
+
+        $pemesanan = Pemesanan::with(['tiket', 'pembayaran'])
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
+
+        if ($pemesanan->status === 'dibatalkan') {
+            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
+                ->with('error', 'Pesanan ini sudah kedaluwarsa atau dibatalkan karena melewati batas waktu pembayaran.');
+        }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
                 ->with('info', 'Pembayaran sudah pernah diajukan.');
         }
 
+        $deadline = $expirationService->getDeadline($pemesanan);
         $metodeBayar = config('payment.methods');
 
-        return view('wisatawan.pembayaran', compact('pemesanan', 'metodeBayar'));
+        return view('wisatawan.pembayaran', compact('pemesanan', 'metodeBayar', 'deadline'));
     }
 
-    public function store(Request $request, $id_pemesanan)
+    public function store(Request $request, BookingExpirationService $expirationService, $id_pemesanan)
     {
-        $pemesanan = Pemesanan::with('tiket')
+        $expirationService->expire(Auth::id());
+
+        $pemesanan = Pemesanan::with(['tiket', 'pembayaran'])
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
+
+        if ($pemesanan->status === 'dibatalkan') {
+            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
+                ->with('error', 'Pesanan ini sudah kedaluwarsa atau dibatalkan.');
+        }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return back()->with('error', 'Pembayaran sudah pernah diajukan.');

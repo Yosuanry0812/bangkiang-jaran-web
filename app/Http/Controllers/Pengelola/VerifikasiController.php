@@ -6,6 +6,7 @@ use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
 use App\Models\Pemesanan;
 use App\Models\Pembayaran;
+use App\Services\BookingExpirationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -14,8 +15,10 @@ use App\Mail\PembayaranDitolak;
 
 class VerifikasiController extends Controller
 {
-    public function index()
+    public function index(BookingExpirationService $expirationService)
     {
+        $expirationService->expire();
+
         // Semua pemesanan yg sudah punya pembayaran.
         // Prioritas: belum diverifikasi (pembayaran pending) di atas, lalu sisanya — masing-masing urut terbaru.
         $pemesanan = Pemesanan::with(['user', 'tiket', 'pembayaran', 'detailPemesanan'])
@@ -31,8 +34,10 @@ class VerifikasiController extends Controller
     /**
      * Data notifikasi realtime (polling) untuk topbar pengelola.
      */
-    public function notifikasi()
+    public function notifikasi(BookingExpirationService $expirationService)
     {
+        $expirationService->expire();
+
         // Prioritas 1: pembayaran pending — butuh verifikasi
         $verifikasi = Pembayaran::with(['pemesanan.user'])
             ->where('status', 'pending')

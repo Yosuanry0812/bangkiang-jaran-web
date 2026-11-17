@@ -24,26 +24,64 @@ class GoogleLoginTest extends TestCase
         Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
     }
 
-    public function test_verified_google_user_is_saved_and_can_return(): void
+    public function test_new_google_user_is_redirected_to_username_creation_and_sets_username_manually(): void
     {
-        $this->googleUser('google@example.com');
-        $this->get('/auth/google/callback')->assertRedirect();
+        $this->googleUser('baru@example.com', 'google-123');
+
+        // Pendaftaran pertama kali via Google diarahkan ke halaman pembuatan username sendiri
+        $response = $this->get('/auth/google/callback');
+        $response->assertRedirect(route('auth.google.username'));
+
+        // Akun belum disimpan di DB sampai username ditentukan oleh pengguna
+        $this->assertDatabaseCount('users', 0);
+        $this->assertGuest();
+
+        // Buka halaman form pembuatan username
+        $this->get(route('auth.google.username'))
+            ->assertOk()
+            ->assertSee('Buat Username Anda')
+            ->assertSee('baru@example.com')
+            ->assertSee('Wisatawan');
+
+        // Pengguna membuat username sendiri secara mandiri
+        $storeResponse = $this->post(route('auth.google.username.store'), [
+            'username' => 'petualang_bali',
+        ]);
+
+        $storeResponse->assertRedirect(route('landing'));
+
         $user = User::where('google_id', 'google-123')->firstOrFail();
-        $this->assertSame('google@example.com', $user->email);
+        $this->assertSame('baru@example.com', $user->email);
+        $this->assertSame('petualang_bali', $user->username);
         $this->assertNull($user->password);
         $this->assertNotNull($user->email_verified_at);
         $this->assertSame('wisatawan', $user->role);
         $this->assertSame('google', $user->registration_method);
         $this->assertSame('google', $user->email_verification_method);
-        $this->assertStringStartsWith('pengunjung_', $user->username);
         $this->assertAuthenticatedAs($user);
         $this->assertSame(1, $user->login_count);
         $this->assertSame((string) $user->id, session(EnsureExplicitLogin::SESSION_KEY));
+    }
 
-        $this->googleUser('google@example.com');
-        $this->get('/auth/google/callback')->assertRedirect();
-        $this->assertDatabaseCount('users', 1);
-        $this->assertSame(2, $user->fresh()->login_count);
+    public function test_existing_google_user_logs_in_directly_to_landing_without_username_or_profile_page(): void
+    {
+        $existing = User::factory()->create([
+            'google_id' => 'google-999',
+            'email' => 'lama@example.com',
+            'username' => 'wisatawan_setia',
+            'role' => 'wisatawan',
+            'login_count' => 1,
+        ]);
+
+        $this->googleUser('lama@example.com', 'google-999');
+
+        // Akun lama langsung masuk ke beranda, tidak ke halaman setting profil atau halaman username
+        $response = $this->get('/auth/google/callback');
+        $response->assertRedirect(route('landing'));
+
+        $this->assertAuthenticatedAs($existing);
+        $this->assertSame(2, $existing->fresh()->login_count);
+        $this->assertSame('wisatawan_setia', $existing->fresh()->username);
     }
 
     public function test_unverified_google_email_is_rejected(): void
@@ -54,19 +92,46 @@ class GoogleLoginTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_google_login_returns_to_booking_after_role_redirect(): void
+    public function test_new_google_user_returns_to_booking_after_submitting_username(): void
     {
         $bookingUrl = route('wisatawan.pemesanan.create', ['id_tiket' => 1]);
-        $this->googleUser('booking@example.com');
-        $this->withSession(['url.intended' => $bookingUrl])->get('/auth/google/callback')
-            ->assertRedirect(route('profile.edit'));
+        $this->googleUser('booking@example.com', 'google-book');
 
-        $this->patch('/profile', ['username' => 'liburan_bali'])->assertSessionHasNoErrors();
-        $this->assertSame('liburan_bali', User::firstOrFail()->username);
+        $this->withSession(['url.intended' => $bookingUrl])
+            ->get('/auth/google/callback')
+            ->assertRedirect(route('auth.google.username'));
 
-        \Illuminate\Support\Facades\Auth::forgetGuards();
-        $this->get('/redirect-after-login')->assertRedirect($bookingUrl);
+        $this->post(route('auth.google.username.store'), [
+            'username' => 'liburan_seru',
+        ])->assertRedirect($bookingUrl);
+
+        $user = User::where('google_id', 'google-book')->firstOrFail();
+        $this->assertSame('liburan_seru', $user->username);
+        $this->assertSame('wisatawan', $user->role);
         $this->assertAuthenticated();
+    }
+
+    public function test_username_validation_rejects_duplicate_and_invalid_formats(): void
+    {
+        User::factory()->create(['username' => 'sudah_ada']);
+
+        $this->googleUser('validasi@example.com', 'google-val');
+        $this->get('/auth/google/callback');
+
+        // Duplikat username
+        $this->post(route('auth.google.username.store'), ['username' => 'sudah_ada'])
+            ->assertSessionHasErrors('username');
+
+        // Terlalu pendek (< 3 karakter)
+        $this->post(route('auth.google.username.store'), ['username' => 'ab'])
+            ->assertSessionHasErrors('username');
+
+        // Karakter tidak diizinkan
+        $this->post(route('auth.google.username.store'), ['username' => 'user name!#'])
+            ->assertSessionHasErrors('username');
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertGuest();
     }
 
     public function test_existing_manual_account_is_not_automatically_linked(): void
@@ -76,18 +141,6 @@ class GoogleLoginTest extends TestCase
         $this->get('/auth/google/callback')->assertRedirect('/login')->assertSessionHas('error');
         $this->assertNull($user->fresh()->google_id);
         $this->assertGuest();
-    }
-
-    public function test_custom_username_survives_subsequent_google_login(): void
-    {
-        $this->googleUser('google@example.com');
-        $this->get('/auth/google/callback')->assertRedirect('/profile');
-        $this->patch('/profile', ['username' => 'air_terjun.bali'])->assertSessionHasNoErrors();
-        $this->post('/logout');
-        \Illuminate\Support\Facades\Auth::forgetGuards();
-        $this->googleUser('google@example.com');
-        $this->get('/auth/google/callback')->assertRedirect(route('redirect.after.login'));
-        $this->assertSame('air_terjun.bali', User::firstOrFail()->username);
     }
 
     public function test_callback_without_oauth_state_is_rejected(): void

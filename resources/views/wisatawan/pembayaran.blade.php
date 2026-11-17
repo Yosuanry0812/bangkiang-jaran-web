@@ -28,6 +28,22 @@
 <div class="bj-payment-flow min-h-screen pt-32 md:pt-36 pb-16 px-gutter bj-transaction-page" data-booking-watch="{{ route('wisatawan.pemesanan.status', $pemesanan->id_pemesanan) }}" data-status-token="{{ $pemesanan->statusToken() }}" data-booking-destination="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}">
     <div class="bj-payment-shell max-w-5xl mx-auto">
         <header class="bj-payment-intro"><h1>{{ app()->getLocale() === 'en' ? 'One step closer to the waterfall.' : 'Selangkah lagi menuju air terjun.' }}</h1><p>{{ app()->getLocale() === 'en' ? 'Choose a payment method, then upload your receipt. The team will verify your payment before issuing your e-ticket.' : 'Pilih metode pembayaran, lalu unggah buktinya. Pengelola akan memverifikasi pembayaran sebelum e-ticket diterbitkan.' }}</p></header>
+
+        @php
+            $deadlineTime = isset($deadline) ? $deadline : app(\App\Services\BookingExpirationService::class)->getDeadline($pemesanan);
+        @endphp
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50/95 p-4 text-sm text-amber-900 flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-amber-600 text-xl flex-shrink-0">hourglass_top</span>
+                <div>
+                    <span class="font-semibold text-amber-950">Batas Waktu Pembayaran:</span>
+                    <span class="text-xs text-amber-900 ml-1">
+                        Selesaikan pembayaran sebelum <strong class="font-bold text-amber-950">{{ $deadlineTime->format('H:i') }} WITA</strong> ({{ $deadlineTime->translatedFormat('d M Y') }}).
+                        Pesanan otomatis hangus jika melewati batas waktu.
+                    </span>
+                </div>
+            </div>
+        </div>
         <div class="bj-payment-layout grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
             {{-- ── LEFT: Steps ─────────────────────────── --}}

@@ -25,7 +25,7 @@
                    pattern="[0-9]{6}" minlength="6" maxlength="6" required autofocus
                    placeholder="6 digit angka" aria-describedby="otp-expiry{{ $errors->any() ? ' otp-error' : '' }}"
                    @if($errors->has('otp')) aria-invalid="true" @endif>
-            <p id="otp-expiry" data-expires-at="{{ $expiresAt }}">Kode berlaku 10 menit sejak dikirim.</p>
+            <p id="otp-expiry" data-expires-at="{{ $expiresAt }}">Kode berlaku 5 menit sejak dikirim.</p>
             <button type="submit">Verifikasi &amp; Buat Akun</button>
         </form>
 

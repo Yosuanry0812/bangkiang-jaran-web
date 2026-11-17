@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Wisatawan;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ActivityLogger;
 use App\Models\Tiket;
 use App\Models\Pemesanan;
 use App\Models\DetailPemesanan;
+use App\Services\BookingExpirationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -199,8 +201,10 @@ class PemesananController extends Controller
         return view('wisatawan.pemesanan-sukses', compact('pemesanan'));
     }
 
-    public function riwayat()
+    public function riwayat(BookingExpirationService $expirationService)
     {
+        $expirationService->expire(Auth::id());
+
         $pemesanan = Pemesanan::with(['tiket', 'pembayaran', 'detailPemesanan'])
             ->where('id_user', Auth::id())
             ->orderBy('created_at', 'desc')
@@ -208,8 +212,10 @@ class PemesananController extends Controller
         return view('wisatawan.riwayat', compact('pemesanan'));
     }
 
-    public function status($id)
+    public function status(BookingExpirationService $expirationService, $id)
     {
+        $expirationService->expire(Auth::id());
+
         $booking = Pemesanan::with('pembayaran')->where('id_user', Auth::id())->findOrFail($id);
 
         return response()->json([
@@ -218,8 +224,10 @@ class PemesananController extends Controller
         ])->header('Cache-Control', 'no-store, private');
     }
 
-    public function statuses()
+    public function statuses(BookingExpirationService $expirationService)
     {
+        $expirationService->expire(Auth::id());
+
         $bookings = Pemesanan::with('pembayaran')->where('id_user', Auth::id())->get();
 
         return response()->json($bookings->mapWithKeys(fn ($booking) => [
@@ -227,11 +235,43 @@ class PemesananController extends Controller
         ])->all())->header('Cache-Control', 'no-store, private');
     }
 
-    public function detailPemesanan($id)
+    public function detailPemesanan(BookingExpirationService $expirationService, $id)
     {
+        $expirationService->expire(Auth::id());
+
         $pemesanan = Pemesanan::with(['tiket', 'pembayaran', 'user', 'detailPemesanan'])
             ->where('id_user', Auth::id())
             ->findOrFail($id);
-        return view('wisatawan.pemesanan-detail', compact('pemesanan'));
+
+        $deadline = $expirationService->getDeadline($pemesanan);
+
+        return view('wisatawan.pemesanan-detail', compact('pemesanan', 'deadline'));
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        $booking = Pemesanan::with('pembayaran')
+            ->where('id_user', Auth::id())
+            ->findOrFail($id);
+
+        // Hanya pesanan pending tanpa bukti bayar atau bukti bayar ditolak yang boleh dibatalkan
+        if ($booking->status !== 'pending' || ($booking->pembayaran && $booking->pembayaran->status === 'valid')) {
+            return back()->with('error', 'Pesanan ini tidak dapat dibatalkan.');
+        }
+
+        DB::transaction(function () use ($booking) {
+            $booking->update(['status' => 'dibatalkan']);
+            DetailPemesanan::where('id_pemesanan', $booking->id_pemesanan)
+                ->update(['status_tiket' => 'kadaluarsa']);
+
+            ActivityLogger::log(
+                'Batalkan pesanan',
+                'Wisatawan membatalkan pesanan ' . $booking->kode_booking . '.',
+                $booking->id_user
+            );
+        });
+
+        return redirect()->route('wisatawan.pemesanan.riwayat')
+            ->with('success', 'Pesanan ' . $booking->kode_booking . ' berhasil dibatalkan.');
     }
 }

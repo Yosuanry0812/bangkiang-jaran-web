@@ -8,6 +8,7 @@ use App\Mail\PemesananBerhasil;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Services\BookingCheckout;
+use App\Services\BookingExpirationService;
 use App\Services\BookingLifecycle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -163,8 +164,10 @@ class PemesananController extends Controller
         return view('wisatawan.pemesanan-sukses', compact('pemesanan'));
     }
 
-    public function riwayat(BookingFilters $request)
+    public function riwayat(BookingFilters $request, BookingExpirationService $expirationService)
     {
+        $expirationService->expire(Auth::id());
+
         $pemesanan = Pemesanan::with(['tiket', 'pembayaran', 'detailPemesanan'])
             ->where('id_user', Auth::id())->filter($request->validated())
             ->orderByDesc('id_pemesanan')->paginate(15)->withQueryString();
@@ -174,6 +177,7 @@ class PemesananController extends Controller
 
     public function status($id)
     {
+
         $booking = Pemesanan::with('pembayaran')->where('id_user', Auth::id())->findOrFail($id);
 
         app(BookingLifecycle::class)->refresh($booking);
@@ -203,6 +207,7 @@ class PemesananController extends Controller
 
     public function detailPemesanan($id)
     {
+
         $pemesanan = Pemesanan::with(['tiket', 'pembayaran', 'user', 'detailPemesanan'])
             ->where('id_user', Auth::id())
             ->findOrFail($id);

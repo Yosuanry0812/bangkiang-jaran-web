@@ -153,7 +153,7 @@ Kode yang sudah berhasil digunakan tidak membuat akun kedua. Jika email/username
 | Aturan | Implementasi |
 | --- | --- |
 | Bentuk kode | 6 digit angka |
-| Masa berlaku OTP | 600 detik / 10 menit |
+| Masa berlaku OTP | 300 detik / 5 menit (otomatis hangus jika lewat dari 5 menit) |
 | Masa data sementara | 1800 detik / 30 menit; diperpanjang setelah resend berhasil |
 | Jeda kirim ulang | 60 detik |
 | Kode salah | Maksimal 5 sebelum blokir sementara |
@@ -215,10 +215,10 @@ Login eksplisit diberi penanda session. Input `remember` tidak membuat remember-
 2. Pilih akun dan selesaikan persetujuan pada Google.
 3. Google mengembalikan pengguna ke `/auth/google/callback`.
 4. Server memeriksa identitas serta verifikasi email Google.
-5. Akun baru dibuat sebagai wisatawan dan diarahkan ke Profil Saya.
-6. Pilih username sendiri, simpan, kemudian tekan Lanjutkan.
+5. Untuk akun baru (pertama kali daftar): diarahkan langsung ke halaman pembuatan username sendiri (`/auth/google/username`). Pengguna menentukan username secara mandiri (tidak otomatis dari email).
+6. Untuk akun lama (sudah terdaftar): langsung diarahkan masuk ke Beranda (`/`), tanpa masuk ke halaman setting akun/profil.
 
-Akun baru mendapat username sementara `pengunjung_` dengan nilai acak. Username pilihan pengguna dipertahankan pada login berikutnya dan tidak mengubah nama Google.
+Catatan Keamanan Peran: Seluruh pengguna yang mendaftar atau masuk melalui Google maupun formulir publik otomatis mendapatkan peran `wisatawan`. Peran `pengelola` hanya dapat ditentukan secara internal dan tidak dapat diakses melalui alur pendaftaran publik.
 
 ### 5.2 Aturan identitas dan konflik akun
 

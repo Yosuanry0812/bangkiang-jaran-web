@@ -20,7 +20,8 @@ use Illuminate\Validation\ValidationException;
 class RegistrationOtp
 {
     public const SESSION_KEY = 'registration.challenge';
-    public const CODE_LIFETIME = 600;
+    // Batas waktu kode OTP berlaku 5 menit (300 detik). Lewat dari 5 menit otomatis hangus/kedaluwarsa.
+    public const CODE_LIFETIME = 300;
     public const PENDING_LIFETIME = 1800;
     public const RESEND_DELAY = 60;
     public const MAX_ATTEMPTS = 5;
@@ -125,6 +126,8 @@ class RegistrationOtp
                     'username' => $pending['username'],
                     'email' => $pending['email'],
                     'password' => $pending['password'],
+                    // CATATAN KEAMANAN: Seluruh pendaftaran publik otomatis menjadi role 'wisatawan'.
+                    // Role 'pengelola' tidak dapat didaftarkan secara mandiri demi keamanan sistem.
                     'role' => 'wisatawan',
                     'last_login_at' => now(),
                     'last_login_method' => 'manual',

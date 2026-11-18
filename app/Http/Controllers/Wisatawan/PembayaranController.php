@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Wisatawan;
 use App\Http\Controllers\Controller;
 use App\Models\Pembayaran;
 use App\Models\Pemesanan;
+use App\Services\BookingExpirationService;
 use App\Services\BookingLifecycle;
 use App\Services\VisitQuota;
 use Illuminate\Http\Request;
@@ -17,13 +18,15 @@ class PembayaranController extends Controller
 {
     public function create($id_pemesanan)
     {
-        $pemesanan = Pemesanan::with('tiket')
+
+        $pemesanan = Pemesanan::with(['tiket', 'pembayaran'])
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
 
         app(BookingLifecycle::class)->refresh($pemesanan);
         if ($pemesanan->status !== 'pending') {
-            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan);
+            return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
+                ->with('error', 'Pesanan ini sudah kedaluwarsa atau dibatalkan karena melewati batas waktu pembayaran.');
         }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
@@ -31,14 +34,16 @@ class PembayaranController extends Controller
                 ->with('info', 'Pembayaran sudah pernah diajukan.');
         }
 
+        $deadline = app(BookingExpirationService::class)->getDeadline($pemesanan);
         $metodeBayar = config('payment.methods');
 
-        return view('wisatawan.pembayaran', compact('pemesanan', 'metodeBayar'));
+        return view('wisatawan.pembayaran', compact('pemesanan', 'metodeBayar', 'deadline'));
     }
 
     public function store(Request $request, $id_pemesanan)
     {
-        $pemesanan = Pemesanan::with('tiket')
+
+        $pemesanan = Pemesanan::with(['tiket', 'pembayaran'])
             ->where('id_user', Auth::id())
             ->findOrFail($id_pemesanan);
 

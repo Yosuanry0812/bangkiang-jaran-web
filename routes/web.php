@@ -47,7 +47,10 @@ Route::get('/kunjungan/kuota', function (Request $request, VisitQuota $quota) {
 
 // ========== AUTHENTICATED WISATAWAN ROUTES ==========
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+Route::get('/auth/google/username', [AuthController::class, 'createGoogleUsername'])->name('auth.google.username');
+Route::post('/auth/google/username', [AuthController::class, 'storeGoogleUsername'])->name('auth.google.username.store');
+Route::post('/auth/google/cancel', [AuthController::class, 'cancelGoogleRegistration'])->name('auth.google.cancel');
 
 Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisatawan.')->group(function () {
     // Pemesanan
@@ -55,12 +58,12 @@ Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisata
     Route::post('/pemesanan', [PemesananController::class, 'store'])->middleware('throttle:10,1')->name('pemesanan.store');
     Route::get('/pemesanan/data-diri', [PemesananController::class, 'dataDiri'])->name('pemesanan.data-diri');
     Route::post('/pemesanan/data-diri', [PemesananController::class, 'storeDataDiri'])->block(30, 30)->name('pemesanan.store-data-diri');
-    Route::post('/pemesanan/{id}/batal', [PemesananController::class, 'cancel'])->name('pemesanan.cancel');
     Route::get('/pemesanan/sukses/{id}', [PemesananController::class, 'sukses'])->name('pemesanan.sukses');
     Route::get('/pemesanan/riwayat', [PemesananController::class, 'riwayat'])->name('pemesanan.riwayat');
     Route::get('/pemesanan/status', [PemesananController::class, 'statuses'])->name('pemesanan.statuses');
     Route::get('/pemesanan/{id}/status', [PemesananController::class, 'status'])->name('pemesanan.status');
     Route::get('/pemesanan/{id}', [PemesananController::class, 'detailPemesanan'])->name('pemesanan.detail');
+    Route::post('/pemesanan/{id}/cancel', [PemesananController::class, 'cancel'])->name('pemesanan.cancel');
 
     // Pembayaran
     Route::get('/pembayaran/{id_pemesanan}', [PembayaranController::class, 'create'])->name('pembayaran.create');

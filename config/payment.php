@@ -13,10 +13,18 @@ $methods = [
     ['id' => 'GoPay', 'name' => 'GoPay', 'type' => 'ewallet', 'logo' => 'gopay.jpg', 'number' => env('PAYMENT_GOPAY_NUMBER'), 'account_name' => $accountName],
 ];
 
+$rawContactWa = (string) env('CONTACT_WHATSAPP', '082111454935');
+$contactWa = preg_replace('/\D+/', '', $rawContactWa);
+if (str_starts_with($contactWa, '0')) {
+    $contactWa = '62' . substr($contactWa, 1);
+}
+
 return [
     'trial_mode' => $trialMode,
+    'booking_expiry_hours' => (int) env('BOOKING_EXPIRY_HOURS', 2),
     'catalog' => array_map(static fn (array $method): array => array_intersect_key($method, array_flip(['id', 'name', 'type', 'logo'])), $methods),
-    'contact_whatsapp' => preg_replace('/\D+/', '', (string) env('CONTACT_WHATSAPP', '')),
+    'contact_whatsapp' => $contactWa,
+    'contact_whatsapp_display' => '0821-1145-4935',
     'methods' => array_values(array_map(static fn (array $method): array => $method + [
         'is_trial' => !filled($method['number']) || !filled($method['account_name']),
     ], array_filter($methods, static fn (array $method): bool =>

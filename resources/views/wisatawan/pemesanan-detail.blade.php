@@ -22,6 +22,48 @@
 <div class="min-h-screen pt-28 pb-16 px-gutter bg-[#F8F7F5]" data-booking-watch="{{ route('wisatawan.pemesanan.status', $pemesanan->id_pemesanan) }}" data-status-token="{{ $pemesanan->statusToken() }}">
     <div class="max-w-2xl mx-auto">
 
+        @if(session('success'))
+        <div class="mb-5 flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm no-print">
+            <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+            <p>{{ session('success') }}</p>
+        </div>
+        @endif
+        @if(session('error'))
+        <div class="mb-5 flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-800 text-sm no-print">
+            <span class="material-symbols-outlined text-red-600">error</span>
+            <p>{{ session('error') }}</p>
+        </div>
+        @endif
+
+        {{-- Expiration Alert / Notice --}}
+        @if($pemesanan->status === 'dibatalkan')
+        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50/90 p-4 text-sm text-red-900 flex items-start gap-3 no-print" data-aos="fade-down">
+            <span class="material-symbols-outlined text-red-600 mt-0.5">cancel</span>
+            <div>
+                <strong class="font-semibold">Pesanan Dibatalkan / Kedaluwarsa</strong>
+                <p class="text-xs text-red-700 mt-1 leading-relaxed">
+                    Pesanan ini sudah tidak aktif karena telah dibatalkan atau melewati batas waktu pembayaran tanpa adanya bukti transfer yang sah. E-ticket tidak dapat digunakan.
+                </p>
+            </div>
+        </div>
+        @elseif($pemesanan->status === 'pending' && (!$pemesanan->pembayaran || $pemesanan->pembayaran->status === 'ditolak'))
+        @php
+            $deadlineTime = isset($deadline) ? $deadline : app(\App\Services\BookingExpirationService::class)->getDeadline($pemesanan);
+            $isPastDeadline = now()->isAfter($deadlineTime);
+        @endphp
+        <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-sm text-amber-900 flex items-start justify-between gap-3 no-print" data-aos="fade-down">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-amber-600 mt-0.5">hourglass_top</span>
+                <div>
+                    <strong class="font-semibold">Batas Waktu Pembayaran</strong>
+                    <p class="text-xs text-amber-800 mt-1 leading-relaxed">
+                        Selesaikan pembayaran sebelum <strong class="text-amber-950 font-bold">{{ $deadlineTime->format('H:i') }} WITA</strong> ({{ $deadlineTime->translatedFormat('d M Y') }}). Pesanan yang belum dibayar dalam batas waktu akan otomatis hangus.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
+
 
         <h1 class="font-sans text-2xl font-semibold mb-6">{{ __('operations.booking_details') }}</h1>
         {{-- Order info header --}}
@@ -117,6 +159,15 @@
                 <span class="material-symbols-outlined text-sm">payments</span>
                 {{ $pemesanan->pembayaran?->status === 'ditolak' ? 'Unggah Ulang Bukti Bayar' : __('messages.pay_btn') }}
             </a>
+            <form method="POST" action="{{ route('wisatawan.pemesanan.cancel', $pemesanan->id_pemesanan) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')" class="flex-none">
+                @csrf
+                <button type="submit"
+                        class="w-full sm:w-auto px-4 flex items-center justify-center gap-1.5 border border-red-200 text-red-600 font-sans text-sm font-medium py-3.5 rounded-xl hover:bg-red-50 hover:border-red-300 transition-colors cursor-pointer"
+                        title="Batalkan pesanan ini">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                    Batalkan
+                </button>
+            </form>
             @endif
             <button onclick="window.print()"
                     class="flex-1 flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">

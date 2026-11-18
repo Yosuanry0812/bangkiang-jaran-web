@@ -53,9 +53,9 @@ class ExampleTest extends TestCase
             ->assertSee('Aliran air')
             ->assertSee('Jalur masuk');
 
-        $response = $this->get('/')->assertSee('bj-photo-collage--3', false)->assertSee('Tepian air');
-        $response->assertSee('data-photo-slideshow', false)->assertDontSee('data-columns-pause', false);
-        $this->assertSame(3, substr_count($response->getContent(), 'class="bj-photo-collage__photo bj-photo-collage__photo--'));
+        $response = $this->get('/')->assertSee('data-rv-trail', false)->assertSee('bj-rv-wall', false)->assertSee('Tepian air');
+        $response->assertSee('data-photo-columns', false)->assertDontSee('data-columns-pause', false);
+        $this->assertSame(5, substr_count($response->getContent(), 'data-rv-panel'));
     }
 
     public function test_hero_video_loops_without_playback_controls_or_a_background_slideshow(): void
@@ -129,7 +129,7 @@ class ExampleTest extends TestCase
 
         $this->get('/')->assertSee('marketing-editorial.css', false)->assertSee('DM+Sans', false)
             ->assertSee('home-flow.css', false)->assertSee('home-flow.js', false)
-            ->assertSee('data-photo-columns', false)->assertSee('data-overlap-stack', false)
+            ->assertSee('data-photo-columns', false)->assertSee('data-rv-trail', false)
             ->assertDontSee('home-dining-title', false);
         $this->get('/login')->assertDontSee('marketing-editorial.css', false)->assertDontSee('photo-exhibition.css', false);
     }
@@ -167,7 +167,7 @@ class ExampleTest extends TestCase
                 @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
                 $xpath = new \DOMXPath($dom);
                 $links = $xpath->query('//a[@data-photo-open]');
-                $this->assertSame($url === '/' ? 3 : 1, $links->length);
+                $this->assertSame(1, $links->length);
                 foreach ($links as $link) {
                     $this->assertSame(asset('storage/'.$file), $link->getAttribute('href'));
                     $this->assertSame('dialog', $link->getAttribute('aria-haspopup'));

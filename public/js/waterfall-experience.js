@@ -200,7 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             if (!source.src) {
-                source.src = source.dataset.videoSrc;
+                const wideScreen = matchMedia('(min-width: 1100px)').matches;
+                const slowLink = connection && (/2g|3g/.test(connection.effectiveType || '') || (connection.downlink && connection.downlink < 1.5));
+                source.src = source.dataset.videoSrcHd && wideScreen && !slowLink ? source.dataset.videoSrcHd : source.dataset.videoSrc;
                 film.load();
             }
             if (pending || !film.paused) return;

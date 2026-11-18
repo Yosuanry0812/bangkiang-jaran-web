@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ETicketController;
+use App\Http\Controllers\MediaVariantController;
 use App\Http\Controllers\PaymentProofController;
 use App\Http\Controllers\Pengelola\DashboardController;
 use App\Http\Controllers\Pengelola\GaleriController;
@@ -17,16 +18,35 @@ use App\Http\Controllers\Wisatawan\LandingController;
 use App\Http\Controllers\Wisatawan\PembayaranController;
 use App\Http\Controllers\Wisatawan\PemesananController;
 use App\Http\Controllers\Wisatawan\TiketController as WisatawanTiketController;
+use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\EnsureExplicitLogin;
+use App\Http\Middleware\Localization;
 use App\Http\Middleware\RedirectPengelolaFromPublicPages;
+use App\Http\Middleware\VerifyCsrfToken;
 use App\Services\VisitQuota;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes - E-Tourism Bangkiang Jaran Waterfall
 |--------------------------------------------------------------------------
 */
+
+// Foto galeri dalam ukuran yang pas untuk layar.
+Route::get('/img/{width}/{path}', MediaVariantController::class)->where('width', '[0-9]+')->where('path', 'galeri/.+')->name('media.variant')
+    ->withoutMiddleware([
+        EncryptCookies::class,
+        AddQueuedCookiesToResponse::class,
+        StartSession::class,
+        EnsureExplicitLogin::class,
+        ShareErrorsFromSession::class,
+        VerifyCsrfToken::class,
+        Localization::class,
+    ]);
 
 // ========== PUBLIC ROUTES ==========
 Route::middleware(RedirectPengelolaFromPublicPages::class)->group(function () {

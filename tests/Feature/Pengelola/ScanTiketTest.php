@@ -143,4 +143,35 @@ class ScanTiketTest extends TestCase
             ->assertOk()
             ->assertSee('Tiket Bukan Untuk Hari Ini');
     }
+
+    public function test_cari_dan_check_in_dengan_url_lengkap_qr_code(): void
+    {
+        $pengelola = $this->setupPengelola();
+        $this->setupPemesanan($pengelola->id, 'BJ-SCANURL1', 'BJ-URL01', now()->toDateString(), 'selesai');
+
+        // Cari dengan full URL dari hasil pemindaian QR Code kamera
+        $this->actingAs($pengelola)
+            ->post('/pengelola/scan/cari', ['kode' => 'http://127.0.0.1:8000/tiket/verifikasi/BJ-URL01'])
+            ->assertOk()
+            ->assertSee('BJ-URL01');
+
+        // Check-in dengan full URL
+        $this->actingAs($pengelola)
+            ->post('/pengelola/scan/gunakan', ['kode' => 'http://127.0.0.1:8000/tiket/verifikasi/BJ-URL01'])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $detail = DetailPemesanan::where('kode_tiket', 'BJ-URL01')->first();
+        $this->assertSame('digunakan', $detail->status_tiket);
+        $this->assertNotNull($detail->check_in_at);
+
+        // Check-out dengan full URL
+        $this->actingAs($pengelola)
+            ->post('/pengelola/scan/checkout', ['kode' => 'http://127.0.0.1:8000/tiket/verifikasi/BJ-URL01'])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $detail->refresh();
+        $this->assertNotNull($detail->check_out_at);
+    }
 }

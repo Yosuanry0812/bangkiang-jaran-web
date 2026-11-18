@@ -31,13 +31,31 @@ class ScanController extends Controller
             ->get();
     }
 
+    private function normalizeKode(?string $input): string
+    {
+        $trimmed = trim((string) $input);
+        if (preg_match('#/(?:tiket/verifikasi|verifikasi)/([A-Za-z0-9_-]+)#i', $trimmed, $matches)) {
+            return strtoupper($matches[1]);
+        }
+        if (filter_var($trimmed, FILTER_VALIDATE_URL)) {
+            $path = parse_url($trimmed, PHP_URL_PATH);
+            if ($path) {
+                $segments = explode('/', trim($path, '/'));
+                return strtoupper(end($segments));
+            }
+        }
+        return strtoupper($trimmed);
+    }
+
     public function cari(Request $request)
     {
-        $request->validate([
-            'kode' => ['required', 'string', 'max:20'],
-        ]);
+        $raw = (string) $request->input('kode');
+        $kode = $this->normalizeKode($raw);
+        $request->merge(['kode' => $kode]);
 
-        $kode = strtoupper(trim($request->kode));
+        $request->validate([
+            'kode' => ['required', 'string', 'max:50'],
+        ]);
 
         $detail = DetailPemesanan::with(['pemesanan.user', 'pemesanan.tiket', 'tiket'])
             ->where('kode_tiket', $kode)
@@ -70,11 +88,13 @@ class ScanController extends Controller
 
     public function gunakan(Request $request)
     {
-        $request->validate([
-            'kode' => ['required', 'string', 'max:20'],
-        ]);
+        $raw = (string) $request->input('kode');
+        $kode = $this->normalizeKode($raw);
+        $request->merge(['kode' => $kode]);
 
-        $kode = strtoupper(trim($request->kode));
+        $request->validate([
+            'kode' => ['required', 'string', 'max:50'],
+        ]);
 
         DB::beginTransaction();
         try {
@@ -138,11 +158,13 @@ class ScanController extends Controller
 
     public function checkout(Request $request)
     {
-        $request->validate([
-            'kode' => ['required', 'string', 'max:20'],
-        ]);
+        $raw = (string) $request->input('kode');
+        $kode = $this->normalizeKode($raw);
+        $request->merge(['kode' => $kode]);
 
-        $kode = strtoupper(trim($request->kode));
+        $request->validate([
+            'kode' => ['required', 'string', 'max:50'],
+        ]);
 
         DB::beginTransaction();
         try {

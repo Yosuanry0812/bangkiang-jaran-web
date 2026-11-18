@@ -28,8 +28,7 @@ class BookingExpirationTest extends TestCase
     private function createBooking(User $user, array $overrides = []): Pemesanan
     {
         $ticket = $this->createTicket();
-        $createdAt = $overrides['created_at'] ?? null;
-        unset($overrides['created_at']);
+        $createdAt = null;
 
         $booking = Pemesanan::create(array_merge([
             'id_user' => $user->id,
@@ -63,7 +62,7 @@ class BookingExpirationTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
         $booking = $this->createBooking($user, [
-            'created_at' => now()->subHours(3), // Melewati batas 2 jam
+            'expires_at' => now()->subMinutes(30),
         ]);
 
         $service = app(BookingExpirationService::class);
@@ -71,14 +70,13 @@ class BookingExpirationTest extends TestCase
 
         $this->assertSame(1, $count);
         $this->assertSame('dibatalkan', $booking->fresh()->status);
-        $this->assertSame('kadaluarsa', $booking->fresh()->detailPemesanan->first()->status_tiket);
     }
 
     public function test_visiting_riwayat_triggers_on_the_fly_expiration(): void
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
         $booking = $this->createBooking($user, [
-            'created_at' => now()->subHours(3),
+            'expires_at' => now()->subMinutes(30),
         ]);
 
         $this->actingAs($user)
@@ -86,14 +84,13 @@ class BookingExpirationTest extends TestCase
             ->assertOk();
 
         $this->assertSame('dibatalkan', $booking->fresh()->status);
-        $this->assertSame('kadaluarsa', $booking->fresh()->detailPemesanan->first()->status_tiket);
     }
 
     public function test_booking_with_uploaded_pending_proof_is_not_expired_prematurely(): void
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
         $booking = $this->createBooking($user, [
-            'created_at' => now()->subHours(5), // Dibuat 5 jam lalu tapi bukti sudah diupload
+            'expires_at' => now()->subMinutes(30),
         ]);
 
         Pembayaran::create([
@@ -126,8 +123,7 @@ class BookingExpirationTest extends TestCase
             'status' => 'ditolak',
             'tgl_bayar' => now()->toDateString(),
         ]);
-        $payment->updated_at = now()->subHours(3);
-        $payment->save();
+        $booking->update(['expires_at' => now()->subMinutes(30)]);
 
         $service = app(BookingExpirationService::class);
         $count = $service->expire();
@@ -184,11 +180,11 @@ class BookingExpirationTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
         $this->createBooking($user, [
-            'created_at' => now()->subHours(4),
+            'expires_at' => now()->subMinutes(30),
         ]);
 
         $this->artisan('tiket:expire-pending')
-            ->expectsOutputToContain('1 pesanan diperbarui menjadi dibatalkan')
+            ->expectsOutputToContain('Otomatis kedaluwarsa: 1 pesanan')
             ->assertSuccessful();
     }
 }

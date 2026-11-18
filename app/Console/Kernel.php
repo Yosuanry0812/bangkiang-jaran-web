@@ -16,7 +16,6 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('tiket:auto-checkout')->hourly();
-        $schedule->command('tiket:expire-pending')->everyFifteenMinutes();
     }
 
     /**

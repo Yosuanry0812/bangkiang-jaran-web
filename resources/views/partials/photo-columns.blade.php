@@ -6,7 +6,7 @@
     <div class="bj-photo-columns__viewport" data-columns-viewport tabindex="0" aria-label="{{ $columnsEnglish ? 'Photo collection' : 'Kumpulan foto' }}">
         <div class="bj-photo-columns__source" data-columns-source>
             @forelse($columnPhotos as $columnPhoto)
-                <figure><img src="{{ $columnPhoto['url'] }}" alt="{{ $columnPhoto['caption'] }}" width="706" height="1020" loading="lazy" decoding="async"><p hidden>{{ $columnsEnglish ? 'This photo could not be loaded.' : 'Foto ini belum dapat dimuat.' }}</p>@include('partials.photo-link', ['photoUrl' => $columnPhoto['url'], 'photoCaption' => $columnPhoto['caption']])</figure>
+                <figure><img src="{{ $columnPhoto['url'] }}" @if(! empty($columnPhoto['srcset'])) srcset="{{ $columnPhoto['srcset'] }}" sizes="(min-width: 900px) 33vw, 50vw" @endif alt="{{ $columnPhoto['caption'] }}" width="706" height="1020" loading="lazy" decoding="async"><p hidden>{{ $columnsEnglish ? 'This photo could not be loaded.' : 'Foto ini belum dapat dimuat.' }}</p>@include('partials.photo-link', ['photoUrl' => $columnPhoto['url'], 'photoCaption' => $columnPhoto['caption']])</figure>
             @empty
                 <p>{{ $columnEmptyMessage ?? ($columnsEnglish ? 'Photographs have not been added yet.' : 'Dokumentasi foto belum tersedia.') }}</p>
             @endforelse

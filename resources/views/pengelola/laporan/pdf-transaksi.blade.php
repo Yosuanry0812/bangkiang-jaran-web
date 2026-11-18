@@ -8,7 +8,7 @@
 <body>
     <div class="header">
         <h1>{{ __('messages.transaction_report_title') }}</h1>
-        <p>Bangkiang Jaran · Desa Bakbakan, Gianyar</p>
+        <p>{{ __('ui.pdf_place') }}</p>
     </div>
 
     <table class="info-table">
@@ -50,7 +50,7 @@
                     {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
                 </td>
                 <td>{{ $t->tgl_bayar ? \Carbon\Carbon::parse($t->tgl_bayar)->format('d/m/Y') : '-' }}</td>
-                <td>{{ $t->metode ?? '-' }}</td>
+                <td>{{ \App\Support\Label::method($t->metode ?? null) ?: '-' }}</td>
                 <td>Rp {{ number_format($t->total, 0, ',', '.') }}</td>
             </tr>
             @empty

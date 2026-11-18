@@ -17,7 +17,7 @@ class RegistrationOtpController extends Controller
     {
         $pending = $otp->pending($request);
         if (!$pending) {
-            return redirect()->route('register')->with('error', 'Sesi pendaftaran berakhir. Silakan daftar kembali.');
+            return redirect()->route('register')->with('error', __('flash.register_session_expired'));
         }
 
         return view('auth.registration-otp', [
@@ -30,8 +30,8 @@ class RegistrationOtpController extends Controller
     public function verify(Request $request, RegistrationOtp $otp): RedirectResponse
     {
         $validated = $request->validate(['otp' => ['required', 'string', 'regex:/\A[0-9]{6}\z/']], [
-            'otp.required' => 'Masukkan kode OTP dari email Anda.',
-            'otp.regex' => 'Kode OTP harus berisi 6 digit angka.',
+            'otp.required' => __('flash.otp_required'),
+            'otp.regex' => __('flash.otp_regex'),
         ]);
         $user = $otp->verify($request, $validated['otp']);
         event(new Verified($user));

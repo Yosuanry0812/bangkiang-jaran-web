@@ -41,9 +41,11 @@ class ScanController extends Controller
             $path = parse_url($trimmed, PHP_URL_PATH);
             if ($path) {
                 $segments = explode('/', trim($path, '/'));
+
                 return strtoupper(end($segments));
             }
         }
+
         return strtoupper($trimmed);
     }
 
@@ -63,7 +65,7 @@ class ScanController extends Controller
 
         if (! $detail) {
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
+                ->with('error', __('flash.scan_not_found', ['code' => $kode]));
         }
 
         $pemesanan = $detail->pemesanan;
@@ -104,15 +106,15 @@ class ScanController extends Controller
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
+                    ->with('error', __('flash.scan_not_found', ['code' => $kode]));
             }
 
             if ($detail->status_tiket !== 'aktif') {
-                $statusLabel = $detail->status_tiket === 'digunakan' ? 'sudah digunakan' : $detail->status_tiket;
+                $statusLabel = $detail->status_tiket === 'digunakan' ? __('flash.scan_status_used') : $detail->status_tiket;
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini '.$statusLabel.'. Tidak bisa digunakan lagi.');
+                    ->with('error', __('flash.scan_unusable', ['status' => $statusLabel]));
             }
 
             // Cek pemesanan harus selesai (lunas)
@@ -121,7 +123,7 @@ class ScanController extends Controller
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket belum lunas. Status pemesanan: '.$pemesanan->status.'.');
+                    ->with('error', __('flash.scan_unpaid', ['status' => $pemesanan->status]));
             }
 
             // Hanya tiket dengan kunjungan HARI INI yang bisa check-in
@@ -129,7 +131,7 @@ class ScanController extends Controller
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini untuk kunjungan '.$pemesanan->tgl_kunjungan.'. Hanya tiket hari ini ('.now()->format('d/m/Y').') yang bisa di-scan.');
+                    ->with('error', __('flash.scan_wrong_date', ['date' => $pemesanan->tgl_kunjungan, 'today' => now()->format('d/m/Y')]));
             }
 
             if (! $detail->canCheckIn()) {
@@ -142,17 +144,17 @@ class ScanController extends Controller
                 'check_in_at' => now(),
             ]);
 
-            $detail->pemesanan->recordEvent($request->routeIs('pengelola.scan.checkout') ? 'checked_out' : 'checked_in', $detail->kode_tiket);
-            AuditTrail::record($request->routeIs('pengelola.scan.checkout') ? 'Check-out' : 'Check-in', $detail->kode_tiket);
+            $detail->pemesanan->recordEvent('checked_in', $detail->kode_tiket);
+            AuditTrail::record('Check-in', $detail->kode_tiket);
             DB::commit();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('success', 'Tiket '.$kode.' berhasil discan. Pengunjung dipersilakan masuk.');
+                ->with('success', __('flash.scan_checked_in', ['code' => $kode]));
         } catch (\Exception $e) {
             DB::rollBack();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Gagal memproses tiket. Silakan coba lagi.');
+                ->with('error', __('flash.scan_failed'));
         }
     }
 
@@ -174,46 +176,40 @@ class ScanController extends Controller
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket dengan kode "'.$kode.'" tidak ditemukan.');
+                    ->with('error', __('flash.scan_not_found', ['code' => $kode]));
             }
 
             if ($detail->status_tiket !== 'digunakan') {
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket harus sudah check-in sebelum check-out.');
+                    ->with('error', __('flash.scan_need_checkin'));
             }
 
             if ($detail->check_out_at) {
                 DB::rollBack();
 
                 return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini sudah check-out sebelumnya.');
+                    ->with('error', __('flash.scan_already_out'));
             }
 
-            // Hanya tiket dengan kunjungan HARI INI yang bisa check-out
-            if ($detail->pemesanan->tgl_kunjungan !== now()->toDateString()) {
-                DB::rollBack();
-
-                return redirect()->route('pengelola.scan.index')
-                    ->with('error', 'Tiket ini untuk kunjungan '.$detail->pemesanan->tgl_kunjungan.'. Hanya tiket hari ini ('.now()->format('d/m/Y').') yang bisa di-scan.');
-            }
+            // Check-out tidak dibatasi tanggal: pengunjung yang masuk malam hari boleh keluar setelah tengah malam.
 
             $detail->update([
                 'check_out_at' => now(),
             ]);
 
-            $detail->pemesanan->recordEvent($request->routeIs('pengelola.scan.checkout') ? 'checked_out' : 'checked_in', $detail->kode_tiket);
-            AuditTrail::record($request->routeIs('pengelola.scan.checkout') ? 'Check-out' : 'Check-in', $detail->kode_tiket);
+            $detail->pemesanan->recordEvent('checked_out', $detail->kode_tiket);
+            AuditTrail::record('Check-out', $detail->kode_tiket);
             DB::commit();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('success', 'Tiket '.$kode.' berhasil check-out. Terima kasih.');
+                ->with('success', __('flash.scan_checked_out', ['code' => $kode]));
         } catch (\Exception $e) {
             DB::rollBack();
 
             return redirect()->route('pengelola.scan.index')
-                ->with('error', 'Gagal check-out. Silakan coba lagi.');
+                ->with('error', __('flash.scan_checkout_failed'));
         }
     }
 }

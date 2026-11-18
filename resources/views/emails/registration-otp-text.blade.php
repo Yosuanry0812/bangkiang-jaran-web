@@ -1,8 +1,8 @@
-Halo {{ $name }},
+{{ __('mail.otp_text_hello', ['name' => $name]) }}
 
-Kode verifikasi akun Bangkiang Jaran: {{ $code }}
+{{ __('mail.otp_text_code', ['code' => $code]) }}
 
-Masukkan kode di halaman pendaftaran. Kode berlaku 5 menit dan hanya dapat digunakan sekali.
-Jangan bagikan kode ini kepada siapa pun.
+{{ __('mail.otp_text_expiry') }}
+{{ __('mail.otp_text_share') }}
 
-Jika Anda tidak mendaftar, abaikan email ini. Akun belum dibuat sebelum kode berhasil diverifikasi.
+{{ __('mail.otp_text_ignore') }}

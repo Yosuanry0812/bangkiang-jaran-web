@@ -84,8 +84,8 @@
 
             <aside class="bj-booking-summary-wrap">
                 <div class="bj-booking-summary bj-reveal">
-                    <div class="bj-booking-summary__eyebrow"><span>{{ $isEnglish ? 'Your visit' : 'Kunjunganmu' }}</span><small>{{ $isEnglish ? 'Step 1 of 3' : 'Langkah 1 dari 3' }}</small></div>
-                    <h2>{{ $isEnglish ? 'Let’s make a plan.' : 'Rencana kunjunganmu.' }}</h2>
+                    <div class="bj-booking-summary__eyebrow"><span>{{ $isEnglish ? 'Your visit' : 'Kunjungan Anda' }}</span><small>{{ $isEnglish ? 'Step 1 of 3' : 'Langkah 1 dari 3' }}</small></div>
+                    <h2>{{ $isEnglish ? 'Let’s make a plan.' : 'Rencana kunjungan Anda.' }}</h2>
                     <dl class="bj-booking-summary__meta">
                         <div><dt><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ $isEnglish ? 'Location' : 'Lokasi' }}</dt><dd>Bangkiang Jaran, Gianyar</dd></div>
                         <div><dt><span class="material-symbols-outlined" aria-hidden="true">event</span>{{ $isEnglish ? 'Visit date' : 'Tanggal kunjungan' }}</dt><dd x-text="formattedDisplayDate()"></dd></div>
@@ -139,6 +139,5 @@ function ticketBooking(prices, names, initialDate, preSelectedId, initialTickets
 }
 </script>
 @endpush
-<div class="bj-operations"><p class="bj-quota-status" role="status" data-quota-status="{{ route('kunjungan.kuota') }}" data-loading="{{ __('operations.quota_loading') }}" data-unlimited="{{ __('operations.quota_unlimited') }}" data-remaining="{{ __('operations.quota_remaining') }}" data-error="{{ __('operations.quota_full') }}"></p></div>
 @endsection
 

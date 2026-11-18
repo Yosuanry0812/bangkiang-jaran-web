@@ -34,8 +34,8 @@ class TiketController extends Controller
             'kategori' => ['nullable', 'in:perorangan'],
             'status' => ['required', 'in:aktif,nonaktif'],
         ], [
-            'nama_tiket.required' => 'Nama tiket wajib diisi.',
-            'harga.required' => 'Harga tiket wajib diisi.',
+            'nama_tiket.required' => __('flash.ticket_name_required'),
+            'harga.required' => __('flash.ticket_price_required'),
             'harga.numeric' => 'Harga harus angka.',
         ]);
 
@@ -46,7 +46,7 @@ class TiketController extends Controller
             AuditTrail::record('Tambah tiket', 'ID: '.$ticket->id_tiket);
         });
 
-        return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil ditambahkan.');
+        return redirect()->route('pengelola.tiket.index')->with('success', __('flash.ticket_added'));
     }
 
     public function edit($id)
@@ -75,7 +75,7 @@ class TiketController extends Controller
             AuditTrail::record('Ubah tiket', 'ID: '.$tiket->id_tiket.'; '.implode(', ', array_keys($tiket->getChanges())));
         });
 
-        return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil diperbarui.');
+        return redirect()->route('pengelola.tiket.index')->with('success', __('flash.ticket_updated'));
     }
 
     public function destroy($id)
@@ -84,6 +84,6 @@ class TiketController extends Controller
         ActivityLogger::log('Hapus tiket', 'Nama: '.$tiket->nama_tiket);
         $tiket->delete(); // soft delete
 
-        return redirect()->route('pengelola.tiket.index')->with('success', 'Tiket berhasil dihapus.');
+        return redirect()->route('pengelola.tiket.index')->with('success', __('flash.ticket_deleted'));
     }
 }

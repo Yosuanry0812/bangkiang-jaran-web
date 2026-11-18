@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,11 +11,11 @@
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#fffdfa;border:1px solid #ded8cd;">
             <tr><td style="padding:27px 34px;border-bottom:1px solid #ded8cd;">
                 <span style="font-family:Georgia,serif;font-size:25px;letter-spacing:-1px;color:#173d34;">Bangkiang Jaran</span><br>
-                <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#a46147;">Desa Bakbakan · Gianyar, Bali</span>
+                <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#a46147;">{{ __('mail.location_line') }}</span>
             </td></tr>
             <tr><td style="padding:38px 34px 42px;">@yield('content')</td></tr>
             <tr><td style="padding:24px 34px;border-top:1px solid #ded8cd;background:#f7f4ed;">
-                <p style="margin:0 0 6px;font-size:12px;color:#66736c;">Air Terjun Bangkiang Jaran · Desa Bakbakan, Gianyar</p>
+                <p style="margin:0 0 6px;font-size:12px;color:#66736c;">{{ __('mail.footer_place') }}</p>
                 <p style="margin:0;font-size:11px;color:#8c958e;">© {{ date('Y') }} Bangkiang Jaran</p>
             </td></tr>
         </table>

@@ -75,7 +75,7 @@ class RegistrationOtp
             }
 
             $this->ensureDeliveryMailer();
-            // Reserve the quota before contacting SMTP, including failed attempts.
+            // Reserve the OTP attempt before contacting SMTP, including failed attempts.
             RateLimiter::hit($cooldown, self::RESEND_DELAY);
             RateLimiter::hit($hourly, 3600);
             RateLimiter::hit($ip, 3600);

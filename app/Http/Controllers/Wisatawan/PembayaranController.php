@@ -7,7 +7,6 @@ use App\Models\Pembayaran;
 use App\Models\Pemesanan;
 use App\Services\BookingExpirationService;
 use App\Services\BookingLifecycle;
-use App\Services\VisitQuota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,12 +25,12 @@ class PembayaranController extends Controller
         app(BookingLifecycle::class)->refresh($pemesanan);
         if ($pemesanan->status !== 'pending') {
             return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
-                ->with('error', 'Pesanan ini sudah kedaluwarsa atau dibatalkan karena melewati batas waktu pembayaran.');
+                ->with('error', __('flash.booking_expired'));
         }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
             return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
-                ->with('info', 'Pembayaran sudah pernah diajukan.');
+                ->with('info', __('flash.payment_already_submitted'));
         }
 
         $deadline = app(BookingExpirationService::class)->getDeadline($pemesanan);
@@ -53,27 +52,27 @@ class PembayaranController extends Controller
         }
 
         if ($pemesanan->pembayaran && $pemesanan->pembayaran->status !== 'ditolak') {
-            return back()->with('error', 'Pembayaran sudah pernah diajukan.');
+            return back()->with('error', __('flash.payment_already_submitted'));
         }
 
         $availableMethods = array_column(config('payment.methods'), 'id');
         if ($availableMethods === []) {
-            return back()->with('error', 'Metode pembayaran belum tersedia. Hubungi pengelola sebelum melakukan transfer.');
+            return back()->with('error', __('flash.payment_method_unavailable'));
         }
 
         $request->validate([
             'metode' => ['required', 'string', Rule::in($availableMethods)],
             'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], [
-            'metode.required' => 'Pilih metode pembayaran.',
-            'bukti_bayar.required' => 'Upload bukti transfer.',
-            'bukti_bayar.mimes' => 'Format file harus: jpg, jpeg, png, atau pdf.',
-            'bukti_bayar.max' => 'Ukuran file maksimal 5MB.',
+            'metode.required' => __('flash.method_required'),
+            'bukti_bayar.required' => __('flash.proof_required'),
+            'bukti_bayar.mimes' => __('flash.proof_mimes'),
+            'bukti_bayar.max' => __('flash.proof_max'),
         ]);
 
         // Handle file upload aman
         if (! $request->hasFile('bukti_bayar')) {
-            return back()->withErrors(['bukti_bayar' => 'File bukti pembayaran tidak ditemukan.'])->withInput();
+            return back()->withErrors(['bukti_bayar' => __('flash.proof_not_found')])->withInput();
         }
 
         $file = $request->file('bukti_bayar');
@@ -81,21 +80,20 @@ class PembayaranController extends Controller
         // Validasi MIME type asli
         $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
         if (! in_array($file->getMimeType(), $allowedMimes)) {
-            return back()->withErrors(['bukti_bayar' => 'Tipe file tidak valid. Gunakan JPG, PNG, atau PDF.'])->withInput();
+            return back()->withErrors(['bukti_bayar' => __('flash.proof_type_invalid')])->withInput();
         }
 
         // Rename dengan nama acak
         $path = $file->store('bukti', 'private');
 
         if (! $path) {
-            return back()->withErrors(['bukti_bayar' => 'Gagal menyimpan file. Coba lagi.'])->withInput();
+            return back()->withErrors(['bukti_bayar' => __('flash.proof_save_failed')])->withInput();
         }
 
         $oldPath = null;
         $oldDisk = 'public';
         try {
             $saved = DB::transaction(function () use ($id_pemesanan, $request, $path, $pemesanan, &$oldPath, &$oldDisk) {
-                app(VisitQuota::class)->lock($pemesanan->tgl_kunjungan);
                 $booking = Pemesanan::where('id_user', Auth::id())->whereKey($id_pemesanan)->lockForUpdate()->firstOrFail();
                 $payment = Pembayaran::where('id_pemesanan', $booking->id_pemesanan)->lockForUpdate()->first();
                 app(BookingLifecycle::class)->expire($booking);
@@ -128,7 +126,7 @@ class PembayaranController extends Controller
         if (! $saved) {
             Storage::disk('private')->delete($path);
 
-            return back()->with('error', 'Pembayaran tidak dapat diajukan untuk status pemesanan ini.');
+            return back()->with('error', __('flash.payment_status_invalid'));
         }
 
         if ($oldPath && $oldPath !== $path) {
@@ -136,6 +134,6 @@ class PembayaranController extends Controller
         }
 
         return redirect()->route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan)
-            ->with('success', 'Bukti pembayaran berhasil diupload. Menunggu verifikasi pengelola.');
+            ->with('success', __('flash.proof_uploaded'));
     }
 }

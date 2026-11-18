@@ -26,17 +26,17 @@
 
                     <div class="mt-3" id="previewFoto" style="display:none">
                         <p class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-2">{{ __('messages.preview') }}</p>
-                        <img id="previewImg" class="max-h-48 rounded-xl border border-gray-300-200" alt="Preview">
+                        <img id="previewImg" class="max-h-48 rounded-xl border border-gray-300-200" alt="{{ __('panel.preview_31fd') }}">
                     </div>
                     <p class="text-xs text-gray-500-400 mt-1.5">{{ __('messages.format_hint') }}</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Tipe Galeri <span class="text-red-400">*</span></label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('panel.tipe_galeri_1100') }} <span class="text-red-400">*</span></label>
                     <select name="tipe" required
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800">
-                        <option value="wisata" {{ old('tipe') === 'wisata' ? 'selected' : '' }}>Wisata Bangkiang Jaran</option>
-                        <option value="restoran" {{ old('tipe') === 'restoran' ? 'selected' : '' }}>Restoran / Kuliner</option>
+                        <option value="wisata" {{ old('tipe') === 'wisata' ? 'selected' : '' }}>{{ __('panel.wisata_bangkiang_jaran_b48d') }}</option>
+                        <option value="restoran" {{ old('tipe') === 'restoran' ? 'selected' : '' }}>{{ __('panel.restoran_kuliner_7b13') }}</option>
                     </select>
                     @error('tipe') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -49,10 +49,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Keterangan (English)</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('panel.keterangan_english_d0fa') }}</label>
                     <input type="text" name="keterangan_en" value="{{ old('keterangan_en') }}"
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
-                    <p class="text-xs text-stone mt-1">Terjemahan bahasa Inggris (opsional — kalau kosong, situs bahasa Inggris memakai keterangan Indonesia).</p>
+                    <p class="text-xs text-stone mt-1">{{ __('panel.terjemahan_bahasa_inggris_op_4519') }}</p>
                     @error('keterangan_en') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 

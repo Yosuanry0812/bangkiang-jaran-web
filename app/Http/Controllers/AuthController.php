@@ -16,7 +16,7 @@ class AuthController extends Controller
     {
         if (!config('services.google.client_id') || !config('services.google.client_secret')) {
             return redirect()->route('login')
-                ->with('error', 'Login Google belum dikonfigurasi. Hubungi admin.');
+                ->with('error', __('flash.google_not_configured'));
         }
 
         return Socialite::driver('google')->redirect();
@@ -33,13 +33,13 @@ class AuthController extends Controller
                 Log::warning('Google login gagal.', ['exception_type' => get_class($inner)]);
 
                 return redirect()->route('login')
-                    ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
+                    ->with('error', __('flash.google_failed'));
             }
         } catch (\Exception $e) {
             Log::warning('Google login gagal.', ['exception_type' => get_class($e)]);
 
             return redirect()->route('login')
-                ->with('error', 'Login dengan Google gagal. Silakan coba lagi.');
+                ->with('error', __('flash.google_failed'));
         }
 
         $email = strtolower(trim((string) $googleUser->getEmail()));
@@ -47,7 +47,7 @@ class AuthController extends Controller
 
         if ($googleId === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || ($googleUser->user['email_verified'] ?? false) !== true) {
             return redirect()->route('login')
-                ->with('error', 'Akun Google harus memiliki email yang telah diverifikasi.');
+                ->with('error', __('flash.google_email_unverified'));
         }
 
         $user = User::where('google_id', $googleId)->first();
@@ -56,7 +56,7 @@ class AuthController extends Controller
         // Never link an existing account solely on the basis of a matching email.
         if (($emailOwner && (!$user || $emailOwner->id !== $user->id)) || ($user && $user->email !== $email)) {
             return redirect()->route('login')
-                ->with('error', 'Email ini sudah terdaftar atau berubah. Silakan masuk dengan akun yang sudah ada atau hubungi admin.');
+                ->with('error', __('flash.google_email_exists'));
         }
 
         $fullName = $googleUser->getName() ?: $email;
@@ -117,7 +117,7 @@ class AuthController extends Controller
 
         if (!$googleData) {
             return redirect()->route('login')
-                ->with('error', 'Sesi pendaftaran Google telah berakhir. Silakan coba lagi.');
+                ->with('error', __('flash.google_session_expired'));
         }
 
         $validated = $request->validate([
@@ -130,18 +130,18 @@ class AuthController extends Controller
                 'unique:users,username',
             ],
         ], [
-            'username.required' => 'Username wajib diisi.',
-            'username.min'      => 'Username minimal 3 karakter.',
-            'username.max'      => 'Username maksimal 50 karakter.',
-            'username.regex'    => 'Username hanya boleh huruf, angka, titik, garis bawah (_), dan strip (-).',
-            'username.unique'   => 'Username ini sudah digunakan, silakan pilih username lain.',
+            'username.required' => __('flash.username_required'),
+            'username.min'      => __('flash.username_min'),
+            'username.max'      => __('flash.username_max'),
+            'username.regex'    => __('flash.username_regex'),
+            'username.unique'   => __('flash.username_unique'),
         ]);
 
         // Re-check keunikan email
         if (User::where('email', $googleData['email'])->exists()) {
             $request->session()->forget('google_register');
             return redirect()->route('login')
-                ->with('error', 'Email ini sudah terdaftar. Silakan masuk menggunakan akun Anda.');
+                ->with('error', __('flash.email_registered'));
         }
 
         // CATATAN KEAMANAN:
@@ -173,7 +173,7 @@ class AuthController extends Controller
         ActivityLogger::log('Registrasi', 'Registrasi akun Google dengan username @' . $user->username, $user->id);
         ActivityLogger::log('Login sukses', 'Login via Google sebagai ' . $user->email, $user->id);
 
-        return redirect()->intended(route('landing'))->with('status', 'Selamat datang! Akun Anda berhasil dibuat.');
+        return redirect()->intended(route('landing'))->with('status', __('flash.account_created'));
     }
 
     /**

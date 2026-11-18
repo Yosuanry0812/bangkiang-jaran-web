@@ -20,7 +20,7 @@
         <a href="{{ route('pengelola.laporan.kunjungan', array_merge(request()->all(), ['export' => 'pdf'])) }}"
             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
             <span class="material-symbols-outlined text-base">picture_as_pdf</span>
-            Export PDF
+            {{ __('panel.export_pdf_af80') }}
         </a>
     </div>
 
@@ -71,7 +71,7 @@
                 <span class="material-symbols-outlined text-2xl">login</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-sky-600">Jumlah Masuk</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-sky-600">{{ __('panel.jumlah_masuk_643f') }}</p>
                 <p class="text-2xl font-bold text-sky-900">{{ $totalCheckIn }}</p>
             </div>
         </div>
@@ -80,7 +80,7 @@
                 <span class="material-symbols-outlined text-2xl">logout</span>
             </div>
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-orange-600">Jumlah Keluar</p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-orange-600">{{ __('panel.jumlah_keluar_6363') }}</p>
                 <p class="text-2xl font-bold text-orange-900">{{ $totalCheckOut }}</p>
             </div>
         </div>
@@ -130,7 +130,7 @@
                         <td class="py-3.5 px-4 text-gray-500-700 font-medium">Rp {{ number_format($k->total_harga, 0, ',', '.') }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700 text-xs">
                             @if($checkIns->count() > 0)
-                                <span class="text-emerald-600 font-medium">{{ $checkIns->count() }} org</span>
+                                <span class="text-emerald-600 font-medium">{{ trans_choice('ui.people_n', $checkIns->count()) }}</span>
                                 <span class="block text-gray-400">{{ $checkIns->first()->check_in_at ? \Carbon\Carbon::parse($checkIns->first()->check_in_at)->format('H:i') : '-' }}</span>
                             @else
                                 <span class="text-gray-400">-</span>
@@ -138,7 +138,7 @@
                         </td>
                         <td class="py-3.5 px-4 text-gray-500-700 text-xs">
                             @if($checkOuts->count() > 0)
-                                <span class="text-orange-600 font-medium">{{ $checkOuts->count() }} org</span>
+                                <span class="text-orange-600 font-medium">{{ trans_choice('ui.people_n', $checkOuts->count()) }}</span>
                                 <span class="block text-gray-400">{{ $checkOuts->first()->check_out_at ? \Carbon\Carbon::parse($checkOuts->first()->check_out_at)->format('H:i') : '-' }}</span>
                             @else
                                 <span class="text-gray-400">-</span>
@@ -153,7 +153,7 @@
                                 default => 'bg-stone-100 text-gray-500-600'
                             };
                         @endphp
-                        <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $sc }}">{{ ucfirst($k->status) }}</span>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $sc }}">{{ \App\Support\Label::status($k->status) }}</span>
                         </td>
                     </tr>
                     @empty

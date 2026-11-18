@@ -29,8 +29,8 @@ class ProfileUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'username.regex' => 'Username hanya boleh berisi huruf, angka, titik, garis bawah, dan tanda hubung.',
-            'email.in' => 'Email terverifikasi tidak dapat diganti melalui formulir profil.',
+            'username.regex' => __('flash.username_regex_profile'),
+            'email.in' => __('flash.email_verified_locked'),
         ];
     }
 }

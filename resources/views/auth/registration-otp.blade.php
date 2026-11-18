@@ -1,16 +1,16 @@
 @extends('layouts.guest')
-@section('title', 'Verifikasi email — Bangkiang Jaran')
+@section('title', __('ui.t_email_verif'))
 @section('content')
 <div class="bj-auth-card bj-otp-card w-full bg-white">
     <div class="bj-auth-form">
         <div>
-            <p class="bj-otp-kicker">VERIFIKASI EMAIL</p>
-            <h1>Periksa email Anda</h1>
-            <p>Kode verifikasi 6 digit dikirim ke <strong class="bj-otp-email">{{ $email }}</strong>. Masukkan kode untuk menyelesaikan pendaftaran.</p>
+            <p class="bj-otp-kicker">{{ __('auth_ui.otp_badge') }}</p>
+            <h1>{{ __('auth_ui.otp_title') }}</h1>
+            <p>{{ __('auth_ui.otp_sent_to') }}<strong class="bj-otp-email">{{ $email }}</strong>{{ __('auth_ui.otp_enter') }}</p>
         </div>
 
         @if(session('status') === 'otp-sent')
-            <p class="bj-otp-status" role="status">Kode baru berhasil dikirim. Periksa kotak masuk atau folder spam.</p>
+            <p class="bj-otp-status" role="status">{{ __('auth_ui.otp_resent') }}</p>
         @endif
         @if($errors->any())
             <div id="otp-error" class="bj-otp-error" role="alert">
@@ -20,26 +20,26 @@
 
         <form method="POST" action="{{ route('registration.otp.verify') }}" class="bj-otp-form">
             @csrf
-            <label for="otp">Kode OTP</label>
+            <label for="otp">{{ __('auth_ui.otp_label') }}</label>
             <input id="otp" name="otp" type="text" inputmode="numeric" autocomplete="one-time-code"
                    pattern="[0-9]{6}" minlength="6" maxlength="6" required autofocus
-                   placeholder="6 digit angka" aria-describedby="otp-expiry{{ $errors->any() ? ' otp-error' : '' }}"
+                   placeholder="{{ __('auth_ui.otp_placeholder') }}" aria-describedby="otp-expiry{{ $errors->any() ? ' otp-error' : '' }}"
                    @if($errors->has('otp')) aria-invalid="true" @endif>
-            <p id="otp-expiry" data-expires-at="{{ $expiresAt }}">Kode berlaku 5 menit sejak dikirim.</p>
-            <button type="submit">Verifikasi &amp; Buat Akun</button>
+            <p id="otp-expiry" data-expires-at="{{ $expiresAt }}">{{ __('auth_ui.otp_expiry') }}</p>
+            <button type="submit">{{ __('auth_ui.otp_submit') }}</button>
         </form>
 
         <form method="POST" action="{{ route('registration.otp.resend') }}" class="bj-otp-resend">
             @csrf
-            <p>Belum menerima email? Periksa folder spam atau kirim kode baru.</p>
-            <button type="submit" data-resend-at="{{ $resendAt }}">Kirim ulang kode</button>
+            <p>{{ __('auth_ui.otp_noemail') }}</p>
+            <button type="submit" data-resend-at="{{ $resendAt }}">{{ __('auth_ui.otp_resend') }}</button>
             <span id="otp-resend-countdown" role="status" aria-live="polite"></span>
         </form>
         <form method="POST" action="{{ route('registration.otp.cancel') }}" class="bj-otp-cancel">
             @csrf
-            <button type="submit">Ganti email atau data pendaftaran</button>
+            <button type="submit">{{ __('auth_ui.otp_change') }}</button>
         </form>
-        <p class="bj-otp-note">Akun dibuat setelah email terverifikasi. Jangan bagikan kode Anda kepada siapa pun.</p>
+        <p class="bj-otp-note">{{ __('auth_ui.otp_footer') }}</p>
     </div>
 </div>
 @endsection

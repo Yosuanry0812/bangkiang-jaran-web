@@ -28,7 +28,6 @@ class BookingCheckout
         $request->validate($rules);
 
         return DB::transaction(function () use ($flow, $request, $offline) {
-            $quota = app(VisitQuota::class)->lock($flow['tgl_kunjungan']);
             $token = $flow['draft_token'] ?? (string) Str::uuid();
             $existing = Pemesanan::where('draft_token', $token)->where('id_user', $request->user()->id)->first();
             if ($existing) {
@@ -53,7 +52,6 @@ class BookingCheckout
             if ($count < 1 || $total > 99999999) {
                 throw ValidationException::withMessages(['booking' => __('operations.invalid_total')]);
             }
-            app(VisitQuota::class)->assertAvailable($quota, $count);
             $deadline = now()->addMinutes((int) app(DestinationSettings::class)->values()['payment_minutes']);
             $visitEnd = Carbon::parse($flow['tgl_kunjungan'])->endOfDay();
             $booking = Pemesanan::create([

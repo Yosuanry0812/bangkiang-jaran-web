@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('nav-mode', 'light')
 
-@section('title', 'Pemesanan Berhasil — Bangkiang Jaran')
+@section('title', __('ui.t_booking_done'))
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center px-gutter py-20" style="background:#F8F7F5;">
@@ -37,7 +37,7 @@
             </div>
             <div class="bg-gray-50 rounded-xl p-4">
                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble mb-0.5">{{ __('messages.quantity_label') }}</p>
-                <p class="font-sans text-sm font-medium text-ink">{{ $pemesanan->detailPemesanan->count() }} tiket</p>
+                <p class="font-sans text-sm font-medium text-ink">{{ trans_choice('ui.tickets_n', $pemesanan->detailPemesanan->count()) }}</p>
             </div>
             <div class="bg-gray-50 rounded-xl p-4">
                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble mb-0.5">{{ __('messages.total_label') }}</p>
@@ -53,7 +53,7 @@
                 {{ $pemesanan->status == 'selesai' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : '' }}
                 {{ $pemesanan->status == 'dibatalkan' ? 'bg-red-50 text-red-700 border border-red-200' : '' }}">
                 <span class="material-symbols-outlined text-sm">info</span>
-                {{ ucfirst($pemesanan->status) }}
+                {{ \App\Support\Label::status($pemesanan->status) }}
             </span>
         </div>
 

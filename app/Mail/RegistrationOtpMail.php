@@ -8,11 +8,14 @@ use Illuminate\Mail\Mailables\Envelope;
 
 class RegistrationOtpMail extends Mailable
 {
-    public function __construct(public string $name, public string $code) {}
+    public function __construct(public string $name, public string $code)
+    {
+        $this->locale(app()->getLocale());
+    }
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Kode verifikasi akun Bangkiang Jaran');
+        return new Envelope(subject: __('mail.subject_otp'));
     }
 
     public function content(): Content

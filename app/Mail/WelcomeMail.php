@@ -16,11 +16,12 @@ class WelcomeMail extends Mailable
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->locale(app()->getLocale());
     }
 
     public function build()
     {
-        return $this->subject('Selamat Datang di Bangkiang Jaran Waterfall')
+        return $this->subject(__('mail.subject_welcome'))
                     ->view('emails.welcome');
     }
 }

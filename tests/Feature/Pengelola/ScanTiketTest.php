@@ -91,6 +91,27 @@ class ScanTiketTest extends TestCase
             ->assertSessionHas('error');
     }
 
+    public function test_check_out_tetap_bisa_setelah_tanggal_kunjungan_lewat(): void
+    {
+        $pengelola = $this->setupPengelola();
+        $this->setupPemesanan($pengelola->id, 'BJ-SCAN002', 'BJ-NIGHT01', now()->subDay()->toDateString(), 'selesai');
+        DetailPemesanan::where('kode_tiket', 'BJ-NIGHT01')->update(['status_tiket' => 'digunakan', 'check_in_at' => now()->subHours(2)]);
+
+        $this->actingAs($pengelola)
+            ->post('/pengelola/scan/checkout', ['kode' => 'BJ-NIGHT01'])
+            ->assertSessionHas('success');
+
+        $this->assertNotNull(DetailPemesanan::where('kode_tiket', 'BJ-NIGHT01')->first()->check_out_at);
+    }
+
+    public function test_halaman_scan_memakai_pustaka_kamera_lokal(): void
+    {
+        $this->actingAs($this->setupPengelola())->get('/pengelola/scan')
+            ->assertOk()
+            ->assertSee('js/vendor/html5-qrcode-2.3.8.min.js', false)
+            ->assertDontSee('unpkg.com', false);
+    }
+
     public function test_check_in_tiket_tanggal_lain_ditolak(): void
     {
         $pengelola = $this->setupPengelola();

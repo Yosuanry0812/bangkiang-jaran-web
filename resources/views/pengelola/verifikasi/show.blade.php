@@ -47,7 +47,7 @@
                             default => 'bg-stone-100 text-gray-500-600'
                         };
                     @endphp
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $sc }}">{{ ucfirst($pemesanan->status) }}</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $sc }}">{{ \App\Support\Label::status($pemesanan->status) }}</span>
                 </td></tr>
             </table>
         </div>
@@ -59,29 +59,29 @@
     <div class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex items-center gap-2 mb-4">
             <span class="material-symbols-outlined text-emerald-600">confirmation_number</span>
-            <h2 class="font-heading text-lg font-semibold text-gray-500-800">Kode Tiket Individu</h2>
+            <h2 class="font-heading text-lg font-semibold text-gray-500-800">{{ __('panel.kode_tiket_individu_8494') }}</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="admin-table--responsive w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-200 text-left">
                         <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">No</th>
-                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Jenis</th>
-                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Nama Pengunjung</th>
-                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">Jenis Kelamin</th>
-                        <th class="py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Kode Tiket</th>
+                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ __('panel.jenis_4487') }}</th>
+                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ __('panel.nama_pengunjung_1355') }}</th>
+                        <th class="py-2 pr-4 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ __('panel.jenis_kelamin_5ab3') }}</th>
+                        <th class="py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ __('panel.kode_tiket_1e81') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($allItems as $idx => $item)
                     <tr class="border-b border-gray-100">
                         <td data-label="No" class="py-2.5 pr-4 text-gray-500">{{ $idx + 1 }}</td>
-                        <td data-label="Jenis" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_tiket }}</td>
-                        <td data-label="Nama Pengunjung" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_pengunjung ?? '-' }}</td>
-                        <td data-label="Jenis Kelamin" class="py-2.5 pr-4 text-gray-700">
-                            {{ $item->jenis_kelamin == 'L' ? 'Laki-laki' : ($item->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}
+                        <td data-label="{{ __('panel.jenis_4487') }}" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_tiket }}</td>
+                        <td data-label="{{ __('panel.nama_pengunjung_1355') }}" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_pengunjung ?? '-' }}</td>
+                        <td data-label="{{ __('panel.jenis_kelamin_5ab3') }}" class="py-2.5 pr-4 text-gray-700">
+                            {{ $item->jenis_kelamin == 'L' ? __('messages.male') : ($item->jenis_kelamin == 'P' ? __('messages.female') : '-') }}
                         </td>
-                        <td data-label="Kode Tiket" class="py-2.5 font-mono font-bold text-gray-800 tracking-wider">{{ $item->kode_tiket }}</td>
+                        <td data-label="{{ __('panel.kode_tiket_1e81') }}" class="py-2.5 font-mono font-bold text-gray-800 tracking-wider">{{ $item->kode_tiket }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -109,7 +109,7 @@
                             default => 'bg-stone-100 text-gray-500-600'
                         };
                     @endphp
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $pc }}">{{ ucfirst($pemesanan->pembayaran->status) }}</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $pc }}">{{ \App\Support\Label::status($pemesanan->pembayaran->status) }}</span>
                 </td></tr>
             </table>
             <div>
@@ -117,7 +117,7 @@
                 @if ($pemesanan->pembayaran->bukti_bayar)
                     <a href="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" target="_blank" rel="noopener noreferrer">
                         @if(strtolower(pathinfo($pemesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) === 'pdf')
-                        <span class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm text-forest"><span class="material-symbols-outlined">picture_as_pdf</span> Buka bukti pembayaran PDF</span>
+                        <span class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm text-forest"><span class="material-symbols-outlined">picture_as_pdf</span> {{ __('panel.buka_bukti_pembayaran_pdf_def5') }}</span>
                         @else
                         <img src="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" alt="{{ __('messages.payment_proof') }}"
                             class="max-h-48 rounded-xl border border-gray-300-200 cursor-pointer hover:opacity-90 transition">

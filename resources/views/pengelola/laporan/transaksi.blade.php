@@ -20,7 +20,7 @@
         <a href="{{ route('pengelola.laporan.transaksi', array_merge(request()->all(), ['export' => 'pdf'])) }}"
             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all">
             <span class="material-symbols-outlined text-base">picture_as_pdf</span>
-            Export PDF
+            {{ __('panel.export_pdf_af80') }}
         </a>
     </div>
 
@@ -95,7 +95,7 @@
                             {{ $tSum ?: ($t->pemesanan->tiket->nama_tiket ?? '-') }}
                         </td>
                         <td class="py-3.5 px-4 text-gray-500-500 text-xs">{{ $t->tgl_bayar ? \Carbon\Carbon::parse($t->tgl_bayar)->format('d/m/Y') : '-' }}</td>
-                        <td class="py-3.5 px-4 text-gray-500-700">{{ $t->metode ?? '-' }}</td>
+                        <td class="py-3.5 px-4 text-gray-500-700">{{ \App\Support\Label::method($t->metode ?? null) ?: '-' }}</td>
                         <td class="py-3.5 px-4 text-gray-500-700 font-medium">Rp {{ number_format($t->total, 0, ',', '.') }}</td>
                     </tr>
                     @empty

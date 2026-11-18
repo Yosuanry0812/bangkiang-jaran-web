@@ -1,13 +1,13 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Scan Tiket')
-@section('page_title', 'Scan Tiket')
+@section('title', __('ui.t_scan'))
+@section('page_title', __('ui.t_scan'))
 
 @section('content')
 <div class="space-y-6">
     <header class="admin-page-head">
         <div>
-            <h1 class="font-heading text-2xl font-bold text-gray-800">Scan Tiket</h1>
-            <p>Validasi tiket, catat pengunjung masuk, dan konfirmasi kepulangan.</p>
+            <h1 class="font-heading text-2xl font-bold text-gray-800">{{ __('panel.scan_tiket_c19b') }}</h1>
+            <p>{{ __('panel.validasi_tiket_catat_pengunj_4f62') }}</p>
         </div>
     </header>
 
@@ -22,11 +22,11 @@
     {{-- Search form --}}
     <section class="admin-panel admin-scanner">
         <div class="admin-scanner-intro">
-            <h2>Periksa tiket pengunjung</h2>
+            <h2>{{ __('panel.periksa_tiket_pengunjung_96d5') }}</h2>
             <button type="button" id="toggle-camera"
                     class="admin-btn admin-btn--quiet">
                 <span class="material-symbols-outlined text-sm">videocam</span>
-                <span id="toggle-label">Scan via Kamera</span>
+                <span id="toggle-label">{{ __('panel.scan_via_kamera_0046') }}</span>
             </button>
         </div>
 
@@ -34,7 +34,7 @@
         <div id="manual-input">
             <form method="POST" action="{{ route('pengelola.scan.cari') }}" id="form-scan" class="admin-scan-form" autocomplete="off">
                 @csrf
-                <label for="input-kode">Kode tiket</label>
+                <label for="input-kode">{{ __('panel.kode_tiket_5f48') }}</label>
                 <div class="flex items-center gap-3">
                     <div class="relative flex-1">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -44,7 +44,7 @@
                                name="kode"
                                id="input-kode"
                                value="{{ old('kode', $detail->kode_tiket ?? '') }}"
-                               placeholder="Scan atau ketik kode tiket..."
+                               placeholder="{{ __('panel.scan_atau_ketik_kode_0457') }}"
                                required
                                spellcheck="false"
                                autocapitalize="characters"
@@ -53,19 +53,19 @@
                     <button type="submit"
                             class="admin-btn">
                         <span class="material-symbols-outlined text-base">search</span>
-                        Periksa tiket
+                        {{ __('panel.periksa_tiket_29e4') }}
                     </button>
                 </div>
-                <p class="font-sans text-xs text-gray-400 mt-2">Gunakan scanner barcode fisik atau ketik manual kode tiket</p>
+                <p class="font-sans text-xs text-gray-400 mt-2">{{ __('panel.gunakan_scanner_barcode_fisi_9954') }}</p>
             </form>
         </div>
 
         {{-- Camera scanner --}}
         <div id="camera-scanner" class="hidden">
             <div id="qr-reader" class="w-full max-w-md mx-auto rounded-xl overflow-hidden border border-gray-200"></div>
-            <p class="font-sans text-xs text-gray-400 text-center mt-2">Arahkan kamera ke QR code tiket</p>
+            <p class="font-sans text-xs text-gray-400 text-center mt-2">{{ __('panel.arahkan_kamera_ke_qr_62aa') }}</p>
             <div id="qr-result" class="hidden mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
-                <p class="font-sans text-xs text-emerald-700">Kode terdeteksi:</p>
+                <p class="font-sans text-xs text-emerald-700">{{ __('panel.kode_terdeteksi_a18a') }}</p>
                 <p class="font-mono text-sm font-bold text-emerald-800 tracking-wider" id="qr-result-code"></p>
             </div>
         </div>
@@ -96,47 +96,47 @@
                         <div>
                             <p class="font-sans text-sm font-semibold text-gray-900">
                                 @if($bukanHariIni)
-                                    Tiket Bukan Untuk Hari Ini
+                                    {{ __('ui.scan_not_today') }}
                                 @elseif($belumLunas || $pemesananDibatalkan)
-                                    Tiket Tidak Valid
+                                    {{ __('ui.scan_invalid') }}
                                 @elseif($sudahDigunakan)
-                                    Tiket Sudah Digunakan
+                                    {{ __('ui.scan_used') }}
                                 @else
-                                    Tiket Valid
+                                    {{ __('ui.scan_valid') }}
                                 @endif
                             </p>
                             <p class="font-sans text-xs text-gray-400">
                                 @if($bukanHariIni)
-                                    Tiket untuk kunjungan {{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y') }}. Hanya tiket hari ini yang bisa di-scan.
+                                    {{ __('ui.scan_other_date', ['date' => \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y')]) }}
                                 @elseif($belumLunas)
-                                    Pembayaran belum diverifikasi
+                                    {{ __('ui.scan_unverified') }}
                                 @elseif($pemesananDibatalkan)
-                                    Pemesanan dibatalkan
+                                    {{ __('ui.scan_cancelled') }}
                                 @elseif($sudahDigunakan)
-                                    Tiket ini sudah discan pada {{ $detail->updated_at ? \Carbon\Carbon::parse($detail->updated_at)->format('d/m/Y H:i') : '-' }}
+                                    {{ __('ui.scan_used_at', ['time' => $detail->updated_at ? \Carbon\Carbon::parse($detail->updated_at)->format('d/m/Y H:i') : '-']) }}
                                 @else
-                                    Tiket siap digunakan
+                                    {{ __('ui.scan_ready') }}
                                 @endif
                             </p>
                         </div>
                     </div>
                     @if(!$bukanHariIni && !$sudahDigunakan && !$belumLunas && !$pemesananDibatalkan)
-                    <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="Konfirmasi tiket ini? Pengunjung akan dipersilakan masuk.">
+                    <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="{{ __('ui.confirm_checkin') }}">
                         @csrf
                         <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">
                         <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all">
                             <span class="material-symbols-outlined text-base">check</span>
-                            Konfirmasi Masuk
+                            {{ __('panel.konfirmasi_masuk_2351') }}
                         </button>
                     </form>
                     @endif
                     @if(!$bukanHariIni && $sudahDigunakan && !$detail->check_out_at && !$belumLunas && !$pemesananDibatalkan)
-                    <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="Konfirmasi check-out pengunjung ini?">
+                    <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="{{ __('ui.confirm_checkout') }}">
                         @csrf
                         <input type="hidden" name="kode" value="{{ $detail->kode_tiket }}">
                         <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center gap-2 transition-all">
                             <span class="material-symbols-outlined text-base">logout</span>
-                            Konfirmasi Keluar
+                            {{ __('panel.konfirmasi_keluar_9c36') }}
                         </button>
                     </form>
                     @endif
@@ -147,17 +147,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {{-- Left: ticket info --}}
                         <div class="space-y-4">
-                            <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Data Tiket</h3>
+                            <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">{{ __('panel.data_tiket_099d') }}</h3>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Kode Tiket</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.kode_tiket_1e81') }}</p>
                                 <p class="font-mono text-lg font-bold text-gray-900 tracking-wider">{{ $detail->kode_tiket }}</p>
                             </div>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Jenis Tiket</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.jenis_tiket_0497') }}</p>
                                 <p class="font-sans text-sm font-medium text-gray-800">{{ $detail->nama_tiket }}</p>
                             </div>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Status Tiket</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.status_tiket_e25a') }}</p>
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold
                                     @if($detail->status_tiket === 'aktif') bg-emerald-50 text-emerald-700 border border-emerald-200
                                     @elseif($detail->status_tiket === 'digunakan') bg-amber-50 text-amber-700 border border-amber-200
@@ -169,26 +169,26 @@
                                         @else bg-gray-400
                                         @endif">
                                     </span>
-                                    {{ ucfirst($detail->status_tiket) }}
+                                    {{ \App\Support\Label::status($detail->status_tiket) }}
                                 </span>
                             </div>
                         </div>
 
                         {{-- Right: visitor info --}}
                         <div class="space-y-4">
-                            <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Data Pengunjung</h3>
+                            <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">{{ __('panel.data_pengunjung_1e68') }}</h3>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Nama Pengunjung</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.nama_pengunjung_1355') }}</p>
                                 <p class="font-sans text-base font-semibold text-gray-900">
                                     {{ $detail->nama_pengunjung ?? '-' }}
                                 </p>
                             </div>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Pemesan</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.pemesan_3eb0') }}</p>
                                 <p class="font-sans text-sm font-medium text-gray-800">{{ $pemesanan->user->name ?? '-' }}</p>
                             </div>
                             <div>
-                                <p class="font-sans text-[11px] text-gray-400">Tanggal Kunjungan</p>
+                                <p class="font-sans text-[11px] text-gray-400">{{ __('panel.tanggal_kunjungan_3ddb') }}</p>
                                 <p class="font-sans text-sm font-medium text-gray-800">
                                     {{ $pemesanan->tgl_kunjungan ? \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->isoFormat('D MMMM YYYY') : '-' }}
                                 </p>
@@ -199,21 +199,21 @@
                     {{-- Order summary --}}
                     <div class="mt-6 pt-5 border-t border-gray-100">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="font-sans text-xs text-gray-400">Kode Booking</span>
+                            <span class="font-sans text-xs text-gray-400">{{ __('panel.kode_booking_6179') }}</span>
                             <span class="font-mono text-sm font-bold text-emerald-700">{{ $pemesanan->kode_booking }}</span>
                         </div>
                         <div class="flex items-center justify-between text-sm mt-2">
-                            <span class="font-sans text-xs text-gray-400">Status Pemesanan</span>
+                            <span class="font-sans text-xs text-gray-400">{{ __('panel.status_pemesanan_008a') }}</span>
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold
                                 @if($pemesanan->status === 'selesai') bg-emerald-50 text-emerald-700
                                 @else bg-red-50 text-red-700
                                 @endif">
-                                {{ ucfirst($pemesanan->status) }}
+                                {{ \App\Support\Label::status($pemesanan->status) }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-sm mt-2">
-                            <span class="font-sans text-xs text-gray-400">Total Tiket</span>
-                            <span class="font-sans text-sm font-medium text-gray-800">{{ $pemesanan->detailPemesanan->count() }} tiket</span>
+                            <span class="font-sans text-xs text-gray-400">{{ __('panel.total_tiket_6709') }}</span>
+                            <span class="font-sans text-sm font-medium text-gray-800">{{ trans_choice('ui.tickets_n', $pemesanan->detailPemesanan->count()) }}</span>
                         </div>
                     </div>
                 </div>
@@ -223,7 +223,7 @@
         {{-- Sidebar --}}
         <div>
             <div class="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-                <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400">Semua Tiket Pesanan Ini</h3>
+                <h3 class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.semua_tiket_pesanan_ini_5a1b') }}</h3>
                 @foreach($pemesanan->detailPemesanan as $dt)
                 <div class="flex items-center gap-3 p-3 rounded-xl border {{ $dt->kode_tiket === $detail->kode_tiket ? 'border-emerald-300 bg-emerald-50' : 'border-gray-100' }}">
                     <div class="w-2 h-2 rounded-full flex-shrink-0
@@ -246,7 +246,7 @@
     {{-- Empty state --}}
     <div class="admin-scan-guide">
         <span class="material-symbols-outlined" aria-hidden="true">qr_code_scanner</span>
-        <div><h3>Siap menerima pengunjung</h3><p>Pindai QR dengan kamera atau scanner fisik, atau ketik kode tiket di atas. Periksa hasil validasi sebelum mengonfirmasi masuk.</p><p>Tiket harus sesuai tanggal kunjungan dan pembayarannya sudah diverifikasi.</p></div>
+        <div><h3>{{ __('panel.siap_menerima_pengunjung_8efa') }}</h3><p>{{ __('panel.pindai_qr_dengan_kamera_e005') }}</p><p>{{ __('panel.tiket_harus_sesuai_tanggal_1eff') }}</p></div>
     </div>
     @endif
 
@@ -261,8 +261,8 @@
     <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div>
-                <p class="font-sans text-sm font-semibold text-gray-800">Manual Check-in / Check-out Hari Ini</p>
-                <p class="font-sans text-xs text-gray-400 mt-0.5">{{ $todayCount }} tiket tersedia</p>
+                <p class="font-sans text-sm font-semibold text-gray-800">{{ __('panel.manual_check_in_check_dd23') }}</p>
+                <p class="font-sans text-xs text-gray-400 mt-0.5">{{ trans_choice('ui.tickets_available', $todayCount) }}</p>
             </div>
             <span class="inline-flex items-center gap-1 font-sans text-[10px] font-medium text-gray-400 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-full">
                 {{ now()->format('d/m/Y') }}
@@ -272,13 +272,13 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-gray-100 bg-gray-50">
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Kode Tiket</th>
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Pengunjung</th>
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400 hidden sm:table-cell">Tiket</th>
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Status</th>
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Masuk</th>
-                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Keluar</th>
-                        <th class="text-center px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">Aksi</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.kode_tiket_1e81') }}</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.pengunjung_c54d') }}</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400 hidden sm:table-cell">{{ __('panel.tiket_f17c') }}</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.status_ec53') }}</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.masuk_6388') }}</th>
+                        <th class="text-left px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.keluar_1692') }}</th>
+                        <th class="text-center px-4 py-3 font-sans text-[10px] font-semibold uppercase tracking-wider text-gray-400">{{ __('panel.aksi_ae3b') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -302,22 +302,22 @@
                             @if($isDone)
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0"></span>
-                                Selesai
+                                {{ __('panel.selesai_dfe1') }}
                             </span>
                             @elseif($canCheckIn)
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                                Aktif
+                                {{ __('panel.aktif_81c3') }}
                             </span>
                             @elseif($canCheckOut)
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0"></span>
-                                Masuk
+                                {{ __('panel.masuk_6388') }}
                             </span>
                             @else
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></span>
-                                {{ ucfirst($t->status_tiket) }}
+                                {{ \App\Support\Label::status($t->status_tiket) }}
                             </span>
                             @endif
                         </td>
@@ -333,7 +333,7 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             @if($canCheckIn)
-                            <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="Check-in tiket {{ $t->kode_tiket }}?">
+                            <form method="POST" action="{{ route('pengelola.scan.gunakan') }}" class="confirm-form" data-confirm="{{ __('ui.confirm_checkin_code', ['code' => $t->kode_tiket]) }}">
                                 @csrf
                                 <input type="hidden" name="kode" value="{{ $t->kode_tiket }}">
                                 <button type="submit"
@@ -343,7 +343,7 @@
                                 </button>
                             </form>
                             @elseif($canCheckOut)
-                            <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="Check-out tiket {{ $t->kode_tiket }}?">
+                            <form method="POST" action="{{ route('pengelola.scan.checkout') }}" class="confirm-form" data-confirm="{{ __('ui.confirm_checkout_code', ['code' => $t->kode_tiket]) }}">
                                 @csrf
                                 <input type="hidden" name="kode" value="{{ $t->kode_tiket }}">
                                 <button type="submit"
@@ -372,8 +372,8 @@
         <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-gray-50 flex items-center justify-center">
             <span class="material-symbols-outlined text-gray-300" style="font-size:24px">confirmation_number</span>
         </div>
-        <p class="font-sans text-sm font-medium text-gray-500 mb-1">Tidak ada tiket untuk hari ini</p>
-        <p class="font-sans text-xs text-gray-400">Tiket dengan kunjungan hari ini akan tampil di sini</p>
+        <p class="font-sans text-sm font-medium text-gray-500 mb-1">{{ __('panel.tidak_ada_tiket_untuk_2fae') }}</p>
+        <p class="font-sans text-xs text-gray-400">{{ __('panel.tiket_dengan_kunjungan_hari_aa63') }}</p>
     </div>
     @endif
 
@@ -382,7 +382,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="{{ asset('js/vendor/html5-qrcode-2.3.8.min.js') }}"></script>
 <script>
     let html5QrCode = null;
     let scannerActive = false;
@@ -401,7 +401,7 @@
         if (success) {
             Swal.fire({
                 icon: 'success',
-                title: 'Berhasil',
+                title: @json(__('ui.js_success')),
                 text: success.getAttribute('content'),
                 confirmButtonColor: '#059669',
                 confirmButtonText: 'OK',
@@ -412,10 +412,10 @@
         if (error) {
             Swal.fire({
                 icon: 'error',
-                title: 'Gagal',
+                title: @json(__('ui.js_failed')),
                 text: error.getAttribute('content'),
                 confirmButtonColor: '#dc2626',
-                confirmButtonText: 'Tutup',
+                confirmButtonText: @json(__('ui.js_close')),
                 timer: 5000,
                 timerProgressBar: true,
             });
@@ -426,23 +426,23 @@
     document.querySelectorAll('form.confirm-form').forEach(function (form) {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            var msg = this.getAttribute('data-confirm') || 'Konfirmasi?';
+            var msg = this.getAttribute('data-confirm') || @json(__('ui.js_confirm'));
             var btn = this.querySelector('button[type="submit"]');
-            var isCheckin = msg.toLowerCase().includes('masuk') || msg.toLowerCase().includes('check-in');
+            var isCheckin = !(this.getAttribute('action') || '').includes('checkout');
             Swal.fire({
-                title: isCheckin ? 'Check In Tiket' : 'Check Out Tiket',
+                title: isCheckin ? @json(__('ui.js_checkin_title')) : @json(__('ui.js_checkout_title')),
                 text: msg,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: isCheckin ? '#059669' : '#f97316',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: isCheckin ? 'Ya, Check In' : 'Ya, Check Out',
-                cancelButtonText: 'Batal',
+                confirmButtonText: isCheckin ? @json(__('ui.js_yes_checkin')) : @json(__('ui.js_yes_checkout')),
+                cancelButtonText: @json(__('ui.js_cancel')),
                 reverseButtons: true,
             }).then(function (result) {
                 if (result.isConfirmed) {
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">hourglass_top</span> Memproses...';
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px">hourglass_top</span> ' + @json(__('ui.js_processing')) + '...';
                     form.submit();
                 }
             });

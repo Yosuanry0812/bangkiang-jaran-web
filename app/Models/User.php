@@ -56,13 +56,13 @@ class User extends Authenticatable
     public function emailVerificationLabel(): string
     {
         if (! $this->hasVerifiedEmail()) {
-            return 'Belum diverifikasi';
+            return __('flash.email_unverified');
         }
 
         return match ($this->email_verification_method) {
-            'otp' => 'OTP email',
+            'otp' => __('flash.email_otp'),
             'google' => 'Google',
-            default => 'Terverifikasi (akun lama)',
+            default => __('flash.email_verified_legacy'),
         };
     }
 }

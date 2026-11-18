@@ -37,17 +37,17 @@ class PemesananController extends Controller
             'tickets' => ['required', 'array', 'min:1'],
             'tickets.*' => ['integer', 'min:0'],
         ], [
-            'tgl_kunjungan.required' => 'Tanggal kunjungan wajib diisi.',
-            'tgl_kunjungan.after_or_equal' => 'Tanggal kunjungan tidak boleh sebelum hari ini.',
-            'tickets.required' => 'Pilih minimal satu tiket.',
-            'tickets.min' => 'Pilih minimal satu tiket.',
+            'tgl_kunjungan.required' => __('flash.visit_date_required'),
+            'tgl_kunjungan.after_or_equal' => __('flash.visit_date_past'),
+            'tickets.required' => __('flash.select_one_ticket'),
+            'tickets.min' => __('flash.select_one_ticket'),
         ]);
 
         $tanggal = $request->tgl_kunjungan;
         $tickets = array_filter($request->tickets, fn ($q) => $q > 0);
 
         if (empty($tickets)) {
-            return back()->withErrors(['tickets' => 'Pilih minimal satu tiket.'])->withInput();
+            return back()->withErrors(['tickets' => __('flash.select_one_ticket')])->withInput();
         }
 
         // Build detail & generate kode_tiket (temporary, before saving)
@@ -58,7 +58,7 @@ class PemesananController extends Controller
         foreach ($tickets as $id_tiket => $jumlah) {
             $tiket = Tiket::aktif()->find($id_tiket);
             if (! $tiket) {
-                return back()->withErrors(['tickets' => 'Tiket yang dipilih tidak tersedia. Silakan pilih kembali.'])->withInput();
+                return back()->withErrors(['tickets' => __('flash.tickets_unavailable_reselect')])->withInput();
             }
 
             $subtotal = $tiket->harga * $jumlah;
@@ -103,7 +103,7 @@ class PemesananController extends Controller
         ]);
 
         return redirect()->route('wisatawan.pemesanan.data-diri')
-            ->with('success', 'Silakan lengkapi data diri pengunjung.');
+            ->with('success', __('flash.fill_visitor_data'));
     }
 
     /**
@@ -114,7 +114,7 @@ class PemesananController extends Controller
         $flow = session('pemesanan_flow');
         if (! $flow) {
             return redirect()->route('wisatawan.pemesanan.create')
-                ->with('error', 'Sesi pemesanan habis. Silakan mulai lagi.');
+                ->with('error', __('flash.booking_session_expired'));
         }
 
         return view('wisatawan.pemesanan-data-diri', compact('flow'));

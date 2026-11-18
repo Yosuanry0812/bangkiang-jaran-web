@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-    <meta name="description" content="Rencanakan kunjungan ke Air Terjun Bangkiang Jaran di Desa Bakbakan, Gianyar. Temukan informasi tempat, lokasi, dan tiket dalam satu tempat.">
+    <meta name="description" content="{{ __('ui.meta_desc') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name', 'Bangkiang Jaran'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,7 +155,7 @@
             data-nav="{{ $navMode ?? (View::hasSection('nav-mode') ? View::getSection('nav-mode') : 'light') }}"
             @if (Route::is('landing', 'restoran')) data-nav-after-hero inert aria-hidden="true" @endif
             class="fixed top-0 left-0 right-0 z-50 border-b border-transparent {{ Route::is('landing', 'restoran') ? 'nav-hidden nav-awaiting-hero' : '' }}"
-            aria-label="Navigasi utama">
+            aria-label="{{ __('panel.navigasi_utama_7573') }}">
         <div id="nav-bar" class="max-w-7xl mx-auto px-gutter">
             <div class="flex items-center justify-between h-12 md:h-[68px]">
 
@@ -165,7 +165,7 @@
                 </a>
 
                 {{-- Desktop links --}}
-                <nav class="bj-desktop-nav hidden xl:flex items-center" aria-label="Menu desktop">
+                <nav class="bj-desktop-nav hidden xl:flex items-center" aria-label="{{ __('panel.menu_desktop_f4e0') }}">
                     @php
                         $currentRoute = Route::currentRouteName();
                         $links = [
@@ -243,7 +243,7 @@
         <div id="mobileMenu"
              class="menu-close xl:hidden"
              style="background: rgba(10,18,14,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.06);"
-             aria-label="Menu mobile" aria-hidden="true" inert>
+             aria-label="{{ __('panel.menu_mobile_fa87') }}" aria-hidden="true" inert>
             <div class="max-w-7xl mx-auto px-gutter py-2.5 pb-4 space-y-0.5">
                 <a href="{{ route('landing') }}"          class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">home</span>{{ __('messages.home') }}</a>
                 <a href="{{ route('restoran') }}"         class="nav-mobile-link flex items-center gap-3 font-sans text-sm text-white/75 hover:text-white hover:bg-white/6 px-3 py-2 rounded-xl transition-all"><span class="material-symbols-outlined text-base text-white/30">restaurant</span>{{ __('messages.resto_title_nav') }}</a>
@@ -352,7 +352,7 @@
     </footer>
 
     @if(config('payment.contact_whatsapp'))
-    <aside class="fixed bottom-6 right-6 z-40" aria-label="Kontak WhatsApp">
+    <aside class="fixed bottom-6 right-6 z-40" aria-label="{{ __('panel.kontak_whatsapp_4f1c') }}">
         <a href="https://wa.me/{{ config('payment.contact_whatsapp') }}?text={{ urlencode(app()->getLocale() === 'en' ? 'Hello Bangkiang Jaran, I would like to ask a question.' : 'Halo Pengelola Air Terjun Bangkiang Jaran, saya ingin bertanya.') }}" 
            target="_blank" 
            rel="noopener noreferrer"

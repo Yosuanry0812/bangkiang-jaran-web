@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Bangkiang Jaran | Air Terjun di Desa Bakbakan, Gianyar')
+@section('title', __('ui.t_landing'))
 @section('nav-mode', 'hero')
 
 @section('content')
@@ -68,7 +68,7 @@
     ] : [
         ['Pilih tanggal', 'Pilih jenis tiket dan hari kunjungan.'],
         ['Isi data pengunjung', 'Lalu bayar sesuai petunjuk di halaman pembayaran.'],
-        ['Tunggu konfirmasi', 'E-tiket aktif setelah pengelola memeriksa pembayaranmu.'],
+        ['Tunggu konfirmasi', 'E-tiket aktif setelah pengelola memeriksa pembayaran Anda.'],
         ['Siapkan diri', 'Pakai alas kaki yang tidak licin dan simpan e-tiket di ponsel.'],
         ['Tunjukkan tiket', 'Tunjukkan e-tiket di pintu masuk.'],
     ];
@@ -96,7 +96,7 @@
     ];
     $rules = $isEnglish
         ? ['Take your rubbish home', 'Stay on the footpath', 'Follow the staff\'s directions']
-        : ['Bawa pulang sampahmu', 'Tetap di jalan setapak', 'Ikuti arahan petugas'];
+        : ['Bawa pulang sampah Anda', 'Tetap di jalan setapak', 'Ikuti arahan petugas'];
     $visitSteps = $isEnglish ? [
         ['Pick a date', 'Choose a ticket type and the day you want to visit.'],
         ['Fill in visitor details', 'Then pay following the instructions on the payment page.'],
@@ -106,7 +106,7 @@
     ] : [
         ['Pilih tanggal', 'Pilih jenis tiket dan hari kunjungan.'],
         ['Isi data pengunjung', 'Lalu bayar sesuai petunjuk di halaman pembayaran.'],
-        ['Tunggu konfirmasi', 'E-tiket aktif setelah pengelola memeriksa pembayaranmu.'],
+        ['Tunggu konfirmasi', 'E-tiket aktif setelah pengelola memeriksa pembayaran Anda.'],
         ['Siapkan diri', 'Pakai alas kaki yang tidak licin dan simpan e-tiket di ponsel.'],
         ['Tunjukkan tiket', 'Tunjukkan e-tiket di pintu masuk.'],
     ];
@@ -284,7 +284,7 @@
                 @endforeach
             </div>
             <div class="bj-rv-route__foot"><p><span>{{ $isEnglish ? 'Starting point' : 'Titik awal' }}</span><strong data-route-selection>{{ $isEnglish ? 'Choose a starting point' : 'Pilih titik awal' }}</strong></p><a data-route-open href="{{ $destValues['maps_url'] }}" target="_blank" rel="noopener noreferrer">{{ $isEnglish ? 'Open in Google Maps' : 'Buka di Google Maps' }}<span class="material-symbols-outlined" aria-hidden="true">north_east</span></a></div>
-            <p class="bj-rv-route__status" data-route-status role="status" aria-live="polite">{{ $isEnglish ? 'Your location is requested only when you choose My location.' : 'Lokasi perangkat hanya diminta ketika kamu memilih Lokasi saya.' }}</p>
+            <p class="bj-rv-route__status" data-route-status role="status" aria-live="polite">{{ $isEnglish ? 'Your location is requested only when you choose My location.' : 'Lokasi perangkat hanya diminta ketika Anda memilih Lokasi saya.' }}</p>
         </div>
     </section>
 

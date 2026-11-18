@@ -39,11 +39,11 @@ class GaleriController extends Controller
         ];
 
         $messages = [
-            'file.required' => 'File wajib diupload.',
-            'file.image' => 'File harus berupa gambar.',
-            'file.mimes' => 'Format foto: jpg, jpeg, png.',
-            'file.max' => 'Ukuran maksimal 5MB.',
-            'tipe.required' => 'Pilih tipe galeri.',
+            'file.required' => __('flash.gallery_file_required'),
+            'file.image' => __('flash.gallery_file_image'),
+            'file.mimes' => __('flash.gallery_file_mimes'),
+            'file.max' => __('flash.gallery_file_max'),
+            'tipe.required' => __('flash.gallery_type_required'),
         ];
 
         $request->validate($rules, $messages);
@@ -52,7 +52,7 @@ class GaleriController extends Controller
         $file = $request->file('file');
         $allowedMimes = ['image/jpeg', 'image/png'];
         if (! in_array($file->getMimeType(), $allowedMimes)) {
-            return back()->withErrors(['file' => 'Tipe file foto tidak valid.'])->withInput();
+            return back()->withErrors(['file' => __('flash.gallery_file_invalid')])->withInput();
         }
 
         $filename = 'galeri_'.uniqid().'.'.$file->getClientOriginalExtension();
@@ -68,7 +68,7 @@ class GaleriController extends Controller
 
         AuditTrail::record('Tambah galeri', $pathDisplay);
 
-        return redirect()->route('pengelola.galeri.index')->with('success', 'Foto berhasil ditambahkan.');
+        return redirect()->route('pengelola.galeri.index')->with('success', __('flash.gallery_added'));
     }
 
     public function destroy($id)
@@ -80,6 +80,6 @@ class GaleriController extends Controller
         ActivityLogger::log('Hapus galeri', 'File: '.$galeri->file);
         $galeri->delete();
 
-        return redirect()->route('pengelola.galeri.index')->with('success', 'Data berhasil dihapus.');
+        return redirect()->route('pengelola.galeri.index')->with('success', __('flash.data_deleted'));
     }
 }

@@ -22,7 +22,6 @@ class BookingLifecycle
     public function refresh(Pemesanan $booking): Pemesanan
     {
         DB::transaction(function () use ($booking) {
-            app(VisitQuota::class)->lock($booking->tgl_kunjungan);
             $locked = Pemesanan::whereKey($booking->getKey())->lockForUpdate()->firstOrFail();
             $this->expire($locked);
         });
@@ -33,7 +32,6 @@ class BookingLifecycle
     public function cancel(Pemesanan $booking): void
     {
         DB::transaction(function () use ($booking) {
-            app(VisitQuota::class)->lock($booking->tgl_kunjungan);
             $locked = Pemesanan::whereKey($booking->getKey())->lockForUpdate()->firstOrFail();
             if ($this->expire($locked)) {
                 return;

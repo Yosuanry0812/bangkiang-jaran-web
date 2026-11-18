@@ -60,7 +60,7 @@
             </div>
             @endif
         </div>
-        <dl><div><dt>{{ $isEnglish ? 'Find us' : 'Temukan kami' }}</dt><dd>Bangkiang Jaran<br>Desa Bakbakan, Gianyar, Bali</dd></div><div><dt>{{ $isEnglish ? 'Menu & prices' : 'Menu & harga' }}</dt><dd>{{ $isEnglish ? 'Ask the team for the latest menu.' : 'Tanyakan menu terbaru kepada pengelola.' }}</dd></div><div><dt>{{ $isEnglish ? 'Coming with a group?' : 'Datang bersama rombongan?' }}</dt><dd>{{ $isEnglish ? 'Confirm seating before your visit.' : 'Konfirmasikan tempat sebelum berkunjung.' }}</dd></div></dl>
+        <dl><div><dt>{{ $isEnglish ? 'Find us' : 'Temukan kami' }}</dt><dd>Bangkiang Jaran<br>{{ __('ui.address_line') }}</dd></div><div><dt>{{ $isEnglish ? 'Menu & prices' : 'Menu & harga' }}</dt><dd>{{ $isEnglish ? 'Ask the team for the latest menu.' : 'Tanyakan menu terbaru kepada pengelola.' }}</dd></div><div><dt>{{ $isEnglish ? 'Coming with a group?' : 'Datang bersama rombongan?' }}</dt><dd>{{ $isEnglish ? 'Confirm seating before your visit.' : 'Konfirmasikan tempat sebelum berkunjung.' }}</dd></div></dl>
         </div>
     </section>
     </div>

@@ -14,7 +14,7 @@
                 <span class="bj-payment-booking__code" title="{{ $pemesanan->kode_booking ?? '-' }}">{{ $pemesanan->kode_booking ?? '-' }}</span>
             </div>
         </div>
-        <ol class="bj-payment-steps" aria-label="Progres pembayaran">
+        <ol class="bj-payment-steps" aria-label="{{ __('panel.progres_pembayaran_0561') }}">
             <li class="is-current" id="step-1-indicator"><span id="step-1-circle">1</span><strong>{{ __('messages.step_method') }}</strong></li>
             <li class="bj-payment-steps__line" aria-hidden="true"></li>
             <li id="step-2-indicator"><span id="step-2-circle">2</span><strong id="step-2-label">{{ __('messages.step_upload') }}</strong></li>
@@ -36,10 +36,10 @@
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-amber-600 text-xl flex-shrink-0">hourglass_top</span>
                 <div>
-                    <span class="font-semibold text-amber-950">Batas Waktu Pembayaran:</span>
+                    <span class="font-semibold text-amber-950">{{ __('panel.batas_waktu_pembayaran_10b7') }}</span>
                     <span class="text-xs text-amber-900 ml-1">
-                        Selesaikan pembayaran sebelum <strong class="font-bold text-amber-950">{{ $deadlineTime->format('H:i') }} WITA</strong> ({{ $deadlineTime->translatedFormat('d M Y') }}).
-                        Pesanan otomatis hangus jika melewati batas waktu.
+                        {!! __('ui.pay_before', ['time' => '<strong class="font-bold text-amber-950">'.e($deadlineTime->format('H:i')).'</strong>', 'date' => e($deadlineTime->translatedFormat('d M Y'))]) !!}
+                        {{ __('ui.pay_expiry_note') }}
                     </span>
                 </div>
             </div>
@@ -203,7 +203,7 @@
                                 <div class="hidden absolute inset-0 w-full h-full bg-gray-50 z-20 rounded-2xl overflow-hidden" id="upload-preview-container" aria-live="polite">
                                     {{-- Image preview (contain — full image visible) --}}
                                     <div class="relative w-full h-full flex items-center justify-center bg-gray-50" id="image-preview-wrapper" style="display:none;">
-                                        <img alt="Preview"
+                                        <img alt="{{ __('panel.preview_31fd') }}"
                                              class="max-w-full max-h-full w-auto h-auto object-contain"
                                              id="upload-preview">
 
@@ -356,7 +356,7 @@
                             {{ __('messages.whatsapp_contact') }}
                         </a>
                         @else
-                        <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" class="bj-text-link">Kembali ke detail pesanan</a>
+                        <a href="{{ route('wisatawan.pemesanan.detail', $pemesanan->id_pemesanan) }}" class="bj-text-link">{{ __('panel.kembali_ke_detail_pesanan_575d') }}</a>
                         @endif
                     </div>
 

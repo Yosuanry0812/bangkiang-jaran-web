@@ -15,9 +15,9 @@
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                 <span class="material-symbols-outlined text-primary">lock_reset</span>
             </div>
-            <h1 class="font-display text-headline-md text-on-surface mb-2">Atur Password Baru</h1>
+            <h1 class="font-display text-headline-md text-on-surface mb-2">{{ __('auth_ui.rp_title') }}</h1>
             <p class="font-body text-body-md text-on-surface-variant">
-                Masukkan password baru untuk akun Anda.
+                {{ __('auth_ui.rp_lead') }}
             </p>
         </div>
 
@@ -38,7 +38,7 @@
                     <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
                     <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="email"
                            class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-surface rounded-xl py-sm pl-lg pr-sm focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition-all duration-300 @error('email') border-error ring-2 ring-error/30 @enderror"
-                           placeholder="nama@email.com">
+                           placeholder="{{ __('auth_ui.email_placeholder') }}">
                 </div>
                 @error('email')
                     <p class="mt-1 text-sm text-error">{{ $message }}</p>
@@ -47,12 +47,12 @@
 
             {{-- Password --}}
             <div class="space-y-xs">
-                <label for="password" class="font-body text-label-md text-on-surface-variant block">Password Baru</label>
+                <label for="password" class="font-body text-label-md text-on-surface-variant block">{{ __('auth_ui.rp_new') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">lock</span>
                     <input id="password" type="password" name="password" required autocomplete="new-password" minlength="8"
                            class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-surface rounded-xl py-sm pl-lg pr-sm focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition-all duration-300 @error('password') border-error ring-2 ring-error/30 @enderror"
-                           placeholder="Minimal 8 karakter">
+                           placeholder="{{ __('auth_ui.rp_min8') }}">
                 </div>
                 @error('password')
                     <p class="mt-1 text-sm text-error">{{ $message }}</p>
@@ -61,12 +61,12 @@
 
             {{-- Confirm Password --}}
             <div class="space-y-xs">
-                <label for="password_confirmation" class="font-body text-label-md text-on-surface-variant block">Konfirmasi Password</label>
+                <label for="password_confirmation" class="font-body text-label-md text-on-surface-variant block">{{ __('auth_ui.rp_confirm') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">lock</span>
                     <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
                            class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-surface rounded-xl py-sm pl-lg pr-sm focus:border-primary focus:ring-4 focus:ring-primary/20 focus:outline-none transition-all duration-300"
-                           placeholder="Ulangi password">
+                           placeholder="{{ __('auth_ui.pw_repeat') }}">
                 </div>
             </div>
 
@@ -74,7 +74,7 @@
             <div class="pt-sm">
                 <button type="submit"
                         class="w-full flex justify-center py-sm px-4 border border-transparent rounded-xl shadow-sm font-body text-label-md text-white bg-primary-container hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
-                    Reset Password
+                    {{ __('auth_ui.rp_submit') }}
                 </button>
             </div>
         </form>

@@ -22,8 +22,8 @@
         </div>
 
         <div class="relative z-10 p-8 text-white">
-            <p class="text-[11px] uppercase tracking-[.2em] text-white/70 mb-3">Desa Bakbakan · Gianyar</p>
-            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Siapkan kunjungan Anda.</p>
+            <p class="text-[11px] uppercase tracking-[.2em] text-white/70 mb-3">{{ __('auth_ui.reg_location') }}</p>
+            <p class="font-display text-[2.6rem] leading-tight max-w-xs">{{ __('auth_ui.reg_hero') }}</p>
         </div>
     </div>
 
@@ -34,10 +34,10 @@
         <div class="mb-7">
             <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-body font-semibold tracking-[0.15em] uppercase px-3 py-1.5 rounded-full mb-5">
                 <span class="material-symbols-outlined text-[13px]">person_add</span>
-                Akun Baru
+                {{ __('auth_ui.reg_badge') }}
             </div>
-            <h1 class="font-display text-[1.9rem] font-semibold text-gray-900 leading-tight mb-2">Buat Akun</h1>
-            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Buat akun untuk memesan tiket dan menyimpan detail kunjungan.</p>
+            <h1 class="font-display text-[1.9rem] font-semibold text-gray-900 leading-tight mb-2">{{ __('auth_ui.reg_title') }}</h1>
+            <p class="font-body text-[14px] text-gray-500 leading-relaxed">{{ __('auth_ui.reg_lead') }}</p>
         </div>
 
         {{-- Alert --}}
@@ -55,13 +55,13 @@
             <div class="grid grid-cols-2 gap-4">
                 {{-- Name --}}
                 <div>
-                    <label for="name" class="block font-body text-[11px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">Nama Lengkap</label>
+                    <label for="name" class="block font-body text-[11px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">{{ __('auth_ui.full_name') }}</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[17px] transition-colors group-focus-within:text-emerald-600">person</span>
                         <input id="name" type="text" name="name" value="{{ old('name') }}"
                                required autofocus autocomplete="name"
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] rounded-xl pl-10 pr-3 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('name') border-red-400 bg-red-50 @enderror"
-                               placeholder="Nama Anda">
+                               placeholder="{{ __('auth_ui.name_placeholder') }}">
                     </div>
                     @error('name')
                         <p class="mt-1 flex items-center gap-1 text-[11px] text-red-500"><span class="material-symbols-outlined text-[12px]">error</span>{{ $message }}</p>
@@ -92,7 +92,7 @@
                     <input id="email" type="email" name="email" value="{{ old('email') }}"
                            required autocomplete="email"
                            class="w-full h-11 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] rounded-xl pl-10 pr-3 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('email') border-red-400 bg-red-50 @enderror"
-                           placeholder="nama@email.com">
+                           placeholder="{{ __('auth_ui.email_placeholder') }}">
                 </div>
                 @error('email')
                     <p class="mt-1 flex items-center gap-1 text-[11px] text-red-500"><span class="material-symbols-outlined text-[12px]">error</span>{{ $message }}</p>
@@ -109,7 +109,7 @@
                         <input id="password" type="password" name="password"
                                required autocomplete="new-password" minlength="8"
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] rounded-xl pl-10 pr-9 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('password') border-red-400 bg-red-50 @enderror"
-                               placeholder="Min. 8 karakter">
+                               placeholder="{{ __('auth_ui.pw_min8') }}">
                         <button type="button" onclick="togglePwd('password','eye-pwd')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                             <span id="eye-pwd" class="material-symbols-outlined text-[16px]">visibility_off</span>
@@ -122,14 +122,14 @@
 
                 {{-- Confirm Password --}}
                 <div>
-                    <label for="password_confirmation" class="block font-body text-[11px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">Konfirmasi</label>
+                    <label for="password_confirmation" class="block font-body text-[11px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">{{ __('auth_ui.confirm_short') }}</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[17px] transition-colors group-focus-within:text-emerald-600">lock_reset</span>
                         <input id="password_confirmation" type="password" name="password_confirmation"
                                required autocomplete="new-password"
                                oninput="checkMatch()"
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-gray-900 text-[13px] rounded-xl pl-10 pr-9 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300"
-                               placeholder="Ulangi password">
+                               placeholder="{{ __('auth_ui.pw_repeat') }}">
                         <button type="button" onclick="togglePwd('password_confirmation','eye-pwd2')"
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                             <span id="eye-pwd2" class="material-symbols-outlined text-[16px]">visibility_off</span>
@@ -142,7 +142,7 @@
             {{-- Password strength bar --}}
             <div>
                 <div class="flex items-center justify-between mb-1.5">
-                    <p class="font-body text-[11px] text-gray-400">Kekuatan password</p>
+                    <p class="font-body text-[11px] text-gray-400">{{ __('auth_ui.pw_strength') }}</p>
                     <p id="strength-label" class="font-body text-[11px] font-semibold text-gray-300">—</p>
                 </div>
                 <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
@@ -153,12 +153,12 @@
             {{-- Submit --}}
             <button type="submit"
                     class="group w-full h-12 flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-body text-[14px] font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-800/25 hover:-translate-y-0.5 active:translate-y-0 mt-1">
-                Kirim Kode Verifikasi
+                {{ __('auth_ui.reg_submit') }}
                 <span class="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-0.5">person_add</span>
             </button>
         </form>
 
-        <p class="mt-3 font-body text-[12px] leading-relaxed text-gray-500">Kami akan mengirim kode OTP ke email Anda. Akun dibuat setelah kode berhasil diverifikasi.</p>
+        <p class="mt-3 font-body text-[12px] leading-relaxed text-gray-500">{{ __('auth_ui.reg_otp_note') }}</p>
 
         {{-- Divider --}}
         <div class="relative my-5">
@@ -166,7 +166,7 @@
                 <span class="w-full border-t border-gray-100"></span>
             </div>
             <div class="relative flex justify-center">
-                <span class="bg-white px-4 font-body text-[12px] text-gray-300 tracking-wider">atau daftar dengan</span>
+                <span class="bg-white px-4 font-body text-[12px] text-gray-300 tracking-wider">{{ __('auth_ui.reg_or') }}</span>
             </div>
         </div>
 
@@ -179,13 +179,13 @@
                 <path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/>
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/>
             </svg>
-            Daftar dengan Google
+            {{ __('auth_ui.reg_google') }}
         </a>
 
         {{-- Login link --}}
         <p class="mt-5 text-center font-body text-[13px] text-gray-400">
-            Sudah punya akun?
-            <a href="{{ route('login') }}" class="font-semibold text-emerald-700 hover:text-emerald-600 transition-colors ml-1">Masuk di sini</a>
+            {{ __('auth_ui.have_account') }}
+            <a href="{{ route('login') }}" class="font-semibold text-emerald-700 hover:text-emerald-600 transition-colors ml-1">{{ __('auth_ui.sign_in_here') }}</a>
         </p>
     </div>
 </div>
@@ -209,10 +209,10 @@ const strengthLbl  = document.getElementById('strength-label');
 
 const levels = [
     { label: '—',        color: '#d1d5db', pct: '0%'   },
-    { label: 'Lemah',    color: '#ef4444', pct: '25%'  },
-    { label: 'Sedang',   color: '#f97316', pct: '50%'  },
-    { label: 'Kuat',     color: '#22c55e', pct: '75%'  },
-    { label: 'Sangat Kuat', color: '#16a34a', pct: '100%' },
+    { label: @json(__('auth_ui.pw_weak')),    color: '#ef4444', pct: '25%'  },
+    { label: @json(__('auth_ui.pw_fair')),   color: '#f97316', pct: '50%'  },
+    { label: @json(__('auth_ui.pw_strong')),     color: '#22c55e', pct: '75%'  },
+    { label: @json(__('auth_ui.pw_very_strong')), color: '#16a34a', pct: '100%' },
 ];
 
 function calcStrength(val) {
@@ -249,12 +249,12 @@ function checkMatch() {
     msg.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
     if (match) {
         msg.classList.add('text-emerald-600');
-        msg.innerHTML = '<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]" style="font-variation-settings:\'FILL\' 1;">check_circle</span>Password cocok</span>';
+        msg.innerHTML = '<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]" style="font-variation-settings:\'FILL\' 1;">check_circle</span>' + @json(__('auth_ui.pw_match')) + '</span>';
         conf.classList.add('border-emerald-400');
         conf.classList.remove('border-red-400');
     } else {
         msg.classList.add('text-red-500');
-        msg.innerHTML = '<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">error</span>Password tidak cocok</span>';
+        msg.innerHTML = '<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">error</span>' + @json(__('auth_ui.pw_nomatch')) + '</span>';
         conf.classList.add('border-red-400');
         conf.classList.remove('border-emerald-400');
     }

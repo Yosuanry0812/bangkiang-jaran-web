@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="{{ app()->getLocale() }}"><head><meta charset="utf-8"><title>E-ticket</title>
+<!DOCTYPE html><html lang="{{ app()->getLocale() }}"><head><meta charset="utf-8"><title>{{ __('panel.e_ticket_058a') }}</title>
 <style>body{font-family:DejaVu Sans,sans-serif;color:#153c30;font-size:12px}h1{font-size:24px}section{padding:18px;border:1px solid #b6c9bf}section+section{page-break-before:always}img{width:160px;height:160px}dl{line-height:1.8}dt{color:#666;font-size:10px}dd{margin:0 0 10px}code{font-size:13px}p{line-height:1.6}</style></head><body>
 @foreach($booking->detailPemesanan as $detail)
 <section><p>Bangkiang Jaran Waterfall</p><h1>{{ __('operations.eticket') }}</h1>

@@ -26,26 +26,26 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Nama Tiket (English)</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('panel.nama_tiket_english_95d4') }}</label>
                     <input type="text" name="nama_tiket_en" value="{{ old('nama_tiket_en', isset($tiket) ? $tiket->getRawOriginal('nama_tiket_en') : '') }}"
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
-                    <p class="text-xs text-stone mt-1">Terjemahan bahasa Inggris (opsional — kalau kosong, situs bahasa Inggris memakai nama Indonesia).</p>
+                    <p class="text-xs text-stone mt-1">{{ __('panel.terjemahan_bahasa_inggris_op_adac') }}</p>
                     @error('nama_tiket_en') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">Harga (Rp)</label>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-1.5">{{ __('panel.harga_rp_ce49') }}</label>
                     <input type="number" name="harga" value="{{ old('harga', $tiket->harga ?? '') }}" required
                         class="w-full border border-gray-300-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all bg-stone-50/50 text-gray-500-800 placeholder-stone-400">
                     @error('harga') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Kategori Tiket</label>
-                    <input type="text" value="Perorangan (Tiket Pengunjung)" disabled
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">{{ __('panel.kategori_tiket_e31b') }}</label>
+                    <input type="text" value="{{ __('ui.category_individual') }}" disabled
                         class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm bg-stone-100 text-gray-600 cursor-not-allowed">
                     <input type="hidden" name="kategori" value="perorangan">
-                    <p class="text-xs text-stone mt-1">Semua tiket adalah tiket akses masuk perorangan.</p>
+                    <p class="text-xs text-stone mt-1">{{ __('panel.semua_tiket_adalah_tiket_c7f9') }}</p>
                 </div>
 
                 <div>

@@ -35,7 +35,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'login' => 'Email/Username atau password salah.',
+                'login' => __('flash.login_failed'),
             ]);
         }
 

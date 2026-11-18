@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('nav-mode', 'light')
 
-@section('title', 'E-Ticket — Bangkiang Jaran')
+@section('title', __('ui.t_eticket'))
 
 @section('content')
 <style>
@@ -40,9 +40,9 @@
         <div class="mb-6 rounded-2xl border border-red-200 bg-red-50/90 p-4 text-sm text-red-900 flex items-start gap-3 no-print" data-aos="fade-down">
             <span class="material-symbols-outlined text-red-600 mt-0.5">cancel</span>
             <div>
-                <strong class="font-semibold">Pesanan Dibatalkan / Kedaluwarsa</strong>
+                <strong class="font-semibold">{{ __('panel.pesanan_dibatalkan_kedaluwar_1c80') }}</strong>
                 <p class="text-xs text-red-700 mt-1 leading-relaxed">
-                    Pesanan ini sudah tidak aktif karena telah dibatalkan atau melewati batas waktu pembayaran tanpa adanya bukti transfer yang sah. E-ticket tidak dapat digunakan.
+                    {{ __('panel.pesanan_ini_sudah_tidak_7ef6') }}
                 </p>
             </div>
         </div>
@@ -55,9 +55,9 @@
             <div class="flex items-start gap-3">
                 <span class="material-symbols-outlined text-amber-600 mt-0.5">hourglass_top</span>
                 <div>
-                    <strong class="font-semibold">Batas Waktu Pembayaran</strong>
+                    <strong class="font-semibold">{{ __('panel.batas_waktu_pembayaran_8bbc') }}</strong>
                     <p class="text-xs text-amber-800 mt-1 leading-relaxed">
-                        Selesaikan pembayaran sebelum <strong class="text-amber-950 font-bold">{{ $deadlineTime->format('H:i') }} WITA</strong> ({{ $deadlineTime->translatedFormat('d M Y') }}). Pesanan yang belum dibayar dalam batas waktu akan otomatis hangus.
+                        {!! __('ui.pay_before', ['time' => '<strong class="text-amber-950 font-bold">'.e($deadlineTime->format('H:i')).'</strong>', 'date' => e($deadlineTime->translatedFormat('d M Y'))]) !!} {{ __('ui.pay_expiry_note2') }}
                     </p>
                 </div>
             </div>
@@ -157,15 +157,15 @@
             <a href="{{ route('wisatawan.pembayaran.create', $pemesanan->id_pemesanan) }}"
                class="flex-1 flex items-center justify-center gap-2 bg-forest text-white font-sans text-sm font-semibold py-3.5 rounded-xl hover:bg-leaf transition-colors">
                 <span class="material-symbols-outlined text-sm">payments</span>
-                {{ $pemesanan->pembayaran?->status === 'ditolak' ? 'Unggah Ulang Bukti Bayar' : __('messages.pay_btn') }}
+                {{ $pemesanan->pembayaran?->status === 'ditolak' ? __('ui.reupload_proof') : __('messages.pay_btn') }}
             </a>
             <form method="POST" action="{{ route('wisatawan.pemesanan.cancel', $pemesanan->id_pemesanan) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')" class="flex-none">
                 @csrf
                 <button type="submit"
                         class="w-full sm:w-auto px-4 flex items-center justify-center gap-1.5 border border-red-200 text-red-600 font-sans text-sm font-medium py-3.5 rounded-xl hover:bg-red-50 hover:border-red-300 transition-colors cursor-pointer"
-                        title="Batalkan pesanan ini">
+                        title="{{ __('panel.batalkan_pesanan_ini_dba8') }}">
                     <span class="material-symbols-outlined text-sm">close</span>
-                    Batalkan
+                    {{ __('panel.batalkan_8d15') }}
                 </button>
             </form>
             @endif

@@ -8,6 +8,8 @@ class ActivityLog extends Model
 {
     protected $table = 'activity_logs';
 
+    protected $primaryKey = 'id_log';
+
     protected $fillable = [
         'id_user',
         'aktivitas',

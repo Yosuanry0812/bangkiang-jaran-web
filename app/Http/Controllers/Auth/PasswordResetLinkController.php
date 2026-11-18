@@ -38,10 +38,10 @@ class PasswordResetLinkController extends Controller
             Log::error('Pengiriman email reset password gagal.', ['exception' => get_class($e)]);
 
             return back()->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email belum dapat dikirim. Silakan coba lagi nanti.']);
+                ->withErrors(['email' => __('flash.email_send_failed')]);
         }
 
         // Use the same response for unknown addresses and throttled requests.
-        return back()->with('status', 'Jika email terdaftar, link reset password akan dikirim. Periksa juga folder spam.');
+        return back()->with('status', __('flash.reset_link_sent'));
     }
 }

@@ -23,7 +23,6 @@ use App\Http\Middleware\EnsureExplicitLogin;
 use App\Http\Middleware\Localization;
 use App\Http\Middleware\RedirectPengelolaFromPublicPages;
 use App\Http\Middleware\VerifyCsrfToken;
-use App\Services\VisitQuota;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\StartSession;
@@ -59,11 +58,6 @@ Route::middleware(RedirectPengelolaFromPublicPages::class)->group(function () {
     Route::get('/tiket/{id}', [WisatawanTiketController::class, 'detail'])->name('tiket.detail');
 });
 Route::get('/tiket/verifikasi/{kode}', [WisatawanTiketController::class, 'verifikasi'])->middleware('throttle:30,1')->name('tiket.verifikasi');
-Route::get('/kunjungan/kuota', function (Request $request, VisitQuota $quota) {
-    $values = $request->validate(['date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today']]);
-
-    return response()->json($quota->availability($values['date']))->header('Cache-Control', 'no-store');
-})->middleware('throttle:60,1')->name('kunjungan.kuota');
 
 // ========== AUTHENTICATED WISATAWAN ROUTES ==========
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -99,8 +93,6 @@ Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengel
     Route::get('/aktivitas', [OperationsController::class, 'audit'])->name('audit.index');
     Route::get('/pengaturan', [OperationsController::class, 'settings'])->name('settings.edit');
     Route::put('/pengaturan', [OperationsController::class, 'updateSettings'])->name('settings.update');
-    Route::get('/kuota', [OperationsController::class, 'quotas'])->name('quotas.index');
-    Route::put('/kuota', [OperationsController::class, 'updateQuota'])->name('quotas.update');
 
     // Kelola Galeri
     Route::resource('/galeri', GaleriController::class)->parameters([

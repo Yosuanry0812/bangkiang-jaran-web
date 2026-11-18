@@ -1,10 +1,10 @@
 @extends('pengelola.layouts.admin')
-@section('title', 'Pemesanan Offline — Bangkiang Jaran')
-@section('page_title', 'Pemesanan Offline')
+@section('title', __('ui.t_offline'))
+@section('page_title', __('ui.t_offline_short'))
 @section('content')
 <div x-data="offlineOrder({{ Js::from($tiketList->pluck('harga', 'id_tiket')) }}, {{ Js::from($tiketList->pluck('nama_tiket', 'id_tiket')) }}, {{ Js::from(old('tickets', [])) }})">
-    <header class="admin-page-head"><div><h1>Pemesanan offline</h1><p>Catat kunjungan wisatawan yang membeli tiket di lokasi.</p></div><a href="{{ route('pengelola.pemesanan-offline.riwayat') }}" class="admin-btn admin-btn--quiet"><span class="material-symbols-outlined" aria-hidden="true">history</span>Riwayat offline</a></header>
-    <div class="admin-flow" aria-label="Tahap pemesanan"><span aria-current="step"><b>1</b>Pilih tiket</span><span><b>2</b>Data pengunjung</span><span><b>3</b>Tiket terbit</span></div>
+    <header class="admin-page-head"><div><h1>{{ __('panel.pemesanan_offline_13e7') }}</h1><p>{{ __('panel.catat_kunjungan_wisatawan_ya_dc9d') }}</p></div><a href="{{ route('pengelola.pemesanan-offline.riwayat') }}" class="admin-btn admin-btn--quiet"><span class="material-symbols-outlined" aria-hidden="true">history</span>{{ __('panel.riwayat_offline_66eb') }}</a></header>
+    <div class="admin-flow" aria-label="{{ __('panel.tahap_pemesanan_0929') }}"><span aria-current="step"><b>1</b>{{ __('panel.pilih_tiket_8f11') }}</span><span><b>2</b>{{ __('panel.data_pengunjung_512a') }}</span><span><b>3</b>{{ __('panel.tiket_terbit_c2f0') }}</span></div>
     @if(session('error') || $errors->any())
     <div class="admin-alert admin-alert--error" role="alert">{{ session('error') }}<ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
     @endif
@@ -12,42 +12,41 @@
     @csrf
     <div class="admin-booking-grid">
         <div class="admin-booking-fields">
-            <section class="admin-panel admin-date"><label class="admin-field" for="offline-date">Tanggal kunjungan<input id="offline-date" type="date" name="tgl_kunjungan" value="{{ old('tgl_kunjungan', $tanggal) }}" required></label><p class="admin-note mt-3">Tiket berlaku pada tanggal kunjungan yang dipilih.</p></section>
+            <section class="admin-panel admin-date"><label class="admin-field" for="offline-date">{{ __('panel.tanggal_kunjungan_0dff') }}<input id="offline-date" type="date" name="tgl_kunjungan" value="{{ old('tgl_kunjungan', $tanggal) }}" required></label><p class="admin-note mt-3">{{ __('panel.tiket_berlaku_pada_tanggal_e415') }}</p></section>
             <section class="admin-panel">
-                <div class="admin-panel-head"><div><h2>Pilih jenis tiket</h2><p>Masukkan jumlah atau gunakan tombol tambah dan kurang.</p></div></div>
+                <div class="admin-panel-head"><div><h2>{{ __('panel.pilih_jenis_tiket_4a4b') }}</h2><p>{{ __('panel.masukkan_jumlah_atau_gunakan_94f2') }}</p></div></div>
                 @forelse($tiketList as $t)
                 <div class="admin-ticket-row">
-                    <div><h3 id="ticket-name-{{ $t->id_tiket }}">{{ $t->nama_tiket }}</h3><p>Rp{{ number_format($t->harga, 0, ',', '.') }} / {{ $t->kategori === 'kendaraan' ? 'kendaraan' : 'orang' }}</p></div>
+                    <div><h3 id="ticket-name-{{ $t->id_tiket }}">{{ $t->nama_tiket }}</h3><p>Rp{{ number_format($t->harga, 0, ',', '.') }} / {{ $t->kategori === 'kendaraan' ? __('ui.unit_vehicle') : __('ui.unit_person') }}</p></div>
                     <div class="admin-qty">
-                        <button type="button" @click="decrement({{ $t->id_tiket }})" :disabled="qty({{ $t->id_tiket }}) === 0" aria-label="Kurangi {{ $t->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">remove</span></button>
+                        <button type="button" @click="decrement({{ $t->id_tiket }})" :disabled="qty({{ $t->id_tiket }}) === 0" aria-label="{{ __('ui.decrease', ['name' => $t->nama_tiket]) }}"><span class="material-symbols-outlined" aria-hidden="true">remove</span></button>
                         <input type="number" min="0" step="1" inputmode="numeric" name="tickets[{{ $t->id_tiket }}]" :value="qty({{ $t->id_tiket }})" @input="setQty({{ $t->id_tiket }}, $event.target.value)" @change="$event.target.value = qty({{ $t->id_tiket }})" aria-labelledby="ticket-name-{{ $t->id_tiket }}">
-                        <button type="button" @click="increment({{ $t->id_tiket }})" aria-label="Tambah {{ $t->nama_tiket }}"><span class="material-symbols-outlined" aria-hidden="true">add</span></button>
+                        <button type="button" @click="increment({{ $t->id_tiket }})" aria-label="{{ __('ui.increase', ['name' => $t->nama_tiket]) }}"><span class="material-symbols-outlined" aria-hidden="true">add</span></button>
                     </div>
                 </div>
                 @empty
-                <div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><h3>Tidak ada tiket aktif</h3><p>Aktifkan tiket terlebih dahulu untuk membuat pemesanan.</p><a class="admin-btn" href="{{ route('pengelola.tiket.index') }}">Kelola tiket</a></div>
+                <div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><h3>{{ __('panel.tidak_ada_tiket_aktif_5431') }}</h3><p>{{ __('panel.aktifkan_tiket_terlebih_dahu_60c5') }}</p><a class="admin-btn" href="{{ route('pengelola.tiket.index') }}">{{ __('panel.kelola_tiket_e512') }}</a></div>
                 @endforelse
             </section>
-            <p class="admin-note">Harga mengikuti tarif tiket yang tersimpan. Periksa jumlah dan tanggal sebelum melanjutkan.</p>
+            <p class="admin-note">{{ __('panel.harga_mengikuti_tarif_tiket_b289') }}</p>
         </div>
         <aside class="admin-order-aside">
             <section class="admin-panel">
-                <div class="admin-panel-head"><div><h2>Ringkasan pesanan</h2><p><span x-text="quantity()">0</span> tiket dipilih</p></div><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span></div>
+                <div class="admin-panel-head"><div><h2>{{ __('panel.ringkasan_pesanan_7157') }}</h2><p><span x-text="quantity()">0</span> {{ __('panel.tiket_dipilih_5e2d') }}</p></div><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span></div>
                 <div class="admin-order-body">
-                    <div class="admin-empty" x-show="selectedTickets().length === 0"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><h3>Belum ada tiket dipilih</h3><p>Pilih jumlah tiket untuk melihat rincian pesanan.</p></div>
+                    <div class="admin-empty" x-show="selectedTickets().length === 0"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><h3>{{ __('panel.belum_ada_tiket_dipilih_66c2') }}</h3><p>{{ __('panel.pilih_jumlah_tiket_untuk_8c4c') }}</p></div>
                     <div x-show="selectedTickets().length > 0" x-cloak>
                         <template x-for="item in selectedTickets()" :key="item.id"><div class="admin-order-item"><div><strong x-text="item.nama"></strong><small x-text="item.qty + ' × Rp' + item.harga.toLocaleString('id-ID')"></small></div><span x-text="'Rp' + (item.qty * item.harga).toLocaleString('id-ID')"></span></div></template>
                     </div>
-                    <div class="admin-order-totals" aria-live="polite" aria-atomic="true"><div><span>Jumlah tiket</span><span x-text="quantity()">0</span></div><div><strong>Total pembayaran</strong><strong class="admin-order-total" x-text="'Rp' + total().toLocaleString('id-ID')">Rp0</strong></div></div>
-                    <button type="submit" class="admin-btn w-full" :disabled="selectedTickets().length === 0">Lanjut ke data pengunjung<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
+                    <div class="admin-order-totals" aria-live="polite" aria-atomic="true"><div><span>{{ __('panel.jumlah_tiket_334d') }}</span><span x-text="quantity()">0</span></div><div><strong>{{ __('panel.total_pembayaran_3222') }}</strong><strong class="admin-order-total" x-text="'Rp' + total().toLocaleString('id-ID')">Rp0</strong></div></div>
+                    <button type="submit" class="admin-btn w-full" :disabled="selectedTickets().length === 0">{{ __('panel.lanjut_ke_data_pengunjung_cf33') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
                 </div>
             </section>
-            <p>Pesanan offline langsung aktif setelah data pengunjung disimpan. Pembayaran dicatat sebagai <strong>Lunas</strong>.</p>
+            <p>{!! __('ui.offline_note', ['status' => '<strong>'.e(__('panel.lunas_3928')).'</strong>']) !!}</p>
         </aside>
     </div>
     </form>
 </div>
-<div class="bj-operations"><p class="bj-quota-status" role="status" data-quota-status="{{ route('kunjungan.kuota') }}" data-loading="{{ __('operations.quota_loading') }}" data-unlimited="{{ __('operations.quota_unlimited') }}" data-remaining="{{ __('operations.quota_remaining') }}" data-error="{{ __('operations.quota_full') }}"></p></div>
 @endsection
 @push('scripts')
 <script defer src="{{ asset('js/booking-operations.js') }}"></script>

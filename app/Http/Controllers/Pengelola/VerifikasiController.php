@@ -10,7 +10,6 @@ use App\Models\Pembayaran;
 use App\Models\Pemesanan;
 use App\Services\AuditTrail;
 use App\Services\DestinationSettings;
-use App\Services\VisitQuota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -95,14 +94,12 @@ class VerifikasiController extends Controller
 
         DB::beginTransaction();
         try {
-            $date = Pemesanan::findOrFail($id)->tgl_kunjungan;
-            app(VisitQuota::class)->lock($date);
             $pemesanan = Pemesanan::whereKey($id)->lockForUpdate()->firstOrFail();
             $pembayaran = Pembayaran::where('id_pemesanan', $id)->lockForUpdate()->first();
             if (! $pembayaran || $pembayaran->status !== 'pending' || $pemesanan->status !== 'pending') {
                 DB::rollBack();
 
-                return back()->with('error', 'Pembayaran tidak sedang menunggu verifikasi.');
+                return back()->with('error', __('flash.payment_not_pending'));
             }
             $pemesanan->setRelation('pembayaran', $pembayaran);
 
@@ -127,7 +124,7 @@ class VerifikasiController extends Controller
                 }
 
                 return redirect()->route('pengelola.verifikasi.index')
-                    ->with('success', 'Pembayaran diverifikasi VALID. Tiket siap digunakan.');
+                    ->with('success', __('flash.payment_valid'));
             } else {
                 $pemesanan->pembayaran->update([
                     'status' => 'ditolak',
@@ -148,13 +145,13 @@ class VerifikasiController extends Controller
                 }
 
                 return redirect()->route('pengelola.verifikasi.index')
-                    ->with('success', 'Pembayaran ditolak. Wisatawan akan diminta upload ulang.');
+                    ->with('success', __('flash.payment_rejected'));
             }
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Verifikasi pembayaran gagal.', ['exception' => get_class($e)]);
 
-            return back()->with('error', 'Terjadi kesalahan. Silakan coba lagi.');
+            return back()->with('error', __('flash.generic_error'));
         }
     }
 }

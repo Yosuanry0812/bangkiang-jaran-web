@@ -28,16 +28,16 @@ class PemesananOfflineController extends Controller
             'tickets' => ['required', 'array', 'min:1'],
             'tickets.*' => ['integer', 'min:0'],
         ], [
-            'tgl_kunjungan.required' => 'Tanggal kunjungan wajib diisi.',
-            'tickets.required' => 'Pilih minimal satu tiket.',
-            'tickets.min' => 'Pilih minimal satu tiket.',
+            'tgl_kunjungan.required' => __('flash.visit_date_required'),
+            'tickets.required' => __('flash.select_one_ticket'),
+            'tickets.min' => __('flash.select_one_ticket'),
         ]);
 
         $tanggal = $request->tgl_kunjungan;
         $tickets = array_filter($request->tickets, fn ($q) => $q > 0);
 
         if (empty($tickets)) {
-            return back()->withErrors(['tickets' => 'Pilih minimal satu tiket.'])->withInput();
+            return back()->withErrors(['tickets' => __('flash.select_one_ticket')])->withInput();
         }
 
         $detail = [];
@@ -89,7 +89,7 @@ class PemesananOfflineController extends Controller
         ]);
 
         return redirect()->route('pengelola.pemesanan-offline.data-diri')
-            ->with('success', 'Silakan lengkapi data diri pengunjung.');
+            ->with('success', __('flash.fill_visitor_data'));
     }
 
     public function dataDiri()
@@ -97,7 +97,7 @@ class PemesananOfflineController extends Controller
         $flow = session('pemesanan_offline_flow');
         if (! $flow) {
             return redirect()->route('pengelola.pemesanan-offline.create')
-                ->with('error', 'Sesi pemesanan habis. Silakan mulai lagi.');
+                ->with('error', __('flash.booking_session_expired'));
         }
 
         return view('pengelola.pemesanan-offline.data-diri', compact('flow'));

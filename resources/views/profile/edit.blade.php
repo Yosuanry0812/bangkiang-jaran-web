@@ -1,5 +1,5 @@
 @extends(Auth::user()->role === 'pengelola' ? 'pengelola.layouts.admin' : 'layouts.app')
-@section('page_title', 'Akun Saya')
+@section('page_title', __('ui.t_my_account'))
 @section('nav-mode', 'light')
 @section('title', 'Profil — ' . config('app.name'))
 
@@ -11,13 +11,13 @@
 <div class="max-w-5xl mx-auto">
 @if(session('status') === 'google-registered')
 <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900" role="status">
-    Akun Google Anda berhasil dibuat. Pilih username sendiri di bawah; username ini tidak mengubah nama akun Google Anda.
+    {{ __('auth_ui.pf_google_created') }}
 </div>
 @endif
 
 {{-- ── Page header ─────────────────────────────── --}}
 <div class="mb-10" data-aos="fade-up">
-    <p class="font-sans text-[10px] tracking-[0.25em] uppercase text-stone mb-2">Akun Saya</p>
+    <p class="font-sans text-[10px] tracking-[0.25em] uppercase text-stone mb-2">{{ __('ui.t_my_account') }}</p>
     <h1 class="font-serif text-[clamp(2rem,4vw,3rem)] text-ink leading-tight">{{ __('messages.my_account') }}</h1>
     <p class="font-sans text-sm text-stone mt-2">{{ __('messages.manage_account') }}</p>
 </div>
@@ -51,19 +51,19 @@
         {{-- Role badge --}}
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-forest/8 border border-forest/12 font-sans text-[11px] font-medium text-forest">
             <span class="material-symbols-outlined text-[13px]" style="font-variation-settings:'FILL' 1,'wght' 300;">verified</span>
-            {{ Auth::user()->role === 'pengelola' ? 'Pengelola' : 'Wisatawan' }}
+            {{ Auth::user()->role === 'pengelola' ? __('messages.manager') : __('messages.tourist') }}
         </span>
     </div>
 
     {{-- Meta card --}}
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 space-y-4">
         <div>
-            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">Bergabung sejak</p>
+            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">{{ __('messages.member_since') }}</p>
             <p class="font-sans text-sm font-medium text-ink">{{ Auth::user()->created_at->translatedFormat('d F Y') }}</p>
         </div>
         <div class="h-px bg-gray-100"></div>
         <div>
-            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">Pendaftaran melalui</p>
+            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">{{ __('auth_ui.pf_registered_via') }}</p>
             <p class="font-sans text-sm font-medium text-ink flex items-center gap-1.5">
                 @if(Auth::user()->google_id)
                     <svg width="13" height="13" viewBox="0 0 48 48" class="flex-shrink-0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -76,7 +76,7 @@
         </div>
         <div class="h-px bg-gray-100"></div>
         <div>
-            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">Verifikasi email</p>
+            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">{{ __('auth_ui.pf_email_verification') }}</p>
             <p class="font-sans text-sm font-medium text-ink">{{ Auth::user()->emailVerificationLabel() }}</p>
         </div>
         <div class="h-px bg-gray-100"></div>
@@ -96,24 +96,24 @@
         <button @click="tab='profile'"
                 :class="tab==='profile' ? 'bg-forest text-white shadow-sm' : 'text-stone hover:text-ink'"
                 class="font-sans text-[12px] font-medium px-5 py-2 rounded-xl transition-all duration-200">
-            Informasi Akun
+            {{ __('auth_ui.pf_tab_info') }}
         </button>
         @if(Auth::user()->google_id)
         <button @click="tab='password'"
                 :class="tab==='password' ? 'bg-forest text-white shadow-sm' : 'text-stone hover:text-ink'"
                 class="font-sans text-[12px] font-medium px-5 py-2 rounded-xl transition-all duration-200">
-            Atur Kata Sandi
+            {{ __('auth_ui.pf_set_password') }}
         </button>
         @endif
     </div>
 
-    {{-- ── Tab: Informasi Akun ── --}}
+    {{-- ── Tab: {{ __('auth_ui.pf_tab_info') }} ── --}}
     <div x-show="tab==='profile'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
         <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
 
             <div class="mb-7">
-                <h3 class="font-serif text-[1.2rem] text-ink">Informasi Pribadi</h3>
-                <p class="font-sans text-xs text-stone mt-1">Perbarui nama, username, dan nomor telepon Anda.</p>
+                <h3 class="font-serif text-[1.2rem] text-ink">{{ __('auth_ui.pf_personal') }}</h3>
+                <p class="font-sans text-xs text-stone mt-1">{{ __('auth_ui.pf_personal_lead') }}</p>
             </div>
 
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-5">
@@ -123,7 +123,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {{-- Nama --}}
                     <div>
-                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Nama Lengkap</label>
+                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('messages.full_name') }}</label>
                         <div class="relative group">
                             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 transition-colors group-focus-within:text-forest">person</span>
                             <input name="name" type="text" value="{{ old('name', Auth::user()->name) }}" required
@@ -141,7 +141,7 @@
                                    class="w-full h-11 bg-gray-50 border border-gray-200 text-ink text-[13px] rounded-xl pl-10 pr-4 focus:bg-white focus:border-forest/40 focus:ring-4 focus:ring-forest/8 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('username') border-red-400 bg-red-50 @enderror">
                         </div>
                         @error('username') <p class="mt-1 text-[11px] text-red-500 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">error</span>{{ $message }}</p> @enderror
-                        @if(Auth::user()->google_id)<p class="mt-2 text-xs text-stone">Bebas dipilih dan tetap tersimpan saat masuk kembali dengan Google.</p>@endif
+                        @if(Auth::user()->google_id)<p class="mt-2 text-xs text-stone">{{ __('auth_ui.pf_username_note') }}</p>@endif
                     </div>
 
                     {{-- Email --}}
@@ -154,12 +154,12 @@
                                    class="w-full h-11 bg-gray-50 border border-gray-200 text-ink text-[13px] rounded-xl pl-10 pr-4 focus:bg-white focus:border-forest/40 focus:ring-4 focus:ring-forest/8 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('email') border-red-400 bg-red-50 @enderror">
                         </div>
                         @error('email') <p class="mt-1 text-[11px] text-red-500 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">error</span>{{ $message }}</p> @enderror
-                        @if(Auth::user()->google_id || Auth::user()->email_verification_method === 'otp')<p class="mt-2 text-xs text-stone">Email terverifikasi terikat pada akun ini.</p>@endif
+                        @if(Auth::user()->google_id || Auth::user()->email_verification_method === 'otp')<p class="mt-2 text-xs text-stone">{{ __('auth_ui.pf_email_locked') }}</p>@endif
                     </div>
 
                     {{-- Telepon --}}
                     <div>
-                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Nomor Telepon</label>
+                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('messages.phone') }}</label>
                         <div class="relative group">
                             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 transition-colors group-focus-within:text-forest">phone</span>
                             <input name="phone" type="tel" value="{{ old('phone', Auth::user()->phone) }}" placeholder="+62 812 3456 7890"
@@ -174,37 +174,37 @@
                     <button type="submit"
                             class="group inline-flex items-center gap-2 bg-forest hover:bg-leaf text-white font-sans text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
                         <span class="material-symbols-outlined text-[15px]">save</span>
-                        Simpan Perubahan
+                        {{ __('messages.save_changes') }}
                     </button>
                     <a href="{{ route('redirect.after.login') }}"
                        class="font-sans text-[13px] text-stone border border-gray-200 px-6 py-2.5 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-                        Lanjutkan
+                        {{ __('auth_ui.pf_continue') }}
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    {{-- ── Tab: Atur Kata Sandi (Google users) ── --}}
+    {{-- ── Tab: {{ __('auth_ui.pf_set_password') }} (Google users) ── --}}
     @if(Auth::user()->google_id)
     <div x-show="tab==='password'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
         <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
 
             <div class="mb-7">
-                <h3 class="font-serif text-[1.2rem] text-ink">Atur Kata Sandi</h3>
-                <p class="font-sans text-xs text-stone mt-1">Tambahkan kata sandi agar bisa login dengan email & password.</p>
+                <h3 class="font-serif text-[1.2rem] text-ink">{{ __('auth_ui.pf_set_password') }}</h3>
+                <p class="font-sans text-xs text-stone mt-1">{{ __('auth_ui.pf_set_password_lead') }}</p>
             </div>
 
             {{-- Google info banner --}}
             <div class="flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl mb-6">
                 <svg width="16" height="16" viewBox="0 0 48 48" class="flex-shrink-0 mt-0.5"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
-                <p class="font-sans text-[12px] text-blue-700 leading-relaxed">Akun Anda terhubung dengan Google. Atur kata sandi di bawah untuk mengaktifkan login email.</p>
+                <p class="font-sans text-[12px] text-blue-700 leading-relaxed">{{ __('auth_ui.pf_google_linked') }}</p>
             </div>
 
             @if(session('status') === 'password-set')
             <div class="mb-5 flex items-center gap-3 px-5 py-3 rounded-2xl bg-forest/8 border border-forest/15 text-forest font-sans text-sm">
                 <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1,'wght' 300;">check_circle</span>
-                Kata sandi berhasil diatur. Sekarang Anda bisa login dengan email dan password.
+                {{ __('auth_ui.pf_password_set') }}
             </div>
             @endif
 
@@ -213,12 +213,12 @@
                 @if(Auth::user()->password)<label class="block text-sm">{{ __('operations.current_password') }}<input type="password" name="current_password" autocomplete="current-password" required class="block w-full rounded-xl border-gray-300 mt-2"></label>@error('current_password')<p role="alert">{{ $message }}</p>@enderror
                 @endif
                 <div>
-                    <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Kata Sandi Baru</label>
+                    <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('auth_ui.pf_new_password') }}</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 group-focus-within:text-forest transition-colors">lock</span>
                         <input id="new-pwd" name="password" type="password" required minlength="8"
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-ink text-[13px] rounded-xl pl-10 pr-10 focus:bg-white focus:border-forest/40 focus:ring-4 focus:ring-forest/8 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('password') border-red-400 bg-red-50 @enderror"
-                               placeholder="Minimal 8 karakter">
+                               placeholder="{{ __('auth_ui.rp_min8') }}">
                         <button type="button" onclick="togglePwd('new-pwd','eye-new')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-stone transition-colors">
                             <span id="eye-new" class="material-symbols-outlined text-[16px]">visibility_off</span>
                         </button>
@@ -227,12 +227,12 @@
                 </div>
 
                 <div>
-                    <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Konfirmasi Kata Sandi</label>
+                    <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('auth_ui.pf_confirm_password') }}</label>
                     <div class="relative group">
                         <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 group-focus-within:text-forest transition-colors">lock_reset</span>
                         <input id="new-pwd-confirm" name="password_confirmation" type="password" required
                                class="w-full h-11 bg-gray-50 border border-gray-200 text-ink text-[13px] rounded-xl pl-10 pr-10 focus:bg-white focus:border-forest/40 focus:ring-4 focus:ring-forest/8 focus:outline-none transition-all duration-200 placeholder:text-gray-300"
-                               placeholder="Ulangi kata sandi">
+                               placeholder="{{ __('auth_ui.pf_repeat_password') }}">
                         <button type="button" onclick="togglePwd('new-pwd-confirm','eye-conf')" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-stone transition-colors">
                             <span id="eye-conf" class="material-symbols-outlined text-[16px]">visibility_off</span>
                         </button>
@@ -243,7 +243,7 @@
                     <button type="submit"
                             class="inline-flex items-center gap-2 bg-forest hover:bg-leaf text-white font-sans text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
                         <span class="material-symbols-outlined text-[15px]">lock</span>
-                        Atur Kata Sandi
+                        {{ __('auth_ui.pf_set_password') }}
                     </button>
                 </div>
             </form>

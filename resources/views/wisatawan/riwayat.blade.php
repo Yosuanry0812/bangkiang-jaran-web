@@ -18,7 +18,7 @@
         <div class="bj-history-wrap bj-history-intro__inner">
             <div class="bj-history-intro__copy">
                 <p class="bj-history-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Your visits' : 'Kunjungan Anda' }}</p>
-                <h1 id="history-title" class="bj-reveal">{{ $isEnglish ? 'Your visits, all in one place.' : 'Kunjunganmu, dalam satu tempat.' }}</h1>
+                <h1 id="history-title" class="bj-reveal">{{ $isEnglish ? 'Your visits, all in one place.' : 'Kunjungan Anda, dalam satu tempat.' }}</h1>
                 <p class="bj-history-intro__lead bj-reveal">{{ $isEnglish ? 'Check payment status, visitor details, and e-tickets for each booking.' : 'Lihat status pembayaran, detail pengunjung, dan e-ticket untuk setiap pesanan.' }}</p>
             </div>
             <div class="bj-history-intro__count bj-reveal"><span>{{ $isEnglish ? 'Total reservations' : 'Total reservasi' }}</span><strong>{{ str_pad($total, 2, '0', STR_PAD_LEFT) }}</strong><small>{{ $isEnglish ? 'kept in your account' : 'tersimpan di akun Anda' }}</small></div>

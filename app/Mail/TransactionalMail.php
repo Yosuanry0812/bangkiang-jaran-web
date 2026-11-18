@@ -28,6 +28,8 @@ abstract class TransactionalMail extends Mailable implements ShouldQueue
     public function __construct(Pemesanan $pemesanan)
     {
         $this->pemesanan = $pemesanan;
+        $user = $pemesanan->user;
+        $this->locale(auth()->id() && $user && auth()->id() === $user->id ? app()->getLocale() : ($user?->locale ?: config('app.locale')));
         $this->onConnection(config('queue.transactional_connection', 'database'));
         $this->onQueue('mail');
         $this->afterCommit();

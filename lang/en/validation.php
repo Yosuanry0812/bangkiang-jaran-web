@@ -179,6 +179,29 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'tgl_kunjungan' => 'visit date',
+        'login' => 'email or username',
+        'tickets' => 'tickets',
+        'bukti_bayar' => 'payment proof',
+        'metode' => 'payment method',
+        'nama_tiket' => 'ticket name',
+        'nama_tiket_en' => 'ticket name (English)',
+        'harga' => 'price',
+        'kategori' => 'category',
+        'keterangan' => 'description',
+        'keterangan_en' => 'description (English)',
+        'tipe' => 'type',
+        'periode_awal' => 'start period',
+        'periode_akhir' => 'end period',
+        'rejection_reason' => 'rejection reason',
+        'payment_minutes' => 'payment deadline',
+        'operating_hours' => 'opening hours',
+        'maps_url' => 'directions link',
+        'maps_embed' => 'Google Maps URL',
+        'kode' => 'ticket code',
+        'otp' => 'OTP code',
+        'phone' => 'phone number',
+    ],
 
 ];

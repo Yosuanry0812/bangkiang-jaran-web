@@ -6,7 +6,7 @@ class PembayaranValid extends TransactionalMail
 {
     public function build()
     {
-        return $this->subject('Pembayaran Diverifikasi - Tiket Siap Digunakan')
+        return $this->subject(__('mail.subject_valid'))
                     ->view('emails.pembayaran-valid');
     }
 }

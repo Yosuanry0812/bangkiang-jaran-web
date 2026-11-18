@@ -81,8 +81,8 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
         $user = User::factory()->create();
-        $this->post('/forgot-password', ['email' => $user->email])->assertSessionHas('status', 'Jika email terdaftar, link reset password akan dikirim. Periksa juga folder spam.');
-        $this->post('/forgot-password', ['email' => 'unknown@example.com'])->assertSessionHas('status', 'Jika email terdaftar, link reset password akan dikirim. Periksa juga folder spam.')->assertSessionHasNoErrors();
+        $this->post('/forgot-password', ['email' => $user->email])->assertSessionHas('status', 'Jika email terdaftar, tautan atur ulang kata sandi akan dikirim. Periksa juga folder spam.');
+        $this->post('/forgot-password', ['email' => 'unknown@example.com'])->assertSessionHas('status', 'Jika email terdaftar, tautan atur ulang kata sandi akan dikirim. Periksa juga folder spam.')->assertSessionHasNoErrors();
     }
 
     public function test_expired_token_cannot_reset_password(): void

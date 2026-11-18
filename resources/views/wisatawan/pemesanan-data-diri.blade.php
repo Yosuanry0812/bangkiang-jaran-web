@@ -12,12 +12,12 @@
             <div class="bj-visitor-intro__copy">
                 <p class="bj-visitor-kicker bj-reveal"><span aria-hidden="true"></span>{{ $isEnglish ? 'Visitor details' : 'Data pengunjung' }}</p>
                 <h1 id="visitor-title">{{ $isEnglish ? 'Who’s coming along?' : 'Siapa yang ikut berkunjung?' }}</h1>
-                <p class="bj-visitor-intro__lead">{{ $isEnglish ? 'Enter the details for each ticket. You can review your booking before payment.' : 'Isi data untuk setiap tiket. Setelah ini, kamu bisa melanjutkan ke pembayaran.' }}</p>
+                <p class="bj-visitor-intro__lead">{{ $isEnglish ? 'Enter the details for each ticket. You can review your booking before payment.' : 'Isi data untuk setiap tiket. Setelah ini, Anda dapat melanjutkan ke pembayaran.' }}</p>
             </div>
             <div class="bj-visitor-intro__folio bj-reveal" aria-label="{{ $isEnglish ? 'Reservation details' : 'Detail reservasi' }}">
                 <span>{{ $isEnglish ? 'Visit date' : 'Tanggal kunjungan' }}</span>
                 <strong>{{ \Carbon\Carbon::parse($flow['tgl_kunjungan'])->isoFormat('D MMMM YYYY') }}</strong>
-                <small>{{ $isEnglish ? 'Booking reference' : 'Referensi booking' }} · {{ $flow['kode_booking'] }}</small>
+                <small>{{ $isEnglish ? 'Booking reference' : 'Kode pemesanan' }} · {{ $flow['kode_booking'] }}</small>
             </div>
         </div>
     </header>

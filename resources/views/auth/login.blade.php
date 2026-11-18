@@ -15,13 +15,13 @@
         <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(0,30,20,0.85) 0%, transparent 55%);"></div>
 
         {{-- Top logo area --}}
-        <div class="bj-login-location relative z-10 p-8"><span class="bj-login-location-dot" aria-hidden="true"></span> Desa Bakbakan · Gianyar, Bali</div>
+        <div class="bj-login-location relative z-10 p-8"><span class="bj-login-location-dot" aria-hidden="true"></span> {{ __('auth_ui.login_location') }}</div>
 
         <div class="relative z-10 p-8 text-white">
-            <p class="bj-login-image-eyebrow">Cagar Wisata Alam</p>
-            <p class="font-display text-[2.6rem] leading-tight max-w-xs">Perjalanan <em>dimulai</em> di sini.</p>
-            <p class="bj-login-image-note">Selamat datang di Bangkiang Jaran. Masuki ruang hening air terjun di Gianyar, Bali, di mana tradisi menyatu dengan keasrian alam.</p>
-            <div class="bj-login-image-footer">Harmoni Tri Hita Karana</div>
+            <p class="bj-login-image-eyebrow">{{ __('auth_ui.login_eyebrow') }}</p>
+            <p class="font-display text-[2.6rem] leading-tight max-w-xs">{!! __('auth_ui.login_hero') !!}</p>
+            <p class="bj-login-image-note">{{ __('auth_ui.login_note') }}</p>
+            <div class="bj-login-image-footer">{{ __('auth_ui.login_footer') }}</div>
         </div>
     </div>
 
@@ -32,7 +32,7 @@
             <a href="{{ route('landing') }}" class="bj-login-brand"><span class="bj-login-monogram">B</span><span><strong>Bangkiang Jaran</strong><small>Gianyar · Bali</small></span></a>
             <div class="bj-login-header-actions">
                 <a href="{{ route('lang.switch', app()->getLocale() === 'id' ? 'en' : 'id') }}" class="bj-login-language" aria-label="{{ app()->getLocale() === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia' }}">{{ app()->getLocale() === 'id' ? 'ID / EN' : 'EN / ID' }}</a>
-                <a href="{{ route('register') }}" class="bj-login-register">Daftar Akun</a>
+                <a href="{{ route('register') }}" class="bj-login-register">{{ __('auth_ui.login_register_cta') }}</a>
             </div>
         </div>
 
@@ -40,10 +40,10 @@
         <div class="bj-login-intro mb-8">
             <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-[11px] font-body font-semibold tracking-[0.15em] uppercase px-3 py-1.5 rounded-full mb-5">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Portal Pengunjung & Reservasi
+                {{ __('auth_ui.login_portal') }}
             </div>
-            <h1 class="font-display text-[2rem] font-semibold text-gray-900 leading-tight mb-2">Masuk ke Akun</h1>
-            <p class="font-body text-[14px] text-gray-500 leading-relaxed">Masuk untuk memesan tiket, mengecek status reservasi, dan mengelola kunjungan wisata Anda.</p>
+            <h1 class="font-display text-[2rem] font-semibold text-gray-900 leading-tight mb-2">{{ __('auth_ui.login_title') }}</h1>
+            <p class="font-body text-[14px] text-gray-500 leading-relaxed">{{ __('auth_ui.login_lead') }}</p>
         </div>
 
         {{-- Alert messages --}}
@@ -59,7 +59,7 @@
                 <p class="font-body text-sm text-red-600">{{ session('error') }}</p>
             </div>
         @endif
-        @if ($errors->has('login') && str_contains($errors->first('login'), 'Terlalu banyak'))
+        @if ($errors->has('login') && (str_contains($errors->first('login'), 'Terlalu banyak') || str_contains($errors->first('login'), 'Too many')))
             <div class="mb-5 flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100">
                 <span class="material-symbols-outlined text-red-500 text-[18px]">timer</span>
                 <p class="font-body text-sm text-red-600">{{ $errors->first('login') }}</p>
@@ -72,13 +72,13 @@
 
             {{-- Email / Username --}}
             <div>
-                <label for="login" class="block font-body text-[12px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">Email atau Username</label>
+                <label for="login" class="block font-body text-[12px] font-semibold tracking-[0.08em] uppercase text-gray-500 mb-2">{{ __('auth_ui.login_id_label') }}</label>
                 <div class="relative group">
                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-[18px] transition-colors group-focus-within:text-emerald-600">mail</span>
                     <input id="login" type="text" name="login" value="{{ old('login') }}"
                            required autofocus autocomplete="username"
                            class="w-full h-12 bg-gray-50 border border-gray-200 text-gray-900 text-[14px] rounded-2xl pl-11 pr-4 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none transition-all duration-200 placeholder:text-gray-300 @error('login') border-red-400 bg-red-50 focus:border-red-400 focus:ring-red-400/10 @enderror"
-                           placeholder="nama@email.com atau username">
+                           placeholder="{{ __('auth_ui.login_id_placeholder') }}">
                 </div>
                 @error('login')
                     <p class="mt-1.5 flex items-center gap-1 text-[12px] text-red-500 font-body">
@@ -92,7 +92,7 @@
                 <div class="flex items-center justify-between mb-2">
                     <label for="password" class="block font-body text-[12px] font-semibold tracking-[0.08em] uppercase text-gray-500">Password</label>
                     @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="font-body text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">Lupa password?</a>
+                    <a href="{{ route('password.request') }}" class="font-body text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">{{ __('auth_ui.forgot_link') }}</a>
                     @endif
                 </div>
                 <div class="relative group">
@@ -103,7 +103,7 @@
                            placeholder="••••••••">
                     {{-- Toggle password visibility --}}
                     <button type="button" onclick="togglePwd('password','eye-login')"
-                            aria-label="Tampilkan password" aria-pressed="false"
+                            aria-label="{{ __('auth_ui.pw_show') }}" aria-pressed="false"
                             class="bj-password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
                         <span id="eye-login" class="material-symbols-outlined text-[18px]">visibility_off</span>
                     </button>
@@ -118,7 +118,7 @@
             {{-- Submit --}}
             <button type="submit"
                     class="group w-full h-12 flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-body text-[14px] font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-800/25 hover:-translate-y-0.5 active:translate-y-0 mt-2">
-                <span class="bj-login-submit-text">Masuk ke Akun</span>
+                <span class="bj-login-submit-text">{{ __('auth_ui.login_title') }}</span>
                 <span class="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-0.5">arrow_forward</span>
             </button>
         </form>
@@ -134,7 +134,7 @@
                 <span class="w-full border-t border-gray-100"></span>
             </div>
             <div class="relative flex justify-center">
-                <span class="bg-white px-4 font-body text-[12px] text-gray-300 tracking-wider">atau lanjutkan dengan</span>
+                <span class="bg-white px-4 font-body text-[12px] text-gray-300 tracking-wider">{{ __('auth_ui.login_or') }}</span>
             </div>
         </div>
 
@@ -147,17 +147,17 @@
                 <path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/>
                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/>
             </svg>
-            Masuk dengan Google
+            {{ __('auth_ui.login_google') }}
         </a>
 
-        <p class="mt-4 text-center font-body text-[12px] text-gray-400">Anda dapat mengatur kata sandi lewat halaman akun setelah masuk dengan Google.</p>
+        <p class="mt-4 text-center font-body text-[12px] text-gray-400">{{ __('auth_ui.login_google_note') }}</p>
 
         {{-- Register link --}}
         <p class="mt-6 text-center font-body text-[13px] text-gray-400">
-            Belum punya akun?
-            <a href="{{ route('register') }}" class="font-semibold text-emerald-700 hover:text-emerald-600 transition-colors ml-1">Daftar sekarang</a>
+            {{ __('auth_ui.no_account') }}
+            <a href="{{ route('register') }}" class="font-semibold text-emerald-700 hover:text-emerald-600 transition-colors ml-1">{{ __('auth_ui.register_now') }}</a>
         </p>
-        <div class="bj-login-footer"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span> Portal resmi Bangkiang Jaran</div>
+        <div class="bj-login-footer"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span> {{ __('auth_ui.login_official') }}</div>
     </div>
 </div>
 
@@ -171,14 +171,14 @@ function togglePwd(inputId, iconId) {
     input.type = isHidden ? 'text' : 'password';
     icon.textContent = isHidden ? 'visibility' : 'visibility_off';
     const button = icon.closest('button');
-    button.setAttribute('aria-label', isHidden ? 'Sembunyikan password' : 'Tampilkan password');
+    button.setAttribute('aria-label', isHidden ? @json(__('auth_ui.pw_hide')) : @json(__('auth_ui.pw_show')));
     button.setAttribute('aria-pressed', String(isHidden));
 }
 
 document.getElementById('login-form')?.addEventListener('submit', function () {
     const button = this.querySelector('button[type="submit"]');
     button.disabled = true;
-    button.querySelector('.bj-login-submit-text').textContent = 'Memverifikasi akun...';
+    button.querySelector('.bj-login-submit-text').textContent = @json(__('auth_ui.login_verifying'));
     button.setAttribute('aria-busy', 'true');
 });
 

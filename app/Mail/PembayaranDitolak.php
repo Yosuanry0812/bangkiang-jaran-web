@@ -6,7 +6,7 @@ class PembayaranDitolak extends TransactionalMail
 {
     public function build()
     {
-        return $this->subject('Pembayaran Ditolak - Silakan Upload Ulang')
+        return $this->subject(__('mail.subject_rejected'))
                     ->view('emails.pembayaran-ditolak');
     }
 }

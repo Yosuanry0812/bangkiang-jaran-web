@@ -8,7 +8,7 @@
 <body>
     <div class="header">
         <h1>{{ __('messages.visit_report_title') }}</h1>
-        <p>Bangkiang Jaran · Desa Bakbakan, Gianyar</p>
+        <p>{{ __('ui.pdf_place') }}</p>
     </div>
 
     <table class="info-table">
@@ -60,7 +60,7 @@
                 <td>Rp {{ number_format($k->total_harga, 0, ',', '.') }}</td>
                 <td>{{ $checkIns->count() > 0 ? $checkIns->count() . ' org ' . ($checkIns->first()->check_in_at ? \Carbon\Carbon::parse($checkIns->first()->check_in_at)->format('H:i') : '-') : '-' }}</td>
                 <td>{{ $checkOuts->count() > 0 ? $checkOuts->count() . ' org ' . ($checkOuts->first()->check_out_at ? \Carbon\Carbon::parse($checkOuts->first()->check_out_at)->format('H:i') : '-') : '-' }}</td>
-                <td>{{ ucfirst($k->status) }}</td>
+                <td>{{ \App\Support\Label::status($k->status) }}</td>
             </tr>
             @empty
             <tr><td colspan="11" style="text-align:center">{{ __('messages.no_data') }}</td></tr>
@@ -78,8 +78,8 @@
     @endphp
     <div class="total">{{ __('operations.paid_tickets') }}: {{ $terbayar ?? 0 }} | {{ __('operations.arrivals') }}: {{ $total ?? 0 }}</div>
     <div style="margin-top:5px;font-size:12px;color:#555;">
-        <span>Jumlah Masuk: {{ $totalCheckIn }}</span> &nbsp;|&nbsp;
-        <span>Jumlah Keluar: {{ $totalCheckOut }}</span>
+        <span>{{ __('ui.total_in', ['n' => $totalCheckIn]) }}</span> &nbsp;|&nbsp;
+        <span>{{ __('ui.total_out', ['n' => $totalCheckOut]) }}</span>
     </div>
 
     <div class="footer">

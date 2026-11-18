@@ -23,7 +23,6 @@ class OperationalReadiness
                 'pemesanan' => ['expires_at', 'closed_reason', 'draft_token'],
                 'pembayaran' => ['proof_disk', 'rejection_reason', 'verified_at'],
                 'booking_events' => ['actor_id', 'event', 'created_at'],
-                'visit_capacities' => ['visit_date', 'capacity'],
                 'site_settings' => ['key', 'value'],
                 'jobs' => ['queue', 'payload', 'attempts', 'reserved_at', 'available_at', 'created_at'],
                 'failed_jobs' => ['uuid', 'connection', 'queue', 'payload', 'exception'],

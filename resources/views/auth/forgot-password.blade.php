@@ -30,11 +30,11 @@
 <section class="bj-reset-card" aria-labelledby="reset-title">
     <div class="bj-reset-top">
         <span class="bj-reset-icon" aria-hidden="true"><span class="material-symbols-outlined">key</span></span>
-        <span class="bj-reset-badge">Autentikasi</span>
+        <span class="bj-reset-badge">{{ __('auth_ui.fp_badge') }}</span>
     </div>
 
-    <h1 id="reset-title" class="bj-reset-title">Lupa<br><em>Password?</em></h1>
-    <p class="bj-reset-description">Tidak masalah. Masukkan email Anda dan kami akan kirim link untuk mengatur password baru.</p>
+    <h1 id="reset-title" class="bj-reset-title">{!! __('auth_ui.fp_title') !!}</h1>
+    <p class="bj-reset-description">{{ __('auth_ui.fp_lead') }}</p>
 
     @if (session('status'))
         <div class="bj-reset-status" role="status">{{ session('status') }}</div>
@@ -45,17 +45,17 @@
         <label for="email" class="bj-reset-label">Email</label>
         <div class="bj-reset-field">
             <span class="material-symbols-outlined" aria-hidden="true">mail</span>
-            <input id="email" class="bj-reset-input" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
+            <input id="email" class="bj-reset-input" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="{{ __('auth_ui.email_placeholder') }}" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
         </div>
         @error('email')
             <p id="email-error" class="bj-reset-error">{{ $message }}</p>
         @enderror
         <button type="submit" class="bj-reset-submit">
-            Kirim Link Reset Password <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+            {{ __('auth_ui.fp_submit') }} <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
         </button>
     </form>
 
-    <p class="bj-reset-meta"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span> Tautan berlaku selama {{ config('auth.passwords.users.expire') }} menit</p>
-    <p class="bj-reset-login">Ingat password? <a href="{{ route('login') }}">Kembali ke Login</a></p>
+    <p class="bj-reset-meta"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span> {{ __('ui.reset_valid_for', ['minutes' => config('auth.passwords.users.expire')]) }}</p>
+    <p class="bj-reset-login">{{ __('auth_ui.fp_remember') }}<a href="{{ route('login') }}">{{ __('auth_ui.fp_back') }}</a></p>
 </section>
 @endsection

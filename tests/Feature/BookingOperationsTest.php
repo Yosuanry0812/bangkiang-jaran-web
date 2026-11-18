@@ -6,10 +6,8 @@ use App\Mail\PemesananBerhasil;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Models\User;
-use App\Models\VisitCapacity;
 use App\Services\DestinationSettings;
 use App\Services\PaymentProofMigration;
-use App\Services\VisitQuota;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -96,15 +94,15 @@ class BookingOperationsTest extends TestCase
         $this->assertSame(0, Pemesanan::where('id_user', $user->id)->count());
     }
 
-    public function test_cancel_releases_capacity_and_cannot_cancel_another_owners_booking(): void
+    public function test_cancel_releases_held_tickets_and_cannot_cancel_another_owners_booking(): void
     {
         $booking = $this->booking();
         $other = User::factory()->create(['role' => 'wisatawan']);
         $this->actingAs($other)->post(route('wisatawan.pemesanan.cancel', $booking->id_pemesanan))->assertNotFound();
-        $this->assertSame(1, app(VisitQuota::class)->used(now()->toDateString()));
+        $this->assertSame(1, (int) Pemesanan::holdingCapacity()->where("tgl_kunjungan", now()->toDateString())->sum("jumlah"));
         $this->actingAs($booking->user)->post(route('wisatawan.pemesanan.cancel', $booking->id_pemesanan))->assertSessionHas('success');
         $this->assertSame('visitor_cancelled', $booking->fresh()->closed_reason);
-        $this->assertSame(0, app(VisitQuota::class)->used(now()->toDateString()));
+        $this->assertSame(0, (int) Pemesanan::holdingCapacity()->where("tgl_kunjungan", now()->toDateString())->sum("jumlah"));
         $this->assertSame('cancelled', $booking->fresh()->events->last()->event);
     }
 
@@ -130,7 +128,7 @@ class BookingOperationsTest extends TestCase
         $this->assertSame('expired', $expired->fresh()->closed_reason);
         $this->assertSame('pending', $review->fresh()->status);
         $this->assertSame(1, $expired->events()->where('event', 'expired')->count());
-        $this->assertSame(1, app(VisitQuota::class)->used(now()->toDateString()));
+        $this->assertSame(1, (int) Pemesanan::holdingCapacity()->where("tgl_kunjungan", now()->toDateString())->sum("jumlah"));
     }
 
     public function test_expired_booking_cannot_upload_receipt(): void
@@ -172,30 +170,6 @@ class BookingOperationsTest extends TestCase
         $this->assertSame('Nominal transfer tidak sesuai.', $booking->pembayaran->rejection_reason);
         $this->assertSame('payment_rejected', $booking->events->last()->event);
         $this->actingAs($booking->user)->get(route('wisatawan.pemesanan.detail', $booking->id_pemesanan))->assertSee('Nominal transfer tidak sesuai.');
-    }
-
-    public function test_quota_is_checked_at_final_checkout_and_cannot_be_reduced_below_holds(): void
-    {
-        $existing = $this->booking();
-        $user = User::factory()->create(['role' => 'wisatawan']);
-        VisitCapacity::create(['visit_date' => now()->toDateString(), 'capacity' => 1]);
-        $this->begin($user, $existing->tiket);
-        $this->post(route('wisatawan.pemesanan.store-data-diri'), ['nama_0' => 'Uji', 'gender_0' => 'L'])->assertSessionHasErrors('tickets');
-        $this->assertDatabaseCount('pemesanan', 1);
-        $this->getJson(route('kunjungan.kuota', ['date' => now()->toDateString()]))->assertOk()->assertJsonPath('remaining', 0);
-        $manager = User::factory()->create(['role' => 'pengelola']);
-        $this->actingAs($manager)->put(route('pengelola.quotas.update'), ['visit_date' => now()->toDateString(), 'capacity' => 2])->assertSessionHasNoErrors();
-        $this->put(route('pengelola.quotas.update'), ['visit_date' => now()->toDateString(), 'capacity' => 0])->assertSessionHasErrors('capacity');
-        $this->put(route('pengelola.quotas.update'), ['visit_date' => now()->toDateString(), 'capacity' => null])->assertSessionHasNoErrors();
-        $this->assertNull(VisitCapacity::find(now()->toDateString())->capacity);
-    }
-
-    public function test_quota_reduction_below_paid_tickets_is_rejected(): void
-    {
-        $this->booking('selesai', quantity: 2);
-        $manager = User::factory()->create(['role' => 'pengelola']);
-        $this->actingAs($manager)->put(route('pengelola.quotas.update'), ['visit_date' => now()->toDateString(), 'capacity' => 1])->assertSessionHasErrors('capacity');
-        $this->assertDatabaseMissing('visit_capacities', ['visit_date' => now()->toDateString(), 'capacity' => 1]);
     }
 
     public function test_deleting_account_preserves_paid_financial_records_and_revokes_account(): void
@@ -280,7 +254,7 @@ class BookingOperationsTest extends TestCase
     {
         $visitor = User::factory()->create(['role' => 'wisatawan']);
         $manager = User::factory()->create(['role' => 'pengelola']);
-        foreach (['pesanan.index', 'onsite.index', 'quotas.index', 'audit.index', 'settings.edit'] as $name) {
+        foreach (['pesanan.index', 'onsite.index', 'audit.index', 'settings.edit'] as $name) {
             $url = route('pengelola.'.$name);
             $this->actingAs($visitor)->get($url)->assertForbidden();
             $this->actingAs($manager)->get($url)->assertOk();

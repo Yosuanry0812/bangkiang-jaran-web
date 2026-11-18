@@ -457,16 +457,22 @@
         }
     });
 
-    // Auto-extract kode_tiket from URL if scanned/pasted
-    document.getElementById('input-kode')?.addEventListener('input', function () {
-        const val = this.value.trim();
-        // If it looks like a URL, extract the kode from /tiket/verifikasi/KODE or /verifikasi/KODE
+    // Helper extract kode_tiket from URL or string
+    function extractTicketCode(val) {
+        if (!val) return '';
+        val = val.trim();
         if (val.includes('/verifikasi/') || val.includes('/tiket/')) {
-            const match = val.match(/\/([A-Z0-9-]+)(?:\?|$)/i) || val.match(/\/([A-Z0-9-]+)\/?$/i);
+            const match = val.match(/\/([A-Z0-9_-]+)(?:\?|$)/i) || val.match(/\/([A-Z0-9_-]+)\/?$/i);
             if (match && match[1]) {
-                this.value = match[1];
+                return match[1].toUpperCase();
             }
         }
+        return val.toUpperCase();
+    }
+
+    // Auto-extract kode_tiket from URL if scanned/pasted
+    document.getElementById('input-kode')?.addEventListener('input', function () {
+        this.value = extractTicketCode(this.value);
     });
 
     // Toggle camera scanner
@@ -502,26 +508,22 @@
             { facingMode: 'environment' },
             { fps: 10, qrbox: { width: 250, height: 250 } },
             function onScanSuccess(decodedText) {
+                const cleanCode = extractTicketCode(decodedText);
                 // Show result
                 const resultDiv = document.getElementById('qr-result');
                 const resultCode = document.getElementById('qr-result-code');
-                if (resultCode) resultCode.textContent = decodedText;
+                if (resultCode) resultCode.textContent = cleanCode;
                 if (resultDiv) {
                     resultDiv.classList.remove('hidden');
-                    // Auto redirect after 1.5s
+                    // Auto redirect after 1s
                     setTimeout(() => {
-                        // Fill input and submit
                         const input = document.getElementById('input-kode');
                         if (input) {
+                            input.value = cleanCode;
                             const form = document.getElementById('form-scan');
-                            const hiddenInput = document.createElement('input');
-                            hiddenInput.type = 'hidden';
-                            hiddenInput.name = 'kode';
-                            hiddenInput.value = decodedText;
-                            form.appendChild(hiddenInput);
                             form.submit();
                         }
-                    }, 1500);
+                    }, 1000);
                 }
                 stopScanner();
             },

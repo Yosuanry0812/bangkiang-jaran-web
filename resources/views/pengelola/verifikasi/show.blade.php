@@ -115,7 +115,7 @@
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-gray-500-500 mb-2">{{ __('messages.payment_proof') }}</p>
                 @if ($pemesanan->pembayaran->bukti_bayar)
-                    <a href="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" target="_blank" rel="noopener noreferrer">
+                    <a href="{{ route('payment.proof', $pemesanan->pembayaran->id_bayar) }}" data-proof-modal data-proof-type="{{ strtolower(pathinfo($pemesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) === 'pdf' ? 'pdf' : 'image' }}" target="_blank" rel="noopener noreferrer">
                         @if(strtolower(pathinfo($pemesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) === 'pdf')
                         <span class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-3 text-sm text-forest"><span class="material-symbols-outlined">picture_as_pdf</span> {{ __('panel.buka_bukti_pembayaran_pdf_def5') }}</span>
                         @else

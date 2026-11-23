@@ -130,28 +130,7 @@
             @endforeach
         </nav>
 
-        {{-- Footer --}}
-        <div class="px-3 py-4 flex-shrink-0" style="border-top: 1px solid rgba(255,255,255,.06)">
-            <div class="flex items-center gap-2.5 px-3 py-2 mb-1">
-                <div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <span class="font-sans text-[11px] font-semibold text-white/70">
-                        {{ strtoupper(substr(Auth::user()->name ?? 'P', 0, 1)) }}
-                    </span>
-                </div>
-                <div class="min-w-0">
-                    <p class="font-sans text-[12px] font-medium text-white/80 truncate leading-tight">{{ Auth::user()->name ?? 'Pengelola' }}</p>
-                    <p class="font-sans text-[10px] text-white/30 truncate">{{ __('panel.pengelola_58eb') }}</p>
-                </div>
-            </div>
-            <a href="{{ route('profile.edit') }}" class="nav-link text-xs {{ Route::is('profile.*') ? 'active' : '' }}">
-                <span class="material-symbols-outlined">manage_accounts</span>
-                {{ __('panel.profil_saya_538e') }}
-            </a>
-            <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="nav-link text-xs mt-0.5 hover:!bg-red-900/20 hover:!text-red-400">
-                <span class="material-symbols-outlined">logout</span>
-                {{ __('panel.keluar_1692') }}
-            </button></form>
-        </div>
+        {{-- Profil & logout tersedia di dropdown akun pada topbar. --}}
     </aside>
 
     {{-- Overlay mobile --}}

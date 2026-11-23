@@ -33,6 +33,7 @@ return [
     'pw_repeat' => 'Ulangi kata sandi',
     'pw_strength' => 'Kekuatan kata sandi',
     'reg_submit' => 'Kirim Kode Verifikasi',
+    'reg_submit_direct' => 'Buat Akun',
     'reg_otp_note' => 'Kami akan mengirim kode OTP ke email Anda. Akun dibuat setelah kode berhasil diverifikasi.',
     'reg_or' => 'atau daftar dengan',
     'reg_google' => 'Daftar dengan Google',

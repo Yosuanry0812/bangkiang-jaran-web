@@ -153,7 +153,7 @@
             {{-- Submit --}}
             <button type="submit"
                     class="group w-full h-12 flex items-center justify-center gap-2.5 bg-emerald-800 hover:bg-emerald-700 text-white font-body text-[14px] font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-emerald-800/25 hover:-translate-y-0.5 active:translate-y-0 mt-1">
-                {{ __('auth_ui.reg_submit') }}
+                {{ __(config('features.otp_registration') ? 'auth_ui.reg_submit' : 'auth_ui.reg_submit_direct') }}
                 <span class="material-symbols-outlined text-[16px] transition-transform duration-300 group-hover:translate-x-0.5">person_add</span>
             </button>
         </form>

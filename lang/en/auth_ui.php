@@ -33,6 +33,7 @@ return [
     'pw_repeat' => 'Repeat password',
     'pw_strength' => 'Password strength',
     'reg_submit' => 'Send Verification Code',
+    'reg_submit_direct' => 'Create Account',
     'reg_otp_note' => 'We will send an OTP code to your email. Your account is created once the code is verified.',
     'reg_or' => 'or sign up with',
     'reg_google' => 'Sign up with Google',

@@ -25,6 +25,6 @@ if exist "C:\xampp\mysql\bin\mysql.exe" (
 )
 
 call php artisan migrate --force || exit /b 1
-call php artisan db:seed --class=BookingSnapshotSeeder --force || exit /b 1
+call php artisan db:snapshot-import || exit /b 1
 call php artisan storage:link 2>nul
 echo Selesai. Database sama dengan snapshot di repo.

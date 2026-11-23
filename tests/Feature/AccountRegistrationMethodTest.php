@@ -32,14 +32,4 @@ class AccountRegistrationMethodTest extends TestCase
         $this->assertNotNull($emailVerified->fresh()->email_verified_at);
     }
 
-    public function test_management_lists_registration_origin_and_real_verification_status(): void
-    {
-        $manager = User::factory()->create(['role' => 'pengelola']);
-        User::factory()->create(['registration_method' => 'google', 'email_verification_method' => 'google']);
-        User::factory()->create(['registration_method' => 'email', 'email_verification_method' => 'otp']);
-        User::factory()->unverified()->create();
-        $this->actingAs($manager)->get(route('pengelola.user.index'))->assertOk()
-            ->assertSee('Pendaftaran')->assertSee('Verifikasi email')->assertSee('Google')
-            ->assertSee('OTP email')->assertSee('Belum diverifikasi');
-    }
 }

@@ -11,7 +11,6 @@ use App\Http\Controllers\Pengelola\OperationsController;
 use App\Http\Controllers\Pengelola\PemesananOfflineController;
 use App\Http\Controllers\Pengelola\ScanController;
 use App\Http\Controllers\Pengelola\TiketController as PengelolaTiketController;
-use App\Http\Controllers\Pengelola\UserController;
 use App\Http\Controllers\Pengelola\VerifikasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Wisatawan\LandingController;
@@ -91,8 +90,8 @@ Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisata
 Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengelola.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/pesanan', [OperationsController::class, 'bookings'])->name('pesanan.index');
-    Route::get('/di-lokasi', [OperationsController::class, 'onsite'])->name('onsite.index');
+    // Daftar pesanan digabung ke halaman laporan.
+    Route::redirect('/pesanan', '/pengelola/laporan')->name('pesanan.index');
     Route::get('/aktivitas', [OperationsController::class, 'audit'])->name('audit.index');
     Route::get('/pengaturan', [OperationsController::class, 'settings'])->name('settings.edit');
     Route::put('/pengaturan', [OperationsController::class, 'updateSettings'])->name('settings.update');
@@ -117,11 +116,8 @@ Route::middleware(['auth', 'role:pengelola'])->prefix('pengelola')->name('pengel
 
     // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/kunjungan', [LaporanController::class, 'kunjungan'])->name('laporan.kunjungan');
-    Route::get('/laporan/transaksi', [LaporanController::class, 'transaksi'])->name('laporan.transaksi');
-
-    // Manajemen User
-    Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::get('/laporan/data', [LaporanController::class, 'data'])->name('laporan.data');
+    Route::get('/laporan/xlsx', [LaporanController::class, 'xlsx'])->name('laporan.xlsx');
 
     // Scan Tiket
     Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');

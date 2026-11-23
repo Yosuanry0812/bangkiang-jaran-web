@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Pengelola;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingFilters;
 use App\Models\ActivityLog;
-use App\Models\DetailPemesanan;
 use App\Models\Pemesanan;
 use App\Services\AuditTrail;
 use App\Services\DestinationSettings;
@@ -22,20 +21,6 @@ class OperationsController extends Controller
             ->filter($request->validated())->latest('id_pemesanan')->paginate(20)->withQueryString();
 
         return view('pengelola.operasional.pesanan', compact('pemesanan'));
-    }
-
-    public function onsite(BookingFilters $request)
-    {
-        $filters = $request->validated();
-        $term = $filters['q'] ?? null;
-        unset($filters['q']);
-        $query = DetailPemesanan::with('pemesanan.user')->whereNotNull('check_in_at')->whereNull('check_out_at')
-            ->whereHas('pemesanan', fn ($q) => $q->approved()->filter($filters))
-            ->when($term, fn ($q) => $q->where(fn ($search) => $search->where('nama_pengunjung', 'like', '%'.$term.'%')->orWhereHas('pemesanan', fn ($b) => $b->where('kode_booking', 'like', '%'.$term.'%'))));
-        $total = (clone $query)->count();
-        $visitors = $query->orderBy('check_in_at')->paginate(25)->withQueryString();
-
-        return view('pengelola.operasional.di-lokasi', compact('visitors', 'total'));
     }
 
     public function audit(Request $request)

@@ -131,28 +131,39 @@
     </div>
 
     @if ($pemesanan->pembayaran?->status == 'pending' && $pemesanan->status === 'pending')
-    <div class="flex flex-wrap gap-3">
-        <form method="POST" action="{{ route('pengelola.verifikasi.validasi', $pemesanan->id_pemesanan) }}" class="w-full sm:w-auto">
-            @csrf
-            <input type="hidden" name="action" value="valid">
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center justify-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">check_circle</span>
-                {{ __('messages.validate') }}
-            </button>
-        </form>
-        <form method="POST" action="{{ route('pengelola.verifikasi.validasi', $pemesanan->id_pemesanan) }}" class="w-full sm:w-auto" onsubmit="return confirm('{{ __('messages.reject_confirm') }}')">
-            @csrf
-            <input type="hidden" name="action" value="ditolak">
+    @php $decision = old('action', 'valid'); @endphp
+    <form method="POST" action="{{ route('pengelola.verifikasi.validasi', $pemesanan->id_pemesanan) }}"
+          x-data="{ action: '{{ $decision === 'ditolak' ? 'ditolak' : 'valid' }}' }"
+          x-on:submit="if (action === 'ditolak' && ! confirm(@js(__('messages.reject_confirm')))) $event.preventDefault()"
+          class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl">
+        @csrf
+        <fieldset class="space-y-3">
+            <legend class="font-heading text-lg font-semibold text-gray-800 mb-3">{{ __('messages.th_status') }}</legend>
+            <label class="flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer" :class="action === 'valid' ? 'border-emerald-600 bg-emerald-50' : 'border-gray-200'">
+                <input type="radio" name="action" value="valid" x-model="action" class="h-4 w-4 accent-emerald-700">
+                <span class="text-sm font-medium text-gray-800">{{ __('messages.validate') }}</span>
+            </label>
+            <label class="flex items-center gap-3 rounded-xl border px-4 py-3 cursor-pointer" :class="action === 'ditolak' ? 'border-red-600 bg-red-50' : 'border-gray-200'">
+                <input type="radio" name="action" value="ditolak" x-model="action" class="h-4 w-4 accent-red-600">
+                <span class="text-sm font-medium text-gray-800">{{ __('messages.reject') }}</span>
+            </label>
+        </fieldset>
+
+        <div x-show="action === 'ditolak'" x-cloak class="mt-4">
             <label for="rejection-reason" class="block text-sm font-medium mb-2">{{ __('operations.rejection_reason') }}</label>
-            <textarea id="rejection-reason" name="rejection_reason" minlength="5" maxlength="1000" required rows="3" class="w-full rounded-xl border-gray-300 mb-2" aria-describedby="rejection-help">{{ old('rejection_reason') }}</textarea>
-            <p id="rejection-help" class="text-sm mb-3">{{ __('operations.rejection_help') }}</p>
-            @error('rejection_reason')<p role="alert">{{ $message }}</p>@enderror
-            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium inline-flex items-center justify-center gap-2 transition-all">
-                <span class="material-symbols-outlined text-base">cancel</span>
-                {{ __('messages.reject') }}
-            </button>
-        </form>
-    </div>
+            <textarea id="rejection-reason" name="rejection_reason" minlength="5" maxlength="1000" rows="4"
+                      :required="action === 'ditolak'" :disabled="action !== 'ditolak'"
+                      class="w-full rounded-xl border-gray-300" aria-describedby="rejection-help">{{ old('rejection_reason') }}</textarea>
+            <p id="rejection-help" class="text-sm text-gray-500 mt-1">{{ __('operations.rejection_help') }}</p>
+            @error('rejection_reason')<p role="alert" class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+        </div>
+
+        <button type="submit" class="mt-5 w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-medium text-white inline-flex items-center justify-center gap-2 transition-all"
+                :class="action === 'ditolak' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'">
+            <span class="material-symbols-outlined text-base" x-text="action === 'ditolak' ? 'cancel' : 'check_circle'"></span>
+            <span x-text="action === 'ditolak' ? @js(__('messages.reject')) : @js(__('messages.validate'))"></span>
+        </button>
+    </form>
     @endif
     @else
     <div class="bg-white rounded-2xl shadow-sm p-6">

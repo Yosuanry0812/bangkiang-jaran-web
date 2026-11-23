@@ -22,7 +22,6 @@ class HalamanPengelolaTest extends TestCase
             'pengelola.tiket.create',
             'pengelola.verifikasi.index',
             'pengelola.laporan.index',
-            'pengelola.user.index',
             'pengelola.scan.index',
             'pengelola.pemesanan-offline.create',
             'pengelola.pemesanan-offline.riwayat',

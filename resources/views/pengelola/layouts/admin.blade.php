@@ -123,13 +123,9 @@
                 <span class="material-symbols-outlined">monitoring</span>
                 {{ __('panel.laporan_93b3') }}
             </a>
-            <a href="{{ route('pengelola.user.index') }}"
-               class="nav-link {{ Route::is('pengelola.user*') ? 'active' : '' }}">
-                <span class="material-symbols-outlined">group</span>
-                {{ __('panel.pengguna_a354') }}
-            </a>
 
-            @foreach(['pesanan.index' => ['receipt_long', 'all_bookings'], 'onsite.index' => ['groups', 'onsite'], 'audit.index' => ['history', 'audit'], 'settings.edit' => ['settings', 'settings']] as $target => $entry)
+            {{-- Riwayat tindakan (audit.index) disembunyikan sementara; rutenya tetap ada. --}}
+            @foreach(['settings.edit' => ['settings', 'settings']] as $target => $entry)
             <a href="{{ route('pengelola.'.$target) }}" class="nav-link {{ request()->routeIs('pengelola.'.$target) ? 'active' : '' }}"><span class="material-symbols-outlined" aria-hidden="true">{{ $entry[0] }}</span>{{ __('operations.'.$entry[1]) }}</a>
             @endforeach
         </nav>

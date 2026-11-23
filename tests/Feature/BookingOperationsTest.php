@@ -209,9 +209,9 @@ class BookingOperationsTest extends TestCase
         $this->assertNull($detail->fresh()->check_in_at);
         $booking->pembayaran->update(['status' => 'valid']);
         $this->post(route('pengelola.scan.gunakan'), ['kode' => $detail->kode_tiket])->assertSessionHas('success');
-        $this->get(route('pengelola.onsite.index'))->assertOk()->assertViewHas('total', 1)->assertSee($detail->nama_pengunjung);
+        $this->assertNotNull($detail->fresh()->check_in_at);
         $this->post(route('pengelola.scan.checkout'), ['kode' => $detail->kode_tiket])->assertSessionHas('success');
-        $this->get(route('pengelola.onsite.index'))->assertViewHas('total', 0);
+        $this->assertNotNull($detail->fresh()->check_out_at);
         $this->assertSame(['checked_in', 'checked_out'], $booking->events->pluck('event')->all());
     }
 
@@ -254,7 +254,7 @@ class BookingOperationsTest extends TestCase
     {
         $visitor = User::factory()->create(['role' => 'wisatawan']);
         $manager = User::factory()->create(['role' => 'pengelola']);
-        foreach (['pesanan.index', 'onsite.index', 'audit.index', 'settings.edit'] as $name) {
+        foreach (['laporan.index', 'audit.index', 'settings.edit'] as $name) {
             $url = route('pengelola.'.$name);
             $this->actingAs($visitor)->get($url)->assertForbidden();
             $this->actingAs($manager)->get($url)->assertOk();

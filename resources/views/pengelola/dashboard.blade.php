@@ -17,17 +17,15 @@
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">groups</span>{{ __('operations.paid_tickets') }}</dt><dd>{{ $pengunjungHariIni ?? 0 }}</dd><small>{{ __('panel.tanggal_kunjungan_hari_ini_5aeb') }}</small></div>
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">payments</span>{{ __('panel.pendapatan_bulan_ini_82a9') }}</dt><dd>Rp{{ number_format($pendapatanBulanIni ?? 0, 0, ',', '.') }}</dd><small>{{ __('panel.pembayaran_yang_sudah_valid_097d') }}</small></div>
     <div><dt><span class="material-symbols-outlined" aria-hidden="true">pending_actions</span>{{ __('panel.perlu_verifikasi_a762') }}</dt><dd>{{ $pemesananPending ?? 0 }}</dd><small><a href="{{ route('pengelola.verifikasi.index') }}" class="underline underline-offset-4">{{ __('panel.tinjau_pembayaran_0151') }}</a></small></div>
-    <div><dt><span class="material-symbols-outlined" aria-hidden="true">person</span>{{ __('panel.wisatawan_terdaftar_b82b') }}</dt><dd>{{ $totalWisatawan ?? 0 }}</dd><small>{{ __('panel.total_akun_wisatawan_c5c1') }}</small></div>
 </dl>
 <dl class="bj-operational-metrics" aria-label="{{ __('operations.today_visits') }}">
 <div><dt>{{ __('operations.ordered_tickets') }}</dt><dd>{{ $terpesanHariIni }}</dd></div>
 <div><dt>{{ __('operations.arrivals') }}</dt><dd>{{ $scanHariIni }}</dd></div>
 <div><dt>{{ __('operations.departures') }}</dt><dd>{{ $keluarHariIni }}</dd></div>
-<div><dt><a href="{{ route('pengelola.onsite.index') }}">{{ __('operations.onsite') }}</a></dt><dd>{{ $diLokasi }}</dd></div>
 </dl>
 <div class="admin-dashboard-grid">
     <section class="admin-panel">
-        <div class="admin-panel-head"><div><h2 id="recent-bookings-title">{{ __('panel.pemesanan_terbaru_e922') }}</h2><p>{{ __('panel.lima_transaksi_terakhir_yang_4d32') }}</p></div><a class="admin-text-action" href="{{ route('pengelola.pesanan.index') }}">{{ __('panel.lihat_pemesanan_bf7e') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
+        <div class="admin-panel-head"><div><h2 id="recent-bookings-title">{{ __('panel.pemesanan_terbaru_e922') }}</h2><p>{{ __('panel.lima_transaksi_terakhir_yang_4d32') }}</p></div><a class="admin-text-action" href="{{ route('pengelola.laporan.index') }}">{{ __('panel.lihat_pemesanan_bf7e') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a></div>
         <div class="admin-table-wrap">
             <table class="admin-table admin-table--responsive" aria-labelledby="recent-bookings-title">
                 <thead><tr><th scope="col">{{ __('panel.pemesanan_f431') }}</th><th scope="col">{{ __('panel.tiket_f17c') }}</th><th scope="col">{{ __('panel.status_ec53') }}</th><th scope="col">{{ __('panel.tanggal_6b26') }}</th></tr></thead>

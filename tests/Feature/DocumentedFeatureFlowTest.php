@@ -124,12 +124,10 @@ class DocumentedFeatureFlowTest extends TestCase
         $this->get(route('pengelola.pemesanan-offline.sukses', $booking->id_pemesanan))->assertOk();
         $this->get(route('pengelola.pemesanan-offline.riwayat'))->assertOk()->assertSee($booking->kode_booking);
         $period = ['periode_awal' => now()->toDateString(), 'periode_akhir' => now()->toDateString()];
-        foreach (['pengelola.laporan.kunjungan', 'pengelola.laporan.transaksi'] as $report) {
-            $this->get(route($report, $period + ['tipe' => 'offline']))->assertOk()
-                ->assertSee($booking->kode_booking);
-            $this->get(route($report, $period + ['tipe' => 'online']))->assertOk()
-                ->assertDontSee($booking->kode_booking);
-        }
+        $this->get(route('pengelola.laporan.index', $period + ['channel' => 'offline']))->assertOk()
+            ->assertSee($booking->kode_booking);
+        $this->get(route('pengelola.laporan.index', $period + ['channel' => 'online']))->assertOk()
+            ->assertDontSee($booking->kode_booking);
     }
 
     public function test_manager_can_create_update_disable_and_soft_delete_a_ticket(): void
@@ -198,16 +196,6 @@ class DocumentedFeatureFlowTest extends TestCase
         $this->get(route('lang.switch', 'invalid'))->assertSessionHas('locale', 'id');
         $this->get(route('tiket.verifikasi', 'BJ-NOT-FOUND'))->assertOk()->assertViewHas('found', false);
         $this->assertDatabaseCount('detail_pemesanan', 0);
-    }
-
-    public function test_user_search_lists_visitors_and_does_not_offer_manager_accounts(): void
-    {
-        $manager = User::factory()->create(['role' => 'pengelola']);
-        $visitor = User::factory()->create(['role' => 'wisatawan', 'username' => 'dokumentasi_uji']);
-        $unrelated = User::factory()->create(['role' => 'wisatawan']);
-        $this->actingAs($manager)->get(route('pengelola.user.index', ['search' => 'dokumentasi_uji']))
-            ->assertOk()->assertViewHas('users', fn ($users) => $users->count() === 1 && $users->first()->id === $visitor->id);
-        $this->get(route('pengelola.user.index'))->assertViewHas('users', fn ($users) => $users->count() === 2 && ! $users->contains('id', $manager->id));
     }
 
     public function test_auto_checkout_command_only_marks_visits_older_than_twenty_four_hours(): void

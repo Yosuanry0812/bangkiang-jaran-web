@@ -88,7 +88,7 @@
 .bj-admin .admin-welcome time { display: inline-flex; gap: 7px; align-items: center; color: #e9bc79; font-size: 12px; margin-bottom: 20px; }
 .bj-admin .admin-welcome-actions { display: grid; gap: 12px; justify-items: end; }
 .bj-admin .admin-welcome-actions small { color: #c2d1c5; font-size: 12px; }
-.bj-admin .admin-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin-bottom: 28px; background: #fff; border: 1px solid var(--admin-line); border-radius: 14px; }
+.bj-admin .admin-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); margin-bottom: 28px; background: #fff; border: 1px solid var(--admin-line); border-radius: 14px; }
 .bj-admin .admin-metrics > div { padding: 24px; min-width: 0; }
 .bj-admin .admin-metrics > div + div { border-left: 1px solid var(--admin-line); }
 .bj-admin .admin-metrics dt { display: flex; align-items: center; gap: 8px; color: #586b5e; font-size: 12px; }

@@ -32,9 +32,9 @@ class OperationalReportingTest extends TestCase
         return $booking;
     }
 
-    private function reportUrl(string $report, array $extra = []): string
+    private function reportUrl(string $route = 'index', array $extra = []): string
     {
-        return route('pengelola.laporan.'.$report, [...['periode_awal' => now()->toDateString(), 'periode_akhir' => now()->toDateString()], ...$extra]);
+        return route('pengelola.laporan.'.$route, ['bulan' => now()->format('Y-m')] + $extra);
     }
 
     public function test_mixed_ticket_chart_counts_details_and_scan_metrics_use_checkin_time(): void
@@ -46,48 +46,97 @@ class OperationalReportingTest extends TestCase
         $manager = User::factory()->create(['role' => 'pengelola']);
         $response = $this->actingAs($manager)->get(route('pengelola.dashboard'));
         $response->assertOk()->assertViewHas('pengunjungHariIni', 2)->assertViewHas('terpesanHariIni', 4)
-            ->assertViewHas('scanHariIni', 0)->assertViewHas('keluarHariIni', 1)->assertViewHas('diLokasi', 0);
+            ->assertViewHas('scanHariIni', 0)->assertViewHas('keluarHariIni', 1);
         $chart = array_combine($response->viewData('grafikLabels'), $response->viewData('grafikData'));
         $this->assertSame(['Anak' => 1, 'Dewasa' => 1], $chart);
     }
 
-    public function test_visits_separate_paid_tickets_from_actual_arrivals_and_exclude_pending(): void
+    public function test_revenue_report_counts_only_valid_payments_and_breaks_down_by_ticket_type(): void
     {
-        $booking = $this->fixture();
+        $this->fixture();
         $this->fixture('pending', 'BJ-PENDING');
-        $booking->detailPemesanan->first()->update(['check_in_at' => now(), 'status_tiket' => 'digunakan']);
         $manager = User::factory()->create(['role' => 'pengelola']);
-        $this->actingAs($manager)->get($this->reportUrl('kunjungan'))->assertOk()->assertViewHas('total', 1)->assertViewHas('terbayar', 2)->assertViewHas('keluar', 0)->assertDontSee('BJ-PENDING');
-        $this->get($this->reportUrl('transaksi'))->assertViewHas('total', fn ($sum) => (int) $sum === 25000);
+        $response = $this->actingAs($manager)->get($this->reportUrl())->assertOk()->assertSee('BJ-PENDING');
+        $chart = $response->viewData('chart');
+        $this->assertSame(25000, $chart['revenue']);
+        $this->assertSame(1, $chart['transactions']);
+        $this->assertSame(2, $response->viewData('visitorTotal'));
+        $breakdown = $response->viewData('breakdown');
+        $this->assertSame(['count' => 1, 'revenue' => 15000], $breakdown['dewasa']);
+        $this->assertSame(['count' => 1, 'revenue' => 10000], $breakdown['anak']);
+        $this->assertSame(['count' => 0, 'revenue' => 0], $breakdown['wisman']);
     }
 
-    public function test_csv_exports_all_filtered_records_and_neutralizes_spreadsheet_formulas(): void
+    public function test_period_uses_payment_date_and_unknown_tickets_are_grouped_as_other(): void
+    {
+        $booking = $this->fixture();
+        $booking->pembayaran->update(['tgl_bayar' => now()->subMonths(2)->toDateString()]);
+        $manager = User::factory()->create(['role' => 'pengelola']);
+        $this->actingAs($manager)->get($this->reportUrl())->assertViewHas('chart', fn ($c) => $c['revenue'] === 0);
+        $this->assertSame('lainnya', \App\Services\RevenueReport::category('Tiket Parkir'));
+        $this->assertSame('wisman', \App\Services\RevenueReport::category('Tiket Wisatawan Mancanegara'));
+        $this->assertSame('anak', \App\Services\RevenueReport::category('Tiket Anak'));
+        $this->assertSame('dewasa', \App\Services\RevenueReport::category('Tiket Dewasa'));
+    }
+
+    public function test_realtime_data_endpoint_returns_every_day_of_the_month_with_daily_values(): void
+    {
+        $this->fixture();
+        $manager = User::factory()->create(['role' => 'pengelola']);
+        $json = $this->actingAs($manager)->getJson($this->reportUrl('data'))->assertOk()->json();
+        $this->assertCount(now()->daysInMonth, $json['days']);
+        $today = collect($json['days'])->firstWhere('tgl', now()->toDateString());
+        $this->assertSame(25000, $today['pendapatan']);
+        $this->assertSame(['dewasa' => 1, 'anak' => 1, 'wisman' => 0, 'lainnya' => 0], $today['tiket']);
+        $this->assertSame(25000, $json['revenue']);
+        $future = collect($json['days'])->first(fn ($d) => $d['tgl'] > now()->toDateString());
+        $this->assertTrue($future === null || $future['pendapatan'] === null);
+    }
+
+    public function test_xlsx_columns_follow_paid_ticket_names_and_show_payment_and_checkin_dates(): void
     {
         for ($i = 0; $i < 27; $i++) {
             $this->fixture(code: 'BJ-R-'.str_pad((string) $i, 3, '0', STR_PAD_LEFT));
         }
-        $this->fixture(code: 'BJ-OFF-001');
+        $special = $this->fixture(code: 'BJ-OFF-001');
+        $extra = Tiket::firstOrCreate(['nama_tiket' => 'Paket Rombongan'], ['harga' => 5000, 'kategori' => 'perorangan', 'status' => 'aktif']);
+        $special->detailPemesanan->first()->update(['id_tiket' => $extra->id_tiket, 'nama_tiket' => 'Paket Rombongan', 'harga' => 5000, 'check_in_at' => now()]);
         $manager = User::factory()->create(['role' => 'pengelola']);
-        $response = $this->actingAs($manager)->get($this->reportUrl('kunjungan', ['tipe' => 'online', 'export' => 'csv']));
-        $response->assertOk()->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
-        $csv = $response->streamedContent();
-        $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
-        $this->assertStringContainsString('BJ-R-026', $csv);
-        $this->assertStringNotContainsString('BJ-OFF-001', $csv);
-        $this->assertStringContainsString("'=SUM(1,2)", $csv);
-        $this->assertSame(55, count(array_filter(explode("\n", trim($csv)))));
-        $transactions = $this->get($this->reportUrl('transaksi', ['tipe' => 'offline', 'export' => 'csv']))->streamedContent();
-        $this->assertStringContainsString('BJ-OFF-001', $transactions);
-        $this->assertStringNotContainsString('BJ-R-', $transactions);
+        $response = $this->actingAs($manager)->get($this->reportUrl('xlsx'));
+        $response->assertOk();
+        $this->assertStringContainsString('laporan-pendapatan-', $response->headers->get('Content-Disposition'));
+
+        $zip = new \ZipArchive;
+        $this->assertTrue($zip->open($response->baseResponse->getFile()->getPathname()));
+        $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+        $this->assertNotFalse($sheet);
+        $rows = simplexml_load_string($sheet)->sheetData->row;
+        $this->assertCount(30, $rows); // header + 28 transaksi + baris TOTAL
+        $header = [];
+        foreach ($rows[0]->c as $c) {
+            $header[] = (string) $c->is->t;
+        }
+        $this->assertContains('Paket Rombongan (orang)', $header);
+        $this->assertContains('Paket Rombongan (Rp)', $header);
+        $this->assertNotContains('Wisatawan Mancanegara (orang)', $header);
+        $this->assertNotContains('Pengunjung Lainnya', $header);
+        $this->assertContains('Tanggal Bayar', $header);
+        $this->assertContains('Tanggal Kunjungan (Check-in)', $header);
+        $this->assertStringContainsString('Belum check-in', $sheet);
+        $last = $rows[29]->c;
+        $this->assertSame('TOTAL', (string) $last[0]->is->t);
+        $this->assertEquals(28 * 25000, (int) $last[count($last) - 1]->v);
     }
 
-    public function test_deleted_account_remains_in_reports_and_management_search_covers_all_channels(): void
+    public function test_deleted_account_remains_in_reports_and_booking_list_search_is_part_of_the_report_page(): void
     {
         $booking = $this->fixture();
         $offline = $this->fixture(code: 'BJ-OFF-001');
         $manager = User::factory()->create(['role' => 'pengelola']);
         $this->actingAs($booking->user)->delete('/profile', ['password' => 'password'])->assertRedirect('/');
-        $this->actingAs($manager)->get($this->reportUrl('transaksi'))->assertViewHas('total', fn ($n) => (int) $n === 50000)->assertSee('Akun dihapus');
-        $this->get(route('pengelola.pesanan.index', ['q' => 'BJ-OFF-', 'channel' => 'offline']))->assertOk()->assertSee($offline->kode_booking)->assertDontSee('BJ-REPORT');
+        $this->actingAs($manager)->get($this->reportUrl())->assertViewHas('chart', fn ($c) => $c['revenue'] === 50000)->assertSee('Akun dihapus');
+        $this->get($this->reportUrl('index', ['q' => 'BJ-OFF-', 'channel' => 'offline']))->assertOk()->assertSee($offline->kode_booking)->assertDontSee('BJ-REPORT');
+        $this->get(route('pengelola.pesanan.index'))->assertRedirect('/pengelola/laporan');
     }
 }

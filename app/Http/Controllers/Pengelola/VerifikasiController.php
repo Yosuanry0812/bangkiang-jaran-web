@@ -106,7 +106,8 @@ class VerifikasiController extends Controller
             if ($request->action === 'valid') {
                 $pemesanan->pembayaran->update([
                     'status' => 'valid',
-                    'tgl_bayar' => now()->toDateString(),
+                    // Tanggal bayar = saat pembeli mengunggah bukti, bukan saat pengelola memvalidasi.
+                    'tgl_bayar' => $pemesanan->pembayaran->tgl_bayar ?: now()->toDateString(),
                     'verified_at' => now(), 'rejection_reason' => null,
                 ]);
                 $pemesanan->update(['status' => 'selesai']);

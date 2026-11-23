@@ -8,19 +8,33 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Menyamakan data users, tiket, pemesanan, detail_pemesanan, dan pembayaran
- * dengan snapshot di database/seeders/data/booking-snapshot.json.
+ * Menyamakan data seluruh tabel aplikasi (lihat TABLES) dengan snapshot di
+ * database/seeders/data/booking-snapshot.json.
  *
- * PERINGATAN: data pada kelima tabel itu DIGANTI total (bukan digabung).
- * Snapshot tidak berisi password/token/google_id. Semua akun diberi password demo
+ * PERINGATAN: data pada tabel-tabel itu DIGANTI total (bukan digabung).
+ * Snapshot tidak berisi password/token/google_id/IP. Semua akun diberi password demo
  * dari env SNAPSHOT_USER_PASSWORD (default: Password123). Ganti sebelum dipakai publik.
- * File bukti bayar (storage) tidak ikut; hanya path-nya yang tercatat.
+ * File upload (bukti bayar, foto galeri) di storage tidak ikut; hanya path-nya yang tercatat.
  *
  * Jalankan: php artisan migrate && php artisan db:seed --class=BookingSnapshotSeeder
+ * Buat ulang snapshot dari database sendiri: php artisan db:snapshot-export
  */
 class BookingSnapshotSeeder extends Seeder
 {
-    private const TABLES = ['users', 'tiket', 'pemesanan', 'detail_pemesanan', 'pembayaran'];
+    /** Urutan sesuai foreign key (induk dulu). */
+    public const TABLES = [
+        'users', 'tiket', 'pemesanan', 'detail_pemesanan', 'pembayaran',
+        'booking_events', 'galeri', 'konten', 'site_settings', 'activity_logs',
+    ];
+
+    /** Kolom yang dikosongkan saat ekspor (kredensial & data perangkat). */
+    public const SCRUB = [
+        'pemesanan' => ['draft_token'],
+        'activity_logs' => ['ip_address', 'user_agent'],
+    ];
+
+    /** Kolom yang dibuang sama sekali dari ekspor users. */
+    public const DROP = ['users' => ['password', 'remember_token', 'google_id']];
 
     public function run(): void
     {
@@ -36,7 +50,7 @@ class BookingSnapshotSeeder extends Seeder
                 }
                 foreach (self::TABLES as $table) {
                     $columns = Schema::getColumnListing($table);
-                    foreach (array_chunk($data[$table], 200) as $chunk) {
+                    foreach (array_chunk($data[$table] ?? [], 200) as $chunk) {
                         $rows = array_map(function (array $row) use ($table, $columns, $password) {
                             $row = array_intersect_key($row, array_flip($columns));
                             if ($table === 'users') {

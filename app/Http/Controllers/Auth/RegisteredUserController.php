@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Services\RegistrationOtp;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +29,27 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
+
+        if (! config('features.otp_registration')) {
+            // OTP disembunyikan: akun langsung dibuat (role selalu wisatawan), email belum terverifikasi.
+            $user = new User([
+                'name' => $validated['name'],
+                'username' => $validated['username'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'wisatawan',
+                'last_login_at' => now(),
+                'last_login_method' => 'manual',
+                'login_count' => 1,
+            ]);
+            $user->forceFill(['registration_method' => 'email'])->save();
+
+            ActivityLogger::log('Registrasi', 'Pendaftaran akun email tanpa OTP.', $user->id);
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect()->route('redirect.after.login');
+        }
 
         try {
             $otp->start($request, $validated);

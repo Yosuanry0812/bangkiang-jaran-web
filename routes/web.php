@@ -60,11 +60,14 @@ Route::middleware(RedirectPengelolaFromPublicPages::class)->group(function () {
 Route::get('/tiket/verifikasi/{kode}', [WisatawanTiketController::class, 'verifikasi'])->middleware('throttle:30,1')->name('tiket.verifikasi');
 
 // ========== AUTHENTICATED WISATAWAN ROUTES ==========
-Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
-Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
-Route::get('/auth/google/username', [AuthController::class, 'createGoogleUsername'])->name('auth.google.username');
-Route::post('/auth/google/username', [AuthController::class, 'storeGoogleUsername'])->name('auth.google.username.store');
-Route::post('/auth/google/cancel', [AuthController::class, 'cancelGoogleRegistration'])->name('auth.google.cancel');
+// Login Google hanya terdaftar bila fitur diaktifkan (config/features.php).
+if (config('features.google_login')) {
+    Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+    Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+    Route::get('/auth/google/username', [AuthController::class, 'createGoogleUsername'])->name('auth.google.username');
+    Route::post('/auth/google/username', [AuthController::class, 'storeGoogleUsername'])->name('auth.google.username.store');
+    Route::post('/auth/google/cancel', [AuthController::class, 'cancelGoogleRegistration'])->name('auth.google.cancel');
+}
 
 Route::middleware(['auth', 'role:wisatawan'])->prefix('wisatawan')->name('wisatawan.')->group(function () {
     // Pemesanan

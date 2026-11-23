@@ -128,6 +128,7 @@
             {{ app()->getLocale() === 'en' ? 'Continue as guest' : 'Lanjutkan sebagai tamu' }}
         </a>
 
+        @if (config('features.google_login'))
         {{-- Divider --}}
         <div class="relative my-6">
             <div class="absolute inset-0 flex items-center">
@@ -151,6 +152,7 @@
         </a>
 
         <p class="mt-4 text-center font-body text-[12px] text-gray-400">{{ __('auth_ui.login_google_note') }}</p>
+        @endif
 
         {{-- Register link --}}
         <p class="mt-6 text-center font-body text-[13px] text-gray-400">

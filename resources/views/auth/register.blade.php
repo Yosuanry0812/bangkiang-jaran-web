@@ -158,8 +158,11 @@
             </button>
         </form>
 
+        @if (config('features.otp_registration'))
         <p class="mt-3 font-body text-[12px] leading-relaxed text-gray-500">{{ __('auth_ui.reg_otp_note') }}</p>
+        @endif
 
+        @if (config('features.google_login'))
         {{-- Divider --}}
         <div class="relative my-5">
             <div class="absolute inset-0 flex items-center">
@@ -181,6 +184,7 @@
             </svg>
             {{ __('auth_ui.reg_google') }}
         </a>
+        @endif
 
         {{-- Login link --}}
         <p class="mt-5 text-center font-body text-[13px] text-gray-400">

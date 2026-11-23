@@ -19,12 +19,15 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
                 ->middleware('throttle:5,1');
 
-    Route::get('register/otp', [RegistrationOtpController::class, 'show'])->name('registration.otp');
-    Route::post('register/otp', [RegistrationOtpController::class, 'verify'])
-        ->middleware('throttle:10,1')->name('registration.otp.verify');
-    Route::post('register/otp/resend', [RegistrationOtpController::class, 'resend'])
-        ->middleware('throttle:5,1')->name('registration.otp.resend');
-    Route::post('register/otp/cancel', [RegistrationOtpController::class, 'cancel'])->name('registration.otp.cancel');
+    // Rute OTP hanya terdaftar bila fitur diaktifkan (config/features.php).
+    if (config('features.otp_registration')) {
+        Route::get('register/otp', [RegistrationOtpController::class, 'show'])->name('registration.otp');
+        Route::post('register/otp', [RegistrationOtpController::class, 'verify'])
+            ->middleware('throttle:10,1')->name('registration.otp.verify');
+        Route::post('register/otp/resend', [RegistrationOtpController::class, 'resend'])
+            ->middleware('throttle:5,1')->name('registration.otp.resend');
+        Route::post('register/otp/cancel', [RegistrationOtpController::class, 'cancel'])->name('registration.otp.cancel');
+    }
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
                 ->name('login');

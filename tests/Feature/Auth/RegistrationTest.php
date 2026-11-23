@@ -232,6 +232,19 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    public function test_registration_creates_account_directly_when_otp_is_hidden(): void
+    {
+        config(['features.otp_registration' => false]);
+
+        $this->post('/register', $this->registration())->assertRedirect(route('redirect.after.login'));
+
+        $user = User::where('email', $this->registration()['email'])->firstOrFail();
+        $this->assertSame('wisatawan', $user->role);
+        $this->assertNull($user->email_verified_at);
+        $this->assertTrue(Hash::check($this->registration()['password'], $user->password));
+        $this->assertAuthenticated();
+    }
+
     public function test_registration_returns_to_booking_after_verification(): void
     {
         $bookingUrl = route('wisatawan.pemesanan.create', ['id_tiket' => 1]);

@@ -96,3 +96,6 @@ Thumbs.db
 # Local AI Security Audit Skill
 /.agents/skills/security-audit/
 /.claude/skills/security-audit
+
+# Proyek memakai npm (package-lock.json); lockfile pnpm tidak dipakai
+pnpm-lock.yaml

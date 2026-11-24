@@ -33,13 +33,13 @@
                 @forelse($pemesananTerbaru ?? [] as $p)
                     @php
                         $statusClass = match($p->status) { 'selesai' => '', 'pending' => 'admin-status--pending', 'dibatalkan' => 'admin-status--danger', default => 'admin-status--neutral' };
-                        $summary = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->nama_tiket)->implode(', ');
+                        $summary = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->label_tiket)->implode(', ');
                     @endphp
                     <tr>
                         <td data-label="{{ __('panel.pemesanan_f431') }}"><code>{{ $p->kode_booking }}</code><small>{{ $p->user->name ?? __('ui.walk_in') }}</small></td>
                         <td data-label="{{ __('panel.tiket_f17c') }}">{{ $summary ?: ($p->tiket->nama_tiket ?? '—') }}</td>
                         <td data-label="{{ __('panel.status_ec53') }}"><span class="admin-status {{ $statusClass }}">{{ \App\Support\Label::status($p->status) }}</span></td>
-                        <td data-label="{{ __('panel.tanggal_6b26') }}">{{ $p->created_at->format('d M Y') }}</td>
+                        <td data-label="{{ __('panel.tanggal_6b26') }}">{{ $p->created_at->translatedFormat('d M Y') }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="4"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span><h3>{{ __('panel.belum_ada_pemesanan_1ad1') }}</h3><p>{{ __('panel.transaksi_terbaru_akan_tampi_e36c') }}</p></div></td></tr>

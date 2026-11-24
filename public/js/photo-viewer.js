@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         status.hidden = false;
         const caption = link.dataset.photoCaption || '';
         image.alt = caption;
-        viewer.setAttribute('aria-label', caption || (document.documentElement.lang === 'en' ? 'Full photo' : 'Foto lengkap'));
+        viewer.setAttribute('aria-label', caption || ((window.BJ_I18N || {}).photo_full ?? (document.documentElement.lang === 'en' ? 'Full photo' : 'Foto lengkap')));
         scrollPosition = window.scrollY;
         previousBodyStyle = document.body.getAttribute('style');
         // Fixed body also prevents background scrolling in mobile Safari.

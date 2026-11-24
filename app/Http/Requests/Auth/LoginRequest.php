@@ -31,7 +31,10 @@ class LoginRequest extends FormRequest
         $login = $this->input('login');
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (!Auth::attempt([$field => $login, 'password' => $this->input('password')], false)) {
+        // "Ingat saya": cookie remember berlaku 30 hari (menit). Tanpa centang, login hanya untuk sesi browser.
+        Auth::guard('web')->setRememberDuration(60 * 24 * 30);
+
+        if (!Auth::attempt([$field => $login, 'password' => $this->input('password')], $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

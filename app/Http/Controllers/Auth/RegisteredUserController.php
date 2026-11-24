@@ -24,11 +24,13 @@ class RegisteredUserController extends Controller
     public function store(Request $request, RegistrationOtp $otp): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9_.-]+$/', 'unique:' . User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', Password::defaults()],
         ]);
+
+        // Form tidak punya kolom nama lengkap: nama akun memakai username.
+        $validated['name'] = $validated['username'];
 
         if (! config('features.otp_registration')) {
             // OTP disembunyikan: akun langsung dibuat (role selalu wisatawan), email belum terverifikasi.

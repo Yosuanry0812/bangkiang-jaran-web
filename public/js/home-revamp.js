@@ -69,7 +69,6 @@
 
     const weights = [...document.querySelectorAll('[data-rv-weight]')];
     const parallax = [...document.querySelectorAll('[data-rv-parallax]')];
-    const fab = document.querySelector('[data-rv-fab]');
     const hero = document.getElementById('hero-section');
     const cta = document.querySelector('[data-rv-cta]');
     let ticking = false;
@@ -111,12 +110,6 @@
                 img.style.setProperty('--rv-px', Math.round(((pr.left + pr.width / 2 - innerWidth / 2) / innerWidth) * -70) + 'px');
             });
         }
-        if (fab && hero) {
-            const pastHero = hero.getBoundingClientRect().bottom < vh * 0.25;
-            const rect = cta ? cta.getBoundingClientRect() : null;
-            const atCta = rect && rect.top < vh && rect.bottom > 0;
-            fab.classList.toggle('is-visible', pastHero && !atCta);
-        }
     };
     const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
     const remeasure = () => { measureTrail(); request(); };
@@ -124,6 +117,7 @@
     addEventListener('resize', remeasure, { passive: true });
     addEventListener('load', remeasure);
     wide.addEventListener?.('change', remeasure);
+    trail?.querySelectorAll("[data-rv-panel] img").forEach(img => { if (!img.complete) img.addEventListener("load", remeasure, { once: true }); });
     measureTrail();
     update();
 })();

@@ -42,7 +42,7 @@
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
-        <label for="email" class="bj-reset-label">Email</label>
+        <label for="email" class="bj-reset-label">{{ __('ui.email') }}</label>
         <div class="bj-reset-field">
             <span class="material-symbols-outlined" aria-hidden="true">mail</span>
             <input id="email" class="bj-reset-input" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="{{ __('auth_ui.email_placeholder') }}" @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>

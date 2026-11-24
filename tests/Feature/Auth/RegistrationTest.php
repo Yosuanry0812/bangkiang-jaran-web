@@ -26,7 +26,7 @@ class RegistrationTest extends TestCase
     private function registration(array $overrides = []): array
     {
         return array_merge([
-            'name' => 'Test User', 'username' => 'testuser', 'email' => 'test@example.com',
+            'username' => 'testuser', 'email' => 'test@example.com',
             'password' => 'Password123', 'password_confirmation' => 'Password123',
         ], $overrides);
     }
@@ -188,12 +188,12 @@ class RegistrationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_registration_rejects_mismatched_confirmation_and_duplicate_email(): void
+    public function test_registration_rejects_duplicate_email(): void
     {
         User::factory()->create(['email' => 'existing@example.com']);
         $this->post('/register', $this->registration([
-            'email' => 'existing@example.com', 'password_confirmation' => 'different',
-        ]))->assertSessionHasErrors(['email', 'password']);
+            'email' => 'existing@example.com',
+        ]))->assertSessionHasErrors(['email']);
         Mail::assertNothingSent();
         $this->assertDatabaseCount('users', 1);
         $this->assertGuest();

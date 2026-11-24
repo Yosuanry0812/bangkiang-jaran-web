@@ -31,6 +31,17 @@ class DestinationSettings
 
     public function save(array $values): void
     {
+        $translator = app(AutoTranslator::class);
+        foreach (['operating_hours', 'address', 'rules'] as $key) {
+            $id = trim((string) ($values[$key] ?? ''));
+            $en = trim((string) ($values[$key.'_en'] ?? ''));
+            if ($id !== '' && $en === '') {
+                $values[$key.'_en'] = $translator->translate($id, 'id', 'en') ?? '';
+            } elseif ($en !== '' && $id === '') {
+                $values[$key] = $translator->translate($en, 'en', 'id') ?? '';
+            }
+        }
+
         SiteSetting::updateOrCreate(['key' => 'destination'], ['value' => $values]);
         $this->settings = null;
     }

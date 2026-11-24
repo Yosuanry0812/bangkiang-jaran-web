@@ -154,7 +154,7 @@
                             </div>
                             <div>
                                 <p class="font-sans text-[11px] text-gray-400">{{ __('panel.jenis_tiket_0497') }}</p>
-                                <p class="font-sans text-sm font-medium text-gray-800">{{ $detail->nama_tiket }}</p>
+                                <p class="font-sans text-sm font-medium text-gray-800">{{ $detail->label_tiket }}</p>
                             </div>
                             <div>
                                 <p class="font-sans text-[11px] text-gray-400">{{ __('panel.status_tiket_e25a') }}</p>
@@ -234,7 +234,7 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="font-mono text-xs font-bold text-gray-800 tracking-wider truncate">{{ $dt->kode_tiket }}</p>
-                        <p class="font-sans text-[10px] text-gray-400 truncate">{{ $dt->nama_pengunjung ?? $dt->nama_tiket }}</p>
+                        <p class="font-sans text-[10px] text-gray-400 truncate">{{ $dt->nama_pengunjung ?? $dt->label_tiket }}</p>
                     </div>
                     <span class="font-sans text-[10px] text-gray-400 uppercase flex-shrink-0">{{ substr($dt->status_tiket, 0, 4) }}</span>
                 </div>

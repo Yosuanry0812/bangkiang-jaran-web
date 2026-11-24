@@ -34,7 +34,7 @@
             </div>
             <table class="bj-review-facts w-full text-sm">
                 <tr><td class="py-2.5 text-gray-500-500 w-1/3">{{ __('messages.th_booking_code') }}</td><td class="py-2.5 font-mono font-medium text-gray-500-800">{{ $pemesanan->kode_booking }}</td></tr>
-                <tr><td class="py-2.5 text-gray-500-500">{{ __('messages.th_ticket') }}</td><td class="py-2.5 text-gray-500-700">@php $tSum = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', '); @endphp {{ $tSum ?: ($pemesanan->tiket->nama_tiket ?? '-') }}</td></tr>
+                <tr><td class="py-2.5 text-gray-500-500">{{ __('messages.th_ticket') }}</td><td class="py-2.5 text-gray-500-700">@php $tSum = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->label_tiket)->implode(', '); @endphp {{ $tSum ?: ($pemesanan->tiket->nama_tiket ?? '-') }}</td></tr>
                 <tr><td class="py-2.5 text-gray-500-500">{{ __('messages.quantity_label') }}</td><td class="py-2.5 text-gray-500-700">{{ $pemesanan->jumlah }}</td></tr>
                 <tr><td class="py-2.5 text-gray-500-500">{{ __('messages.th_total') }}</td><td class="py-2.5 font-semibold text-gray-500-800">Rp {{ number_format($pemesanan->total_harga, 0, ',', '.') }}</td></tr>
                 <tr><td class="py-2.5 text-gray-500-500">{{ __('messages.visit_date_label') }}</td><td class="py-2.5 text-gray-500-700">{{ $pemesanan->tgl_kunjungan ? \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y') : '-' }}</td></tr>
@@ -76,7 +76,7 @@
                     @foreach($allItems as $idx => $item)
                     <tr class="border-b border-gray-100">
                         <td data-label="No" class="py-2.5 pr-4 text-gray-500">{{ $idx + 1 }}</td>
-                        <td data-label="{{ __('panel.jenis_4487') }}" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_tiket }}</td>
+                        <td data-label="{{ __('panel.jenis_4487') }}" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->label_tiket }}</td>
                         <td data-label="{{ __('panel.nama_pengunjung_1355') }}" class="admin-cell-wide py-2.5 pr-4 text-gray-700">{{ $item->nama_pengunjung ?? '-' }}</td>
                         <td data-label="{{ __('panel.jenis_kelamin_5ab3') }}" class="py-2.5 pr-4 text-gray-700">
                             {{ $item->jenis_kelamin == 'L' ? __('messages.male') : ($item->jenis_kelamin == 'P' ? __('messages.female') : '-') }}

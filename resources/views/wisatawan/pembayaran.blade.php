@@ -318,7 +318,7 @@
                                 <span class="font-sans text-xs text-stone flex-shrink-0">{{ __('messages.ticket') }}</span>
                                 <span class="font-sans text-xs font-semibold text-ink text-right text-right">
                                     @php
-                                        $tSummary = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', ');
+                                        $tSummary = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->label_tiket)->implode(', ');
                                     @endphp
                                     {{ $tSummary ?: ($pemesanan->tiket->nama_tiket ?? '-') }}
                                 </span>

@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wall.columns = count;
         tracks.forEach(({ lane, track, column }, index) => {
             const distance = distances[index];
-            const speed = count === 2 ? [8, 10][column] : [10, 13, 11][column];
+            const speed = count === 2 ? [15, 18][column] : [18, 24, 20][column];
             const duration = distance / speed * 1000;
             const animation = track.animate([{ transform: 'translate3d(0,0,0)' }, { transform: `translate3d(0,${-distance}px,0)` }], { duration, iterations: Infinity, easing: 'linear', direction: column % 2 ? 'reverse' : 'normal' });
             animation.pause();

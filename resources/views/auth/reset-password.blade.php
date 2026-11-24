@@ -33,7 +33,7 @@
 
             {{-- Email --}}
             <div class="space-y-xs">
-                <label for="email" class="font-body text-label-md text-on-surface-variant block">Email</label>
+                <label for="email" class="font-body text-label-md text-on-surface-variant block">{{ __('ui.email') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">mail</span>
                     <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="email"

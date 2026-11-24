@@ -102,7 +102,7 @@
                 <div class="flex items-center justify-between px-5 py-3 bg-gray-50 border-b border-gray-100">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-forest text-sm">person</span>
-                        <span class="font-sans text-xs font-medium text-ink">{{ $item->nama_tiket }}</span>
+                        <span class="font-sans text-xs font-medium text-ink">{{ $item->label_tiket }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full {{ $item->canCheckIn() ? 'bg-green-500' : 'bg-gray-300' }}"></span>

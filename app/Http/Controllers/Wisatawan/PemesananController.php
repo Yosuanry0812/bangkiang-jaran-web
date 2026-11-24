@@ -70,7 +70,8 @@ class PemesananController extends Controller
                 $detailRows[] = [
                     'id_tiket' => (int) $id_tiket,
                     'kode_tiket' => $kode,
-                    'nama_tiket' => $tiket->nama_tiket,
+                    'nama_tiket' => $tiket->getRawOriginal('nama_tiket'),
+                    'label' => $tiket->nama_tiket,
                     'kategori' => $tiket->kategori,
                     'harga' => (int) $tiket->harga,
                     'nama_pengunjung' => null,

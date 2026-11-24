@@ -15,9 +15,10 @@ class EnsureExplicitLogin
     {
         $guard = Auth::guard('web');
 
-        // Legacy sessions and remember cookies must not silently restore a login.
-        if ($guard->check() && ($guard->viaRemember()
-            || $request->session()->get(self::SESSION_KEY) !== (string) $guard->id())) {
+        // Legacy sessions must not silently restore a login. Remember cookies are only
+        // issued when the user ticks "Ingat saya" at login, so they are trusted.
+        if ($guard->check() && ! $guard->viaRemember()
+            && $request->session()->get(self::SESSION_KEY) !== (string) $guard->id()) {
             $locale = $request->session()->get('locale');
             $guard->logoutCurrentDevice();
             $request->session()->invalidate();

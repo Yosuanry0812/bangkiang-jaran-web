@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Middleware\EnsureExplicitLogin;
 use App\Services\DestinationSettings;
+use App\Support\MissingLangKey;
 use App\Support\WindowsProcessDriver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Concurrency\ConcurrencyServiceProvider;
@@ -11,6 +12,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -36,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useTailwind();
+        // Jaring pengaman: kunci lang/ yang hanya ada di satu bahasa diterjemahkan otomatis (lihat MissingLangKey).
+        Lang::handleMissingKeysUsing(fn (string $key, array $replace, ?string $locale, bool $fallback) => MissingLangKey::handle($key, $replace, $locale, $fallback));
         View::composer(['layouts.app', 'wisatawan.landing', 'wisatawan.eticket-pdf', 'wisatawan.pembayaran'], function ($view) {
             $view->with('destination', app(DestinationSettings::class));
         });
@@ -45,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Event::listen(Login::class, function (Login $event): void {
-            if ($event->guard === 'web' && ! $event->remember && request()->hasSession()) {
+            if ($event->guard === 'web' && request()->hasSession()) {
                 request()->session()->put(EnsureExplicitLogin::SESSION_KEY, (string) $event->user->getAuthIdentifier());
             }
         });

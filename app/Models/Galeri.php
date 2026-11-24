@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TranslatesFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Galeri extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, TranslatesFields;
+
+    protected array $autoTranslate = ['keterangan' => 'keterangan_en'];
 
     protected $table = 'galeri';
     protected $primaryKey = 'id_galeri';
@@ -29,6 +32,14 @@ class Galeri extends Model
             return $this->attributes['keterangan_en'];
         }
         return $this->attributes['keterangan'] ?? null;
+    }
+
+    /** URL foto dalam ukuran ringan (WebP); foto asli tetap utuh di storage. */
+    public static function variantUrl(?string $file, int $width): string
+    {
+        $file = ltrim((string) $file, '/');
+
+        return str_starts_with($file, 'galeri/') ? url("img/{$width}/{$file}") : asset('storage/'.$file);
     }
 
     public function scopeWisata($query)

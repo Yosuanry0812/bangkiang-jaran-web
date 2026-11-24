@@ -51,7 +51,7 @@ class ProfileController extends Controller
 
         // Only for users who registered via Google
         if (! $user->google_id) {
-            abort(403, 'Hanya pengguna Google yang bisa akses ini.');
+            abort(403, __('operations.forbidden_google'));
         }
 
         $request->validate([

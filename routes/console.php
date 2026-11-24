@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('pemesanan:expire')->everyMinute()->withoutOverlapping();
 Schedule::command('tiket:auto-checkout')->hourly()->withoutOverlapping();
+// Ulangi terjemahan otomatis isian pengelola yang tadinya gagal (kuota habis / layanan down).
+Schedule::command('translate:fill')->dailyAt('03:00')->withoutOverlapping();
 
 /*
 |--------------------------------------------------------------------------

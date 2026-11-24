@@ -81,7 +81,7 @@
         </div>
         <div class="h-px bg-gray-100"></div>
         <div>
-            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">Username</p>
+            <p class="font-sans text-[10px] tracking-[0.18em] uppercase text-stone/50 mb-1">{{ __('ui.username') }}</p>
             <p class="font-sans text-sm font-medium text-ink">{{ '@' . Auth::user()->username }}</p>
         </div>
     </div>
@@ -134,7 +134,7 @@
 
                     {{-- Username --}}
                     <div>
-                        <label for="profile-username" class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Username</label>
+                        <label for="profile-username" class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('ui.username') }}</label>
                         <div class="relative group">
                             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 transition-colors group-focus-within:text-forest">alternate_email</span>
                             <input id="profile-username" name="username" type="text" value="{{ old('username', Auth::user()->username) }}" required maxlength="50" pattern="[a-zA-Z0-9_.-]+" autocomplete="username"
@@ -146,7 +146,7 @@
 
                     {{-- Email --}}
                     <div>
-                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">Email</label>
+                        <label class="block font-sans text-[11px] font-semibold tracking-[0.08em] uppercase text-stone/60 mb-2">{{ __('ui.email') }}</label>
                         <div class="relative group">
                             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[17px] text-gray-300 transition-colors group-focus-within:text-forest">mail</span>
                             <input name="email" type="email" value="{{ old('email', Auth::user()->email) }}" required

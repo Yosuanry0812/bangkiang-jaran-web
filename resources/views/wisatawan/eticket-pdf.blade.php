@@ -4,7 +4,7 @@
 <section><p>Bangkiang Jaran Waterfall</p><h1>{{ __('operations.eticket') }}</h1>
 <img src="{{ $images[$detail->id_detail] }}" alt="QR"><p><code>{{ $detail->kode_tiket }}</code></p>
 <dl><dt>{{ __('operations.visitor') }}</dt><dd>{{ $detail->nama_pengunjung }}</dd>
-<dt>{{ __('operations.ticket') }}</dt><dd>{{ $detail->nama_tiket }}</dd>
+<dt>{{ __('operations.ticket') }}</dt><dd>{{ $detail->label_tiket }}</dd>
 <dt>{{ __('operations.visit_date') }}</dt><dd>{{ \Carbon\Carbon::parse($booking->tgl_kunjungan)->format('d/m/Y') }}</dd>
 <dt>{{ __('operations.booking_code') }}</dt><dd>{{ $booking->kode_booking }}</dd>
 <dt>{{ __('operations.status') }}</dt><dd>{{ __('operations.verification_'.$detail->verificationState()) }}</dd></dl>

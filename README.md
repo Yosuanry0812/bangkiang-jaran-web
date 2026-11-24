@@ -1216,3 +1216,14 @@ Backup dapat diverifikasi dengan `php artisan tourism:backup --verify=<arsip.zip
 CI tersedia pada `.github/workflows/ci.yml` untuk build, Blade, suite dan audit dependency. Menambahkan workflow tidak berarti run GitHub Actions sudah terjadi.
 
 QA 2026-11-17: **146 passed (1076 assertions)**, 80 kombinasi layout dan 35 pemeriksaan ulang lulus; audit Composer/npm 0. Backup MySQL asli dan unggahan berhasil diverifikasi, tetapi restore MySQL belum diuji. Koneksi Laravel lokal berhasil; migration operasional masih pending karena Agentty mensyaratkan password terisi pada koneksi MySQL yang saat ini memakai password kosong. Kode dengan schema baru belum siap dipakai pada database asli sebelum migrasi disetujui. Worker/scheduler host dan SMTP nyata belum diaktifkan dalam QA.
+
+## Terjemahan otomatis ID ↔ EN
+
+Teks antarmuka tersimpan di `lang/id` dan `lang/en`. Isian pengelola (tiket, galeri, konten, aturan kunjungan) dan kunci `lang/` yang hanya ada di satu bahasa diterjemahkan otomatis oleh `App\Services\AutoTranslator`.
+
+- **Layanan**: `TRANSLATE_DRIVER=mymemory` (gratis, tanpa API key, ±5.000 karakter/hari/IP; isi `TRANSLATE_MYMEMORY_EMAIL` untuk 50.000) atau `libretranslate` (open source, bisa self-host; atur `TRANSLATE_LIBRE_URL`/`TRANSLATE_LIBRE_KEY`). Semua variabel ada di `.env.example`; salin ke `.env`.
+- **Saat pengelola menyimpan**: sisi bahasa yang kosong diisi otomatis; isian manual tidak pernah ditimpa. Bila layanan gagal, data tetap tersimpan.
+- **Kunci `lang/` hilang**: diterjemahkan saat dibutuhkan (di-cache). Simpan permanen ke berkas dengan `php artisan translate:fill --lang` (atau `composer translate`), lalu commit hasilnya agar semua laptop sama.
+- **Data lama**: `php artisan translate:fill` (`--dry-run` untuk pratinjau). Dijadwalkan harian 03:00 lewat scheduler untuk mengulang yang gagal.
+- **Ekspor data**: setelah mengubah data, jalankan `php artisan db:snapshot-export` agar `booking-snapshot.json` (termasuk kolom `*_en`) ikut ter-commit; di laptop lain: `php artisan migrate` lalu `php artisan db:snapshot-import`.
+- Pengujian memakai `TRANSLATE_ENABLED=false` (lihat `phpunit.xml`).

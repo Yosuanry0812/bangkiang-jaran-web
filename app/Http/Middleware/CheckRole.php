@@ -21,6 +21,6 @@ class CheckRole
             }
         }
 
-        abort(403, 'Akses ditolak. Halaman ini hanya untuk ' . implode(', ', $roles) . '.');
+        abort(403, __('operations.forbidden_role', ['roles' => implode(', ', $roles)]));
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pengelola;
 
 use App\Helpers\ActivityLogger;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\MediaVariantController;
 use App\Models\Galeri;
 use App\Services\AuditTrail;
 use Illuminate\Http\Request;
@@ -32,43 +33,54 @@ class GaleriController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'file' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-            'keterangan_en' => ['nullable', 'string', 'max:255'],
+            'file' => ['required', 'array', 'max:20'],
+            'file.*' => ['image', 'mimes:jpg,jpeg,png', 'max:51200'],
             'tipe' => ['required', 'in:wisata,restoran'],
         ];
 
         $messages = [
             'file.required' => __('flash.gallery_file_required'),
-            'file.image' => __('flash.gallery_file_image'),
-            'file.mimes' => __('flash.gallery_file_mimes'),
-            'file.max' => __('flash.gallery_file_max'),
+            'file.max' => __('flash.gallery_files_count'),
+            'file.*.image' => __('flash.gallery_file_image'),
+            'file.*.mimes' => __('flash.gallery_file_mimes'),
+            'file.*.max' => __('flash.gallery_file_max'),
+            'file.*.uploaded' => __('flash.gallery_file_max'),
             'tipe.required' => __('flash.gallery_type_required'),
         ];
 
         $request->validate($rules, $messages);
 
         // Validasi MIME type server-side
-        $file = $request->file('file');
-        $allowedMimes = ['image/jpeg', 'image/png'];
-        if (! in_array($file->getMimeType(), $allowedMimes)) {
-            return back()->withErrors(['file' => __('flash.gallery_file_invalid')])->withInput();
+        $files = $request->file('file');
+        foreach ($files as $file) {
+            if (! in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
+                return back()->withErrors(['file' => __('flash.gallery_file_invalid')])->withInput();
+            }
         }
 
-        $filename = 'galeri_'.uniqid().'.'.$file->getClientOriginalExtension();
-        $path = $file->storeAs('public/galeri', $filename);
-        $pathDisplay = str_replace('public/', '', $path);
+        @set_time_limit(600);
 
-        Galeri::create([
-            'file' => $pathDisplay,
-            'keterangan' => $request->keterangan,
-            'keterangan_en' => $request->keterangan_en,
-            'tipe' => $request->tipe,
-        ]);
+        foreach ($files as $i => $file) {
+            $filename = 'galeri_'.uniqid().'.'.strtolower($file->getClientOriginalExtension());
+            $path = $file->storeAs('public/galeri', $filename);
+            $pathDisplay = str_replace('public/', '', $path);
 
-        AuditTrail::record('Tambah galeri', $pathDisplay);
+            Galeri::create([
+                'file' => $pathDisplay,
+                'tipe' => $request->tipe,
+            ]);
 
-        return redirect()->route('pengelola.galeri.index')->with('success', __('flash.gallery_added'));
+            MediaVariantController::warmInBackground($pathDisplay);
+            AuditTrail::record('Tambah galeri', $pathDisplay);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true, 'count' => count($files)]);
+        }
+
+        return redirect()->route('pengelola.galeri.index')->with('success', count($files) > 1
+            ? __('flash.gallery_added_many', ['count' => count($files)])
+            : __('flash.gallery_added'));
     }
 
     public function destroy($id)

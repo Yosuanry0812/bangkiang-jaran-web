@@ -218,13 +218,13 @@
                     <div id="admin-profile-menu" x-show="open" @click.away="open = false" x-cloak
                          class="absolute right-0 mt-1.5 w-44 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50">
                         <a href="{{ route('profile.edit') }}"
-                           class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+                           class="flex items-center gap-2.5 mx-1.5 px-2.5 py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
                             <span class="material-symbols-outlined" style="font-size:15px">settings</span>
                             {{ __('panel.profil_saya_538e') }}
                         </a>
                         <div class="my-1 border-t border-slate-100"></div>
-                        <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit"
-                           class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors">
+                        <form method="POST" action="{{ route('logout') }}" class="px-1.5">@csrf<button type="submit"
+                           class="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-lg text-left text-xs font-medium text-red-500 hover:text-red-700 hover:bg-red-50 focus-visible:outline-none focus-visible:bg-red-50 transition-colors">
                             <span class="material-symbols-outlined" style="font-size:15px">logout</span>
                             {{ __('panel.keluar_1692') }}
                         </button></form>

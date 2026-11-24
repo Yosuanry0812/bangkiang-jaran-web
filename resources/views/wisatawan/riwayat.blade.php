@@ -39,7 +39,7 @@
                             $isCompleted = $item->isApproved();
                             $isCancelled = $item->status === 'dibatalkan';
                             $isRejected = $item->pembayaran?->status === 'ditolak';
-                            $ticketSummary = $item->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->nama_tiket)->implode(', ');
+                            $ticketSummary = $item->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->label_tiket)->implode(', ');
                             $statusClass = $isCompleted ? 'is-complete' : ($isCancelled ? 'is-cancelled' : 'is-pending');
                             $statusLabel = $item->statusLabel();
                         @endphp
@@ -57,7 +57,7 @@
                                 @if($isCancelled)
                                     <div class="bj-history-card__cancelled"><span class="material-symbols-outlined" aria-hidden="true">info</span><div><strong>{{ __('messages.reason_rejection') }}</strong><p>{{ $item->closed_reason === 'expired' ? __('operations.expired') : __('messages.booking_cancelled') }}</p></div></div>
                                 @else
-                                    <div class="bj-history-ticket-list"><p>{{ __('messages.ticket_list') }}</p><ul>@foreach($item->detailPemesanan as $detail)<li><span class="material-symbols-outlined" aria-hidden="true">person</span><p><strong>{{ $detail->nama_pengunjung ?? $detail->nama_tiket }}</strong><small>{{ $detail->nama_tiket }}</small></p><code>{{ $detail->kode_tiket }}</code></li>@endforeach</ul></div>
+                                    <div class="bj-history-ticket-list"><p>{{ __('messages.ticket_list') }}</p><ul>@foreach($item->detailPemesanan as $detail)<li><span class="material-symbols-outlined" aria-hidden="true">person</span><p><strong>{{ $detail->nama_pengunjung ?? $detail->label_tiket }}</strong><small>{{ $detail->label_tiket }}</small></p><code>{{ $detail->kode_tiket }}</code></li>@endforeach</ul></div>
                                     <div class="bj-history-card__actions"><a href="{{ route('wisatawan.pemesanan.detail', $item->id_pemesanan) }}">{{ __('messages.view_eticket_btn') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></a>@if(!$item->pembayaran || $isRejected)<a class="is-primary" href="{{ route('wisatawan.pembayaran.create', $item->id_pemesanan) }}">{{ $isRejected ? ($isEnglish ? 'Upload payment proof again' : 'Unggah ulang bukti bayar') : __('messages.pay_btn') }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>@endif</div>
                                 @endif
                             </div>

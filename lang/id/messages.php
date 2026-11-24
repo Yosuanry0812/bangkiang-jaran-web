@@ -585,7 +585,7 @@ return [
     'no_media' => 'Belum ada media',
     'file_image' => 'File Gambar',
     'preview' => 'Pratinjau',
-    'format_hint' => 'Format: JPG, JPEG, PNG. Maks 5MB.',
+    'format_hint' => 'Format: JPG, JPEG, PNG. Maks 50MB.',
     'description_label' => 'Keterangan',
     'title_label' => 'Judul',
     'type_label' => 'Jenis',

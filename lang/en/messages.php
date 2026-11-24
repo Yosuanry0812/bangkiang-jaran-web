@@ -585,7 +585,7 @@ return [
     'no_media' => 'No media',
     'file_image' => 'Image File',
     'preview' => 'Preview',
-    'format_hint' => 'Format: JPG, JPEG, PNG. Max 5MB.',
+    'format_hint' => 'Format: JPG, JPEG, PNG. Max 50MB.',
     'description_label' => 'Description',
     'title_label' => 'Title',
     'type_label' => 'Type',

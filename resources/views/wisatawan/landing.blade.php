@@ -16,7 +16,7 @@
     $usableGallery = $galeri->filter(fn ($item) => ! preg_match('/(?:^|\/)(?:galeri-\d+|placeholder\d*)\.(?:jpe?g|png|webp)$/i', (string) $item->file))->values();
     $mediaPhoto = function ($media) {
         $file = ltrim((string) $media->file, '/');
-        $photo = ['url' => asset('storage/' . $file), 'caption' => $media->keterangan ?: 'Bangkiang Jaran'];
+        $photo = ['url' => App\Models\Galeri::variantUrl($file, 1280), 'caption' => $media->keterangan ?: 'Bangkiang Jaran'];
         if (str_starts_with($file, 'galeri/')) {
             $photo['srcset'] = collect([480, 800, 1280, 1920])->map(fn ($w) => url("img/{$w}/{$file}") . " {$w}w")->implode(', ');
             $photo['w1920'] = url("img/1920/{$file}");
@@ -76,6 +76,10 @@
     $hours = $destination->localized('operating_hours');
     $address = $destination->localized('address');
     $pick = fn (int $i) => $sectionPhotos->get($i % $sectionPhotos->count());
+    // Foto jalur dikunci lewat penanda di_jalur: foto baru dari pengelola tidak menggeser/mengganti foto ini.
+    $trailPhotos = $usableGallery->where('di_jalur', true)->sortByDesc('id_galeri')
+        ->values()->take(5)->map(fn ($m) => $mediaPhoto($m) + ['label' => $m->keterangan, 'lift' => (bool) $m->cerahkan]);
+    $trailPick = fn (int $i) => $trailPhotos->isNotEmpty() ? $trailPhotos->get($i % $trailPhotos->count()) : $pick($i) + ['label' => null, 'lift' => false];
     $facts = array_values(array_filter([
         [$isEnglish ? 'Open' : 'Buka', $hours],
         [$isEnglish ? 'Address' : 'Alamat', $address],
@@ -150,7 +154,7 @@
             @else
                 @foreach($usableGallery->take(6) as $index => $media)
                     <div class="bj-home-hero__slide swiper-slide {{ $index === 0 ? 'is-active' : '' }}" data-bj-hero-slide data-caption="{{ $media->keterangan ?: 'Air Terjun Bangkiang Jaran' }}">
-                        <img src="{{ asset('storage/' . ltrim((string) $media->file, '/')) }}" alt="" {{ $index === 0 ? 'fetchpriority=high' : 'loading=lazy' }}>
+                        <img src="{{ App\Models\Galeri::variantUrl($media->file, 1920) }}" alt="" {{ $index === 0 ? 'fetchpriority=high' : 'loading=lazy' }}>
                     </div>
                 @endforeach
             @endif
@@ -199,22 +203,14 @@
 
 <div class="bj-rv">
     {{-- 2. Jalur: foto-foto berjajar menyamping, digulir lewat scroll vertikal --}}
-    <section id="perjalanan" class="bj-rv-trail" data-rv-trail aria-labelledby="rv-trail-title">
+    <section id="perjalanan" class="bj-rv-trail" data-rv-trail aria-label="{{ $isEnglish ? 'Journey' : 'Perjalanan' }}">
         <div class="bj-rv-trail__pin">
             <div class="bj-rv-trail__track" data-rv-track>
-                <div class="bj-rv-trail__intro">
-                    <h2 id="rv-trail-title" data-rv-weight="200" data-rv-weight-to="600">{{ $isEnglish ? 'From the parking area to the water' : 'Dari area parkir sampai ke air' }}</h2>
-                    <p>{{ $isEnglish ? 'Five stops, from the parking area to the rest area.' : 'Lima titik, dari parkir sampai area istirahat.' }}</p>
-                </div>
                 @foreach($journey as $ji => [$jTitle, $jCopy])
-                    @php($jp = $pick($ji))
+                    @php($jp = $trailPick($ji))
                     <article class="bj-rv-panel bj-rv-panel--{{ $ji % 2 ? 'low' : 'high' }}" data-rv-panel>
-                        <figure><img src="{{ $jp['url'] }}" @if(! empty($jp['srcset'])) srcset="{{ $jp['srcset'] }}" sizes="(min-width: 901px) 40vw, (min-width: 600px) 46vw, 100vw" @endif alt="{{ $jp['caption'] }}" loading="lazy" decoding="async"></figure>
-                        <div class="bj-rv-panel__text">
-                            <span>{{ str_pad($ji + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                            <h3>{{ $jTitle }}</h3>
-                            <p>{{ $jCopy }}</p>
-                        </div>
+                        <figure><img @if(! empty($jp['lift'])) data-lift @endif src="{{ $jp['url'] }}" @if(! empty($jp['srcset'])) srcset="{{ $jp['srcset'] }}" sizes="(min-width: 901px) 40vw, (min-width: 600px) 46vw, 100vw" @endif alt="{{ $jp['caption'] }}" decoding="async"></figure>
+                        @if(! empty($jp['label']))<p class="bj-rv-panel__cap"><span aria-hidden="true">{{ str_pad($ji + 1, 2, '0', STR_PAD_LEFT) }}</span><em>{{ $jp['label'] }}</em></p>@endif
                     </article>
                 @endforeach
                 <a class="bj-rv-trail__end" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Book your ticket' : 'Pesan tiketnya' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
@@ -299,6 +295,5 @@
         <a class="bj-rv-btn" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Book tickets' : 'Pesan tiket' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
     </section>
 
-    <a class="bj-rv-fab" href="{{ route('tiket.index') }}" data-rv-fab><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span>{{ $isEnglish ? 'Book tickets' : 'Pesan tiket' }}@if($hargaMulai)<span class="bj-rv-fab__price">&nbsp;· {{ $isEnglish ? 'from' : 'mulai' }} Rp {{ number_format($hargaMulai, 0, ',', '.') }}</span>@endif</a>
 </div>
 @endsection

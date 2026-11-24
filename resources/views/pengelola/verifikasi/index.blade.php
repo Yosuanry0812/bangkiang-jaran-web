@@ -15,11 +15,11 @@
             $paymentStatus = $p->pembayaran->status ?? null;
             $paymentClass = match($paymentStatus) { 'valid' => '', 'pending' => 'admin-status--pending', 'ditolak' => 'admin-status--danger', default => 'admin-status--neutral' };
             $orderClass = match($p->status) { 'selesai' => '', 'pending' => 'admin-status--pending', 'dibatalkan' => 'admin-status--danger', default => 'admin-status--neutral' };
-            $ticketSummary = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->nama_tiket)->implode(', ');
+            $ticketSummary = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($group) => $group->count() . '× ' . $group->first()->label_tiket)->implode(', ');
         @endphp
         <tr>
             <td data-label="{{ __('panel.pemesanan_f431') }}"><code>{{ $p->kode_booking }}</code><small>{{ $p->user->name ?? __('ui.walk_in') }}</small></td>
-            <td data-label="{{ __('panel.tiket_kunjungan_5e3f') }}">{{ $ticketSummary ?: ($p->tiket->nama_tiket ?? '-') }}<small>{{ $p->tgl_kunjungan ? \Carbon\Carbon::parse($p->tgl_kunjungan)->format('d M Y') : '-' }}</small></td>
+            <td data-label="{{ __('panel.tiket_kunjungan_5e3f') }}">{{ $ticketSummary ?: ($p->tiket->nama_tiket ?? '-') }}<small>{{ $p->tgl_kunjungan ? \Carbon\Carbon::parse($p->tgl_kunjungan)->translatedFormat('d M Y') : '-' }}</small></td>
             <td data-label="{{ __('panel.total_96b0') }}" class="admin-money">Rp {{ number_format($p->total_harga, 0, ',', '.') }}</td>
             <td data-label="{{ __('panel.status_pesanan_1b8e') }}"><span class="admin-status {{ $orderClass }}">{{ \App\Support\Label::status($p->status) }}</span></td>
             <td data-label="{{ __('panel.pembayaran_71e2') }}"><span class="admin-status {{ $paymentClass }}">{{ $paymentStatus ? \App\Support\Label::status($paymentStatus) : __('ui.unpaid') }}</span></td>

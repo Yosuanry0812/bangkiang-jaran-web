@@ -55,7 +55,7 @@
                                         <span class="material-symbols-outlined text-slate-600" style="font-size:15px">person</span>
                                     </div>
                                     <div>
-                                        <p class="font-sans text-[13px] font-semibold text-slate-800">{{ $row['nama_tiket'] }}</p>
+                                        <p class="font-sans text-[13px] font-semibold text-slate-800">{{ $row['label'] ?? $row['nama_tiket'] }}</p>
                                         <p class="font-sans text-[11px] text-slate-400">{{ __('panel.masukkan_data_pengunjung_6315') }}</p>
                                     </div>
                                 </div>

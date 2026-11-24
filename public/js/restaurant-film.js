@@ -12,7 +12,7 @@
     const animations = new Set();
     const failed = new Set();
     const pending = new Map();
-    const HOLD = 2200;
+    const HOLD = 3600;
     const DISSOLVE = 1000;
     let current = 0;
     let layer = 0;
@@ -40,12 +40,12 @@
         return animation;
     };
     const drift = (element, index) => animate(element, index % 2 ? [
-        { transform: 'scale(1.12) translate3d(1%, -.5%, 0)' },
-        { transform: 'scale(1.04) translate3d(-1%, .5%, 0)' },
+        { transform: 'scale(1.05) translate3d(.4%, -.2%, 0)' },
+        { transform: 'scale(1.01) translate3d(-.4%, .2%, 0)' },
     ] : [
-        { transform: 'scale(1.04) translate3d(-1%, .5%, 0)' },
-        { transform: 'scale(1.12) translate3d(1%, -.5%, 0)' },
-    ], { duration: 6400, iterations: Infinity, direction: 'alternate', easing: 'linear' });
+        { transform: 'scale(1.01) translate3d(-.4%, .2%, 0)' },
+        { transform: 'scale(1.05) translate3d(.4%, -.2%, 0)' },
+    ], { duration: 9000, iterations: Infinity, direction: 'alternate', easing: 'linear' });
 
     // Keep the visible photo in place until the next photo has loaded AND decoded.
     function load(photo) {

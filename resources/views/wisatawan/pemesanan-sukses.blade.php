@@ -27,13 +27,13 @@
             <div class="bg-gray-50 rounded-xl p-4 col-span-2 sm:col-span-1">
                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble mb-0.5">{{ __('messages.ticket_label') }}</p>
                 @php
-                    $tSum = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->nama_tiket)->implode(', ');
+                    $tSum = $pemesanan->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . ' ' . $g->first()->label_tiket)->implode(', ');
                 @endphp
                 <p class="font-sans text-sm font-medium text-ink">{{ $tSum ?: ($pemesanan->tiket->nama_tiket ?? '-') }}</p>
             </div>
             <div class="bg-gray-50 rounded-xl p-4">
                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble mb-0.5">{{ __('messages.date_label') }}</p>
-                <p class="font-sans text-sm font-medium text-ink">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d M Y') }}</p>
+                <p class="font-sans text-sm font-medium text-ink">{{ \Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->translatedFormat('d M Y') }}</p>
             </div>
             <div class="bg-gray-50 rounded-xl p-4">
                 <p class="font-sans text-[10px] uppercase tracking-wider text-pebble mb-0.5">{{ __('messages.quantity_label') }}</p>

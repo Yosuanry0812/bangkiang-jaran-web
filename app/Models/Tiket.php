@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TranslatesFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tiket extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, TranslatesFields;
+
+    protected array $autoTranslate = ['nama_tiket' => 'nama_tiket_en'];
 
     protected $table = 'tiket';
 

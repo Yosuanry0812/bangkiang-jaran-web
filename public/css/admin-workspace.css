@@ -119,7 +119,7 @@
 .bj-admin .admin-media-image > .material-symbols-outlined { font-size: 30px; color: #6a7b68; }
 .bj-admin .admin-media-image small { font-size: 12px; }
 .bj-admin .admin-media-image img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.bj-admin .admin-media-body { padding: 19px 20px 9px; }
+.bj-admin .admin-media-body { padding: 14px 18px 16px; }
 .bj-admin .admin-media-body > small { color: #5f6d65; font-size: 11px; }
 .bj-admin .admin-media h2 { font-size: 14px; letter-spacing: -.015em; line-height: 1.5; margin-top: 6px; }
 .bj-admin .admin-media-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 12px; margin-top: 15px; border-top: 1px solid var(--admin-line); font-size: 11px; color: var(--admin-muted); }
@@ -280,3 +280,38 @@
     .bj-admin .admin-notification-amount small { margin: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .bj-admin *, .bj-admin *::before, .bj-admin *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* Galeri: form unggah foto */
+.bj-admin .gallery-upload { max-width: 560px; }
+.bj-admin .gallery-upload fieldset { margin: 0 0 28px; padding: 0; border: 0; min-width: 0; }
+.bj-admin .gallery-upload legend { margin-bottom: 10px; padding: 0; color: var(--admin-forest); font-size: 13px; font-weight: 600; }
+.bj-admin .gallery-upload__file { display: block; width: 100%; padding: 10px; border: 1px solid #c8cfc5; border-radius: 8px; background: #fff; font-size: 13px; color: var(--admin-muted); }
+.bj-admin .gallery-upload__file::file-selector-button { margin-right: 12px; padding: 9px 14px; border: 0; border-radius: 6px; background: var(--admin-forest); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.bj-admin .gallery-upload__hint { margin: 8px 0 0; color: var(--admin-muted); font-size: 12px; }
+.bj-admin .gallery-upload__preview { display: block; width: 100%; max-height: 320px; margin-top: 14px; object-fit: cover; border-radius: 8px; }
+.bj-admin .gallery-upload__preview[hidden] { display: none; }
+.bj-admin .gallery-upload__error { margin: 8px 0 0; color: #b42318; font-size: 12px; }
+.bj-admin .gallery-upload__types { display: flex; flex-wrap: wrap; gap: 8px; }
+.bj-admin .gallery-upload__types label { position: relative; cursor: pointer; }
+.bj-admin .gallery-upload__types input { position: absolute; opacity: 0; }
+.bj-admin .gallery-upload__types span { display: inline-flex; min-height: 44px; align-items: center; padding: 10px 16px; border: 1px solid #c8cfc5; border-radius: 7px; font-size: 13px; color: #536457; }
+.bj-admin .gallery-upload__types label:hover span { background: #ecefe6; }
+.bj-admin .gallery-upload__types input:checked + span { background: var(--admin-forest); border-color: var(--admin-forest); color: #fff; }
+.bj-admin .gallery-upload__types input:focus-visible + span { outline: 3px solid #a36e28; outline-offset: 3px; }
+.bj-admin .gallery-upload__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.bj-admin .gallery-upload { max-width: 720px; }
+.bj-admin .gallery-upload__count { margin: 12px 0 0; color: var(--admin-forest); font-size: 13px; font-weight: 600; }
+.bj-admin .gallery-upload__thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-top: 10px; }
+.bj-admin .gallery-upload__thumbs:empty { display: none; }
+.bj-admin .gallery-upload__thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; background: #eceee6; }
+.bj-admin .admin-btn:disabled { cursor: wait; }
+.bj-admin .admin-media { position: relative; }
+.bj-admin .admin-media-delete { position: absolute; top: 10px; right: 10px; margin: 0; }
+.bj-admin .admin-media-delete button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #fffffff0; color: #9b2c1f; box-shadow: 0 1px 6px #10201a33; cursor: pointer; transition: background .18s, color .18s; }
+.bj-admin .admin-media-delete button:hover { background: #b42318; color: #fff; }
+.bj-admin .gallery-upload__thumbs img { transition: opacity .2s, outline-color .2s; outline: 3px solid transparent; outline-offset: -3px; }
+.bj-admin .gallery-upload__thumbs img.is-busy { opacity: .45; }
+.bj-admin .gallery-upload__thumbs img.is-done { outline-color: var(--admin-green); }
+.bj-admin .gallery-upload__thumbs img.is-failed { outline-color: #b42318; opacity: .6; }
+.gallery-upload__captions { display:grid; gap:8px; margin-top:12px; }
+.gallery-upload__caption { width:100%; padding:8px 12px; border:1px solid currentColor; border-radius:6px; background:transparent; font:inherit; }

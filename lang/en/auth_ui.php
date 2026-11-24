@@ -15,6 +15,7 @@ return [
     'forgot_link' => 'Forgot password?',
     'pw_show' => 'Show password',
     'login_verifying' => 'Verifying account...',
+    'remember_me' => 'Remember me',
     'login_or' => 'or continue with',
     'login_google' => 'Sign in with Google',
     'login_google_note' => 'You can set a password from your account page after signing in with Google.',

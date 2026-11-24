@@ -202,6 +202,15 @@ return [
         'kode' => 'ticket code',
         'otp' => 'OTP code',
         'phone' => 'phone number',
+        'name' => 'name',
+        'username' => 'username',
+        'status' => 'status',
+        'email' => 'email',
+        'password' => 'password',
+        'current_password' => 'current password',
+        'password_confirmation' => 'password confirmation',
+        'address' => 'address',
+        'file' => 'file',
     ],
 
 ];

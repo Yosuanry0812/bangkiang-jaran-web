@@ -6,7 +6,7 @@
     $isEnglish = app()->getLocale() === 'en';
     $firstTicket = $tikets->first();
     $photos = ($galeriWisata ?? collect())->filter(fn ($item) => ! preg_match('/(?:^|\/)(?:galeri-\d+|placeholder\d*)\.(?:jpe?g|png|webp)$/i', (string) $item->file))->values();
-    $ticketPhoto = $photos->isNotEmpty() ? asset('storage/' . $photos->first()->file) : asset('images/sejarah-bangkiang-waterfall.webp');
+    $ticketPhoto = $photos->isNotEmpty() ? App\Models\Galeri::variantUrl($photos->first()->file, 1280) : asset('images/sejarah-bangkiang-waterfall.webp');
     $bookingUrlFor = fn ($ticket) => route('wisatawan.pemesanan.create', ['id_tiket' => $ticket->id_tiket]);
     $faqs = $isEnglish ? [
         ['When can I use my ticket?', 'Your ticket is valid for the visit date selected during booking, after the team verifies your payment.'],

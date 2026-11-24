@@ -40,7 +40,7 @@
                                 @php($groupKey = $row['nama_tiket'] . '_' . $row['id_tiket'])
                                 @if($currentGroup !== $groupKey)
                                     @php($currentGroup = $groupKey)
-                                    <div class="bj-visitor-group"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><p><strong>{{ $row['nama_tiket'] }}</strong><small>{{ __('messages.input_full_name') }}</small></p></div>
+                                    <div class="bj-visitor-group"><span class="material-symbols-outlined" aria-hidden="true">confirmation_number</span><p><strong>{{ $row['label'] ?? $row['nama_tiket'] }}</strong><small>{{ __('messages.input_full_name') }}</small></p></div>
                                 @endif
                                 <fieldset class="bj-visitor-entry">
                                     <legend><span>{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>{{ $isEnglish ? 'Visitor details' : 'Data pengunjung' }}</legend>

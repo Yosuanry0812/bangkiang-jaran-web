@@ -2,7 +2,7 @@
 @section('title', __('messages.manage_gallery_title'))
 @section('page_title', __('messages.manage_gallery_title'))
 @section('content')
-<header class="admin-page-head"><div><h1>{{ __('messages.manage_gallery_title') }}</h1><p>{{ __('panel.dokumentasi_destinasi_dan_ku_e15d') }}</p></div><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}"><span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>{{ __('messages.add_media') }}</a></header>
+<header class="admin-page-head"><div><h1>{{ __('messages.manage_gallery_title') }}</h1></div><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}"><span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>{{ __('messages.add_media') }}</a></header>
 <nav class="admin-tabs" aria-label="{{ __('panel.kategori_galeri_1e60') }}">
     @foreach(['' => __('ui.gallery_all'), 'wisata' => __('ui.gallery_tourism'), 'restoran' => __('ui.gallery_resto')] as $type => $label)
     <a href="{{ route('pengelola.galeri.index', $type ? ['tipe' => $type] : []) }}" @if((request('tipe') ?? '') === $type) aria-current="page" @endif>{{ $label }}</a>
@@ -13,19 +13,15 @@
     <article class="admin-media">
         <div class="admin-media-image">
             <span class="material-symbols-outlined" aria-hidden="true">image</span><small>{{ __('panel.foto_tidak_tersedia_ad6a') }}</small>
-            <img src="{{ asset('storage/' . $g->file) }}" alt="{{ $g->keterangan }}" loading="lazy" decoding="async" onerror="this.remove()">
+            <img src="{{ \App\Models\Galeri::variantUrl($g->file, 480) }}" alt="" loading="lazy" decoding="async" onerror="this.remove()">
         </div>
-        <div class="admin-media-body">
-            <small>{{ $g->tipe === 'restoran' ? __('ui.gallery_resto') : __('ui.gallery_tourism') }}</small>
-            <h2>{{ $g->keterangan ?: __('ui.gallery_default') }}</h2>
-            <div class="admin-media-footer"><time>{{ $g->created_at ? $g->created_at->format('d M Y') : '' }}</time>
-                <form method="POST" action="{{ route('pengelola.galeri.destroy', $g->id_galeri) }}" onsubmit="return confirm(@js(__('messages.delete_confirm_msg')))">@csrf @method('DELETE')
-                <button type="submit" class="admin-text-action admin-text-action--danger"><span class="material-symbols-outlined" aria-hidden="true">delete</span>{{ __('messages.delete') }}<span class="sr-only"> {{ $g->keterangan }}</span></button></form>
-            </div>
-        </div>
+        <form class="admin-media-delete" method="POST" action="{{ route('pengelola.galeri.destroy', $g->id_galeri) }}" onsubmit="return confirm(@js(__('messages.delete_confirm_msg')))">@csrf @method('DELETE')
+            <button type="submit" title="{{ __('messages.delete') }}" aria-label="{{ __('messages.delete') }}"><span class="material-symbols-outlined" aria-hidden="true">delete</span></button>
+        </form>
+        <div class="admin-media-body"><small>{{ $g->tipe === 'restoran' ? __('ui.gallery_resto') : __('ui.gallery_tourism') }}</small></div>
     </article>
     @empty
-    <div class="admin-panel col-span-full"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">photo_library</span><h2>{{ __('messages.no_media') }}</h2><p>{{ __('panel.unggah_dokumentasi_asli_untu_7b64') }}</p><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}">{{ __('messages.add_media') }}</a></div></div>
+    <div class="admin-panel col-span-full"><div class="admin-empty"><span class="material-symbols-outlined" aria-hidden="true">photo_library</span><h2>{{ __('messages.no_media') }}</h2><a class="admin-btn" href="{{ route('pengelola.galeri.create') }}">{{ __('messages.add_media') }}</a></div></div>
     @endforelse
 </div>
 @if(method_exists($galeri, 'links') && $galeri->hasPages())<div class="admin-pagination">{{ $galeri->links() }}</div>@endif

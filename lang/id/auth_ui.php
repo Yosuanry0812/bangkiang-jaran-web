@@ -15,6 +15,7 @@ return [
     'forgot_link' => 'Lupa kata sandi?',
     'pw_show' => 'Tampilkan kata sandi',
     'login_verifying' => 'Memverifikasi akun...',
+    'remember_me' => 'Ingat saya',
     'login_or' => 'atau lanjutkan dengan',
     'login_google' => 'Masuk dengan Google',
     'login_google_note' => 'Anda dapat mengatur kata sandi lewat halaman akun setelah masuk dengan Google.',

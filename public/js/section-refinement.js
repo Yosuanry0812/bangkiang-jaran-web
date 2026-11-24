@@ -45,24 +45,24 @@ document.addEventListener('DOMContentLoaded', () => {
             release();
             if (!button.hasAttribute('data-route-current')) {
                 select(button, button.dataset.routeOrigin);
-                message(english ? 'Open Google Maps to view the route from this starting point.' : 'Buka Google Maps untuk melihat rute dari titik keberangkatan ini.');
+                message(tr('route_open', english ? 'Open Google Maps to view the route from this starting point.' : 'Buka Google Maps untuk melihat rute dari titik keberangkatan ini.'));
                 return;
             }
             // Keep the current-location link usable even if this site's GPS request fails.
             select(button);
             if (!window.isSecureContext || !navigator.geolocation) {
-                message(english ? 'Device location is unavailable here. Use HTTPS or choose a starting city.' : 'Lokasi perangkat tidak tersedia. Gunakan HTTPS atau pilih kota keberangkatan.', true);
+                message(tr('loc_unavailable', english ? 'Device location is unavailable here. Use HTTPS or choose a starting city.' : 'Lokasi perangkat tidak tersedia. Gunakan HTTPS atau pilih kota keberangkatan.'), true);
                 return;
             }
             button.disabled = true;
             button.setAttribute('aria-busy', 'true');
-            message(english ? 'Allow location in your browser. Finding a fresh position…' : 'Izinkan lokasi di browser. Sedang mencari posisi terbaru…');
+            message(tr('loc_prompt', english ? 'Allow location in your browser. Finding a fresh position…' : 'Izinkan lokasi di browser. Sedang mencari posisi terbaru…'));
             try {
                 const permission = await navigator.permissions?.query({ name: 'geolocation' });
                 if (currentRequest !== requestId) return;
                 if (permission?.state === 'denied') {
                     release();
-                    message(english ? 'Location is blocked. Allow it in browser site settings, then try again.' : 'Izin lokasi diblokir. Izinkan melalui pengaturan situs di browser, lalu coba lagi.', true);
+                    message(tr('loc_blocked', english ? 'Location is blocked. Allow it in browser site settings, then try again.' : 'Izin lokasi diblokir. Izinkan melalui pengaturan situs di browser, lalu coba lagi.'), true);
                     return;
                 }
             } catch { /* Browsers without Permissions API still request geolocation normally. */ }
@@ -72,22 +72,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 release();
                 const { latitude, longitude, accuracy } = position.coords;
                 if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
-                    message(english ? 'The device returned an invalid position. Try again.' : 'Posisi dari perangkat tidak valid. Silakan coba lagi.', true);
+                    message(tr('loc_invalid', english ? 'The device returned an invalid position. Try again.' : 'Posisi dari perangkat tidak valid. Silakan coba lagi.'), true);
                     return;
                 }
                 select(button, `${latitude},${longitude}`);
                 if (Number.isFinite(accuracy) && accuracy >= 0) {
                     const metres = Math.ceil(accuracy);
-                    message(english ? `Location found. Approximate accuracy: ${metres} m.${metres > 500 ? ' Check your starting point in Google Maps.' : ''}` : `Lokasi ditemukan. Perkiraan akurasi: ${metres} m.${metres > 500 ? ' Periksa titik awal di Google Maps.' : ''}`);
+                    message(tr('loc_found_accuracy', english ? 'Location found. Approximate accuracy: :meter m.' : 'Lokasi ditemukan. Perkiraan akurasi: :meter m.', { meter: metres }) + (metres > 500 ? tr('loc_check_start', english ? ' Check your starting point in Google Maps.' : ' Periksa titik awal di Google Maps.') : ''));
                 } else {
-                    message(english ? 'Location found. Check the starting point in Google Maps.' : 'Lokasi ditemukan. Periksa titik awal di Google Maps.');
+                    message(tr('loc_found', english ? 'Location found. Check the starting point in Google Maps.' : 'Lokasi ditemukan. Periksa titik awal di Google Maps.'));
                 }
             }, error => {
                 if (currentRequest !== requestId) return;
                 release();
-                const errors = english
-                    ? { 1: 'Location permission was declined. Allow it in site settings or choose a city.', 2: 'Your device cannot determine its location. Try again or choose a city.', 3: 'Finding your location timed out. Try again outdoors or choose a city.' }
-                    : { 1: 'Izin lokasi ditolak. Izinkan lewat pengaturan situs atau pilih kota.', 2: 'Perangkat belum dapat menentukan lokasi. Coba lagi atau pilih kota.', 3: 'Pencarian lokasi melewati batas waktu. Coba lagi di area terbuka atau pilih kota.' };
+                const errors = {
+                    1: tr('loc_err_1', english ? 'Location permission was declined. Allow it in site settings or choose a city.' : 'Izin lokasi ditolak. Izinkan lewat pengaturan situs atau pilih kota.'),
+                    2: tr('loc_err_2', english ? 'Your device cannot determine its location. Try again or choose a city.' : 'Perangkat belum dapat menentukan lokasi. Coba lagi atau pilih kota.'),
+                    3: tr('loc_err_3', english ? 'Finding your location timed out. Try again outdoors or choose a city.' : 'Pencarian lokasi melewati batas waktu. Coba lagi di area terbuka atau pilih kota.'),
+                };
                 message(errors[error.code] || errors[2], true);
             }, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
         }));

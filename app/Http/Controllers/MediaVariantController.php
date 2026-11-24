@@ -34,7 +34,55 @@ class MediaVariantController extends Controller
         ]);
     }
 
+    /** Jalankan `media:warm` di proses terpisah supaya unggahan tidak menunggu pengecilan foto. */
+    public static function warmInBackground(string $path): void
+    {
+        $command = escapeshellarg(PHP_BINARY).' '.escapeshellarg(base_path('artisan')).' media:warm '.escapeshellarg($path);
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            pclose(popen('start "" /B '.$command.' >NUL 2>&1', 'r'));
+        } else {
+            exec($command.' >/dev/null 2>&1 &');
+        }
+    }
+
+    /** Buat semua ukuran foto (dipanggil oleh media:warm). */
+
+    public static function warm(string $path): void
+    {
+        $disk = Storage::disk('public');
+        @set_time_limit(180);
+        $self = new self();
+
+        $image = $self->load($disk->path($path));
+        if (! $image) {
+            return;
+        }
+
+        // Dari besar ke kecil: tiap ukuran diperkecil dari hasil sebelumnya, jadi jauh lebih cepat.
+        foreach ([1920, 1280, 800, 480] as $width) {
+            if (imagesx($image) > $width && ($scaled = imagescale($image, $width, -1, IMG_BICUBIC))) {
+                $image = $scaled;
+            }
+            $self->write($image, $disk->path("_variants/{$width}/{$path}.webp"));
+        }
+    }
+
     private function generate(string $source, string $target, int $width): bool
+    {
+        $image = $this->load($source);
+        if (! $image) {
+            return false;
+        }
+
+        if (imagesx($image) > $width && ($scaled = imagescale($image, $width, -1, IMG_BICUBIC))) {
+            $image = $scaled;
+        }
+
+        return $this->write($image, $target);
+    }
+
+    private function load(string $source): \GdImage|false
     {
         if (! function_exists('imagewebp')) {
             return false;
@@ -65,20 +113,20 @@ class MediaVariantController extends Controller
             }
         }
 
-        if (imagesx($image) > $width && ($scaled = imagescale($image, $width, -1, IMG_BICUBIC))) {
-            $image = $scaled;
-        }
-
         imagepalettetotruecolor($image);
         imagealphablending($image, true);
         imagesavealpha($image, true);
 
+        return $image;
+    }
+
+    private function write(\GdImage $image, string $target): bool
+    {
         if (! is_dir(dirname($target))) {
             @mkdir(dirname($target), 0775, true);
         }
         $temporary = $target.'.tmp';
-        $saved = @imagewebp($image, $temporary, 82);
-        if (! $saved) {
+        if (! @imagewebp($image, $temporary, 82)) {
             @unlink($temporary);
 
             return false;

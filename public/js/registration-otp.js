@@ -3,18 +3,14 @@
     const resend = document.querySelector('[data-resend-at]');
     const status = document.getElementById('otp-resend-countdown');
     const en = (document.documentElement.lang || 'id').toLowerCase().startsWith('en');
-    const t = en ? {
-        valid: (m, s) => `Code valid for ${m}:${s} more.`,
-        expired: 'The code has expired or was not sent. Please request a new code.',
-        wait: (w) => `Resend (${w} s)`,
-        resend: 'Resend code',
-        ready: 'You can request a new code.',
-    } : {
-        valid: (m, s) => `Kode berlaku ${m}:${s} lagi.`,
-        expired: 'Kode kedaluwarsa atau belum terkirim. Silakan kirim ulang kode.',
-        wait: (w) => `Kirim ulang (${w} detik)`,
-        resend: 'Kirim ulang kode',
-        ready: 'Anda dapat meminta kode baru.',
+    const I18N = window.BJ_I18N || {};
+    const tr = (key, fallback, vars = {}) => Object.entries(vars).reduce((text, [name, value]) => text.replace(':' + name, value), I18N[key] ?? fallback);
+    const t = {
+        valid: (m, s) => tr('otp_valid', en ? 'Code valid for :menit::detik more.' : 'Kode berlaku :menit::detik lagi.', { menit: m, detik: s }),
+        expired: tr('otp_expired', en ? 'The code has expired or was not sent. Please request a new code.' : 'Kode kedaluwarsa atau belum terkirim. Silakan kirim ulang kode.'),
+        wait: (w) => tr('otp_wait', en ? 'Resend (:detik s)' : 'Kirim ulang (:detik detik)', { detik: w }),
+        resend: tr('otp_resend', en ? 'Resend code' : 'Kirim ulang kode'),
+        ready: tr('otp_ready', en ? 'You can request a new code.' : 'Anda dapat meminta kode baru.'),
     };
     if (!expiry || !resend || !status) return;
 

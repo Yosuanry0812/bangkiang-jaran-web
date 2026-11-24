@@ -51,6 +51,14 @@ class DetailPemesanan extends Model
         'check_out_at',
     ];
 
+    /**
+     * Nama tiket untuk tampilan sesuai locale; snapshot `nama_tiket` tetap versi Indonesia (dipakai laporan).
+     */
+    public function getLabelTiketAttribute(): ?string
+    {
+        return $this->tiket?->nama_tiket ?: ($this->attributes['nama_tiket'] ?? null);
+    }
+
     public function pemesanan()
     {
         return $this->belongsTo(Pemesanan::class, 'id_pemesanan', 'id_pemesanan');

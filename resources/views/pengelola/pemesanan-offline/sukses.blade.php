@@ -61,7 +61,7 @@
                         <span class="material-symbols-outlined text-slate-500" style="font-size:14px">qr_code</span>
                     </div>
                     <div class="min-w-0">
-                        <p class="font-sans text-[12px] font-medium text-slate-800">{{ $d->nama_pengunjung ?? $d->nama_tiket }}</p>
+                        <p class="font-sans text-[12px] font-medium text-slate-800">{{ $d->nama_pengunjung ?? $d->label_tiket }}</p>
                         <p class="font-sans text-[10px] text-slate-400 font-mono truncate">{{ $d->kode_tiket }}</p>
                     </div>
                 </div>

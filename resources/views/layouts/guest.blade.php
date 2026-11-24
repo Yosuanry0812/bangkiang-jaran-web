@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{{ asset('css/auth-refinement.css') }}">
     <link rel="stylesheet" href="{{ asset('css/typography-motion.css') . '?v=' . filemtime(public_path('css/typography-motion.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/responsive-refinement.css') . '?v=' . filemtime(public_path('css/responsive-refinement.css')) }}">
+    <script>window.BJ_I18N = @json(require lang_path((is_file(lang_path(app()->getLocale().'/js.php')) ? app()->getLocale() : 'id').'/js.php'));</script>
 </head>
 <body data-page="{{ Route::currentRouteName() }}" data-motion-profile="balanced" class="bj-guest {{ Route::is('login', 'register', 'registration.otp*') ? 'bj-auth-page' : '' }} font-body antialiased min-h-screen flex flex-col selection:bg-emerald-100">
 

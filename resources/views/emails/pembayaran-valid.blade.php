@@ -7,7 +7,7 @@
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0 0 25px;border-collapse:collapse;">
     <tr style="background:#eae7dc;"><th align="left" style="padding:11px;color:#173d34;font-size:11px;">{{ __('panel.tiket_f17c') }}</th><th align="left" style="padding:11px;color:#173d34;font-size:11px;">{{ __('panel.pengunjung_c54d') }}</th><th align="left" style="padding:11px;color:#173d34;font-size:11px;">{{ __('panel.kode_25cf') }}</th></tr>
     @foreach($pemesanan->detailPemesanan as $item)
-    <tr><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->nama_tiket }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->nama_pengunjung ?? '—' }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#173d34;font-size:12px;font-weight:bold;">{{ $item->kode_tiket }}</td></tr>
+    <tr><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->label_tiket }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#516059;font-size:12px;">{{ $item->nama_pengunjung ?? '—' }}</td><td style="padding:11px;border-bottom:1px solid #ded8cd;color:#173d34;font-size:12px;font-weight:bold;">{{ $item->kode_tiket }}</td></tr>
     @endforeach
 </table>
 <p style="margin:0 0 25px;color:#516059;font-size:13px;line-height:1.75;">{!! __('mail.valid_date', ['date' => '<strong>'.e(\Carbon\Carbon::parse($pemesanan->tgl_kunjungan)->format('d/m/Y')).'</strong>']) !!}</p>

@@ -90,7 +90,7 @@
             {{-- Password --}}
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label for="password" class="block font-body text-[12px] font-semibold tracking-[0.08em] uppercase text-gray-500">Password</label>
+                    <label for="password" class="block font-body text-[12px] font-semibold tracking-[0.08em] uppercase text-gray-500">{{ __('ui.password') }}</label>
                     @if (Route::has('password.request'))
                     <a href="{{ route('password.request') }}" class="font-body text-[12px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">{{ __('auth_ui.forgot_link') }}</a>
                     @endif
@@ -113,6 +113,19 @@
                         <span class="material-symbols-outlined text-[13px]">error</span>{{ $message }}
                     </p>
                 @enderror
+            </div>
+
+            {{-- Remember me --}}
+            <div class="flex items-center gap-3 w-full min-h-[40px] py-1 select-none touch-manipulation" style="-webkit-tap-highlight-color: transparent;">
+                <span class="relative inline-flex w-6 h-6 shrink-0">
+                    {{-- Input asli menutupi seluruh kotak (24px) agar tap/klik langsung kena, tanpa animasi yang menunda --}}
+                    <input id="remember" type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}
+                           aria-label="{{ __('auth_ui.remember_me') }}"
+                           class="peer absolute inset-0 w-full h-full m-0 p-0 opacity-0 cursor-pointer z-10">
+                    <span class="w-6 h-6 rounded-md border-2 border-gray-300 bg-white peer-checked:bg-emerald-700 peer-checked:border-emerald-700 peer-focus-visible:ring-4 peer-focus-visible:ring-emerald-500/30 hover:border-emerald-500"></span>
+                    <svg class="absolute inset-0 w-6 h-6 p-1 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                </span>
+                <span class="font-body text-[14px] leading-snug text-gray-700 min-w-0">{{ __('auth_ui.remember_me') }}</span>
             </div>
 
             {{-- Submit --}}

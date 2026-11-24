@@ -32,7 +32,7 @@ class GuestSessionTest extends TestCase
         $response = $this->get('/login')->assertOk()
             ->assertSee('Lanjutkan sebagai tamu')
             ->assertSee(route('landing'), false)
-            ->assertDontSee('name="remember"', false);
+            ->assertSee('name="remember"', false);
 
         $this->assertTrue(config('session.expire_on_close'));
         $this->assertSame(0, $response->getCookie(config('session.cookie'))->getExpiresTime());
@@ -67,26 +67,37 @@ class GuestSessionTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_legacy_remember_cookie_cannot_automatically_log_in(): void
+    public function test_remember_cookie_restores_login_after_browser_restart(): void
     {
-        $user = User::factory()->create(['role' => 'pengelola', 'remember_token' => Str::random(60)]);
+        $user = User::factory()->create(['role' => 'wisatawan', 'remember_token' => Str::random(60)]);
         $cookieName = Auth::guard('web')->getRecallerName();
         $cookie = implode('|', [$user->id, $user->getRememberToken(), $user->getAuthPassword()]);
 
         $this->withCookie($cookieName, $cookie)->get('/tiket')
-            ->assertOk()->assertCookieExpired($cookieName)
-            ->assertSessionMissing(EnsureExplicitLogin::SESSION_KEY);
-        $this->assertGuest();
+            ->assertOk()->assertSee('id="nav-logout"', false);
+        $this->assertAuthenticatedAs($user);
     }
 
-    public function test_explicit_login_survives_subsequent_requests_but_ignores_remember_input(): void
+    public function test_login_without_remember_sets_no_cookie_and_with_remember_sets_it(): void
     {
         $user = User::factory()->create(['role' => 'wisatawan']);
+        $cookieName = Auth::guard('web')->getRecallerName();
 
-        $this->post('/login', ['login' => $user->email, 'password' => 'password', 'remember' => 'on'])
+        $this->post('/login', ['login' => $user->email, 'password' => 'password'])
             ->assertRedirect()
             ->assertSessionHas(EnsureExplicitLogin::SESSION_KEY, (string) $user->id)
-            ->assertCookieMissing(Auth::guard('web')->getRecallerName());
+            ->assertCookieMissing($cookieName);
+
+        Auth::forgetGuards();
+        $this->get('/tiket')->assertOk()->assertSee('id="nav-logout"', false);
+        $this->assertAuthenticatedAs($user);
+
+        Auth::forgetGuards();
+        $this->flushSession();
+        $this->post('/login', ['login' => $user->email, 'password' => 'password', 'remember' => '1'])
+            ->assertRedirect()
+            ->assertSessionHas(EnsureExplicitLogin::SESSION_KEY, (string) $user->id)
+            ->assertCookie($cookieName);
 
         Auth::forgetGuards();
         $this->get('/tiket')->assertOk()->assertSee('id="nav-logout"', false);

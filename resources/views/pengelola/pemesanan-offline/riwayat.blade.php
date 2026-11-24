@@ -36,12 +36,12 @@
                         <span class="font-mono text-[12px] font-semibold text-slate-700">{{ $p->kode_booking }}</span>
                     </td>
                     <td class="px-4 py-4">
-                        <span class="font-sans text-[12px] text-slate-600">{{ \Carbon\Carbon::parse($p->tgl_kunjungan)->format('d M Y') }}</span>
+                        <span class="font-sans text-[12px] text-slate-600">{{ \Carbon\Carbon::parse($p->tgl_kunjungan)->translatedFormat('d M Y') }}</span>
                     </td>
                     <td class="px-4 py-4 hidden sm:table-cell">
                         <span class="font-sans text-[11px] text-slate-500">
                             @php
-                                $dSum = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->nama_tiket)->implode(', ');
+                                $dSum = $p->detailPemesanan->groupBy('nama_tiket')->map(fn($g) => $g->count() . '× ' . $g->first()->label_tiket)->implode(', ');
                             @endphp
                             {{ $dSum ?: ($p->tiket->nama_tiket ?? '—') }}
                         </span>

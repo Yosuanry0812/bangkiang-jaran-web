@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const describe = photo => {
             link.href = photo.url;
             link.dataset.photoCaption = photo.caption;
-            link.setAttribute('aria-label', `${document.documentElement.lang === 'en' ? 'Enlarge photo: ' : 'Perbesar foto: '}${photo.caption}`);
+            link.setAttribute('aria-label', `${(window.BJ_I18N || {}).photo_enlarge ?? (document.documentElement.lang === 'en' ? 'Enlarge photo: ' : 'Perbesar foto: ')}${photo.caption}`);
         };
         const fallback = () => {
             if (!visible.naturalWidth) { visible.hidden = true; message.hidden = false; }

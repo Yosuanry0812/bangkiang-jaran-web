@@ -51,4 +51,9 @@ class Galeri extends Model
     {
         return $query->where('tipe', 'restoran');
     }
+
+    public function scopeSejarah($query)
+    {
+        return $query->where('tipe', 'sejarah');
+    }
 }

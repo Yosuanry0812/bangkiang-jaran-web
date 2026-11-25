@@ -22,7 +22,9 @@
         <div class="gallery-upload__types">
             <label><input type="radio" name="tipe" value="wisata" required {{ old('tipe', 'wisata') === 'wisata' ? 'checked' : '' }}><span>{{ __('panel.wisata_bangkiang_jaran_b48d') }}</span></label>
             <label><input type="radio" name="tipe" value="restoran" {{ old('tipe') === 'restoran' ? 'checked' : '' }}><span>{{ __('panel.restoran_kuliner_7b13') }}</span></label>
+            <label><input type="radio" name="tipe" value="sejarah" {{ old('tipe') === 'sejarah' ? 'checked' : '' }}><span>{{ __('panel.sejarah_bangkiang_jaran') }}</span></label>
         </div>
+        <p class="gallery-upload__hint">{{ __('panel.sejarah_hint') }}</p>
         @error('tipe') <p class="gallery-upload__error">{{ $message }}</p> @enderror
     </fieldset>
 

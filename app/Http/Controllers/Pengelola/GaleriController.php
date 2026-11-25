@@ -16,7 +16,7 @@ class GaleriController extends Controller
     {
         $query = Galeri::orderBy('created_at', 'desc');
 
-        if ($request->tipe && in_array($request->tipe, ['wisata', 'restoran'])) {
+        if ($request->tipe && in_array($request->tipe, ['wisata', 'restoran', 'sejarah'])) {
             $query->where('tipe', $request->tipe);
         }
 
@@ -35,7 +35,7 @@ class GaleriController extends Controller
         $rules = [
             'file' => ['required', 'array', 'max:20'],
             'file.*' => ['image', 'mimes:jpg,jpeg,png', 'max:51200'],
-            'tipe' => ['required', 'in:wisata,restoran'],
+            'tipe' => ['required', 'in:wisata,restoran,sejarah'],
         ];
 
         $messages = [

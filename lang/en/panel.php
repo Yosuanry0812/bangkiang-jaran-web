@@ -175,6 +175,8 @@ return [
     'preview_31fd' => 'Preview',
     'profil_saya_538e' => 'My Profile',
     'progres_pembayaran_0561' => 'Payment progress',
+    'sejarah_bangkiang_jaran' => 'History (homepage)',
+    'sejarah_hint' => 'The first four history photos appear on the homepage (upload order).',
     'restoran_kuliner_7b13' => 'Restaurant / Dining',
     'ringkasan_operasional_34db' => 'Operations summary',
     'ringkasan_pesanan_7157' => 'Booking summary',

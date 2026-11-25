@@ -58,6 +58,7 @@ return [
     't_eticket' => 'E-Ticket — Bangkiang Jaran',
     'gallery_all' => 'All media',
     'gallery_tourism' => 'Bangkiang Jaran Attraction',
+    'gallery_history' => 'History',
     'gallery_resto' => 'Restaurant / Dining',
     'full_name_lc' => 'Full name',
     'google_account' => 'Google account',

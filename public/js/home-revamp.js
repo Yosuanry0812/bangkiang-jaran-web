@@ -30,12 +30,30 @@
             heading.classList.add('bj-rv-split');
             inView.observe(heading);
         });
-        const groups = ['.bj-rv-stub', '.bj-rv-faq__items details', '.bj-rv-route__origins button', '.bj-rv-tickets__copy > *', '.bj-rv-route__panel > *', '.bj-rv-close > *', '.bj-rv-wall__title small'];
+        const groups = ['.bj-rv-stub', '.bj-rv-faq__items details', '.bj-rv-route__origins button', '.bj-rv-tickets__copy > *', '.bj-rv-route__panel > *', '.bj-rv-close > *', '.bj-rv-wall__title small', '.bj-rv-origin__copy > :not(h2)', '.bj-rv-history__closing'];
         groups.forEach(selector => root.querySelectorAll(selector).forEach((el, index) => {
             el.setAttribute('data-rv-in', '');
             el.style.setProperty('--i', index);
             inView.observe(el);
         }));
+        root.querySelectorAll('.bj-rv-origin__photo').forEach(el => inView.observe(el));
+    }
+
+    // Sejarah: foto di kiri berganti mengikuti babak yang sedang dibaca.
+    const history = document.querySelector('[data-rv-history]');
+    const historyList = history?.querySelector('.bj-rv-history__chapters');
+    if (history) {
+        const chapters = [...history.querySelectorAll('[data-rv-chapter]')];
+        const media = [...history.querySelectorAll('[data-rv-history-media]')];
+        const activate = n => {
+            chapters.forEach(c => c.classList.toggle('is-active', c.dataset.rvChapter === n));
+            media.forEach(m => m.classList.toggle('is-active', m.dataset.rvHistoryMedia === n));
+        };
+        activate('1');
+        if ('IntersectionObserver' in window) {
+            const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) activate(e.target.dataset.rvChapter); }), { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+            chapters.forEach(c => io.observe(c));
+        }
     }
 
     // Bilah progres scroll di tepi atas.
@@ -82,6 +100,10 @@
             track.style.transform = `translate3d(${-Math.round(progress * travel)}px,0,0)`;
         }
         if (!reduce) {
+            if (historyList) {
+                const hr = historyList.getBoundingClientRect();
+                historyList.style.setProperty('--rv-history', Math.min(1, Math.max(0, (vh * 0.5 - hr.top) / hr.height)).toFixed(3));
+            }
             weights.forEach(el => {
                 const r = el.getBoundingClientRect();
                 if (r.bottom < 0 || r.top > vh) return;

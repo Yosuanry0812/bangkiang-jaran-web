@@ -23,11 +23,15 @@
         }
         return $photo;
     };
-    $photoAt = function (int $index) use ($usableGallery, $fallbackPhoto) {
+    $photoAt = function (int $index) use ($usableGallery, $fallbackPhoto, $mediaPhoto) {
         if ($usableGallery->isEmpty()) return ['url' => $fallbackPhoto, 'caption' => 'Air Terjun Bangkiang Jaran'];
         $media = $usableGallery->get($index % $usableGallery->count());
         return $mediaPhoto($media);
     };
+    $historyPhotos = collect(range(0, 3))->map(function ($i) use ($sejarahFoto, $mediaPhoto, $photoAt) {
+        $media = ($sejarahFoto ?? collect())->get($i);
+        return $media ? $mediaPhoto($media) : $photoAt($i + 2);
+    });
     $sectionPhotos = $usableGallery->map($mediaPhoto)->unique('url')->take(12)->values();
     if ($sectionPhotos->isEmpty()) {
         $sectionPhotos->push($photoAt(0));
@@ -181,7 +185,7 @@
                 <p class="bj-home-hero__lead bj-reveal">{{ $isEnglish ? 'Discover the waterfall and the quiet greenery of Bakbakan.' : 'Nikmati air terjun dan teduhnya alam Bakbakan.' }}</p>
                 <div class="bj-home-hero__actions bj-reveal">
                     <a class="bj-home-button bj-home-button--gold" href="{{ route('tiket.index') }}">{{ $isEnglish ? 'Book tickets' : 'Pesan tiket' }}<span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
-                    <a class="bj-home-button bj-home-button--ghost" href="#perjalanan">{{ $isEnglish ? 'Explore' : 'Jelajahi' }}</a>
+                    <a class="bj-home-button bj-home-button--ghost" href="#sejarah">{{ $isEnglish ? 'Explore' : 'Jelajahi' }}</a>
                 </div>
             </div>
 
@@ -197,11 +201,69 @@
             </div>
             @endif
         </div>
-        <a class="bj-home-hero__scroll" href="#perjalanan" aria-label="{{ $isEnglish ? 'Scroll to explore' : 'Gulir untuk menjelajah' }}"><span>{{ $isEnglish ? 'Scroll' : 'Gulir' }}</span><i aria-hidden="true"></i></a>
+        <a class="bj-home-hero__scroll" href="#sejarah" aria-label="{{ $isEnglish ? 'Scroll to explore' : 'Gulir untuk menjelajah' }}"><span>{{ $isEnglish ? 'Scroll' : 'Gulir' }}</span><i aria-hidden="true"></i></a>
     </section>
 </div>
 
 <div class="bj-rv">
+    {{-- 2a. Sejarah: asal-usul nama --}}
+    <section id="sejarah" class="bj-rv-origin" aria-label="{{ __('sejarah.aria_origin') }}">
+        <div class="bj-rv-wrap bj-rv-origin__grid">
+            <div class="bj-rv-origin__copy">
+                <p class="bj-rv-eyebrow">{{ __('sejarah.eyebrow') }}</p>
+                <h2>{{ __('sejarah.origin_title') }}</h2>
+                <p class="bj-rv-origin__lead">{{ __('sejarah.origin_lead') }}</p>
+                <dl class="bj-rv-origin__terms">
+                    @foreach([1, 2] as $n)
+                    <div class="bj-rv-origin__term">
+                        <dt><span lang="ban">{{ __("sejarah.term_{$n}") }}</span><small>{{ __("sejarah.term_{$n}_lang") }}</small></dt>
+                        <dd>{{ __("sejarah.term_{$n}_meaning") }}</dd>
+                    </div>
+                    @endforeach
+                </dl>
+                <p class="bj-rv-origin__oral">{{ __('sejarah.origin_oral') }}</p>
+                <p class="bj-rv-origin__aside">{{ __('sejarah.origin_dedari') }}</p>
+            </div>
+            @php($op = $historyPhotos[0])
+            <figure class="bj-rv-origin__photo">
+                <img src="{{ $op['url'] }}" @if(! empty($op['srcset'])) srcset="{{ $op['srcset'] }}" sizes="(min-width: 901px) 40vw, 100vw" @endif alt="{{ $op['caption'] }}" loading="lazy" decoding="async">
+                <figcaption>{{ $op['caption'] }}</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    {{-- 2b. Sejarah: tiga babak --}}
+    <section class="bj-rv-history" data-rv-history aria-label="{{ __('sejarah.aria_story') }}">
+        <div class="bj-rv-wrap">
+            <header class="bj-rv-history__head">
+                <p class="bj-rv-eyebrow">{{ __('sejarah.story_eyebrow') }}</p>
+                <h2>{{ __('sejarah.story_title') }}</h2>
+            </header>
+            <div class="bj-rv-history__grid">
+                <div class="bj-rv-history__media" aria-hidden="true">
+                    @foreach([1, 2, 3] as $n)
+                        @php($hp = $historyPhotos[$n])
+                        <figure class="{{ $n === 1 ? 'is-active' : '' }}" data-rv-history-media="{{ $n }}">
+                            <img src="{{ $hp['url'] }}" @if(! empty($hp['srcset'])) srcset="{{ $hp['srcset'] }}" sizes="(min-width: 901px) 45vw, 100vw" @endif alt="" loading="lazy" decoding="async">
+                        </figure>
+                    @endforeach
+                </div>
+                <ol class="bj-rv-history__chapters">
+                    @foreach([1, 2, 3] as $n)
+                        @php($hp = $historyPhotos[$n])
+                        <li class="bj-rv-history__chapter{{ $n === 1 ? ' is-active' : '' }}" data-rv-chapter="{{ $n }}">
+                            <figure class="bj-rv-history__inline"><img src="{{ $hp['url'] }}" @if(! empty($hp['srcset'])) srcset="{{ $hp['srcset'] }}" sizes="100vw" @endif alt="{{ $hp['caption'] }}" loading="lazy" decoding="async"></figure>
+                            <p class="bj-rv-history__label">{{ __("sejarah.ch{$n}_label") }}</p>
+                            <h3>{{ __("sejarah.ch{$n}_title") }}</h3>
+                            <p>{{ __("sejarah.ch{$n}_body") }}</p>
+                        </li>
+                    @endforeach
+                </ol>
+            </div>
+            <p class="bj-rv-history__closing">{{ __('sejarah.closing') }}</p>
+        </div>
+    </section>
+
     {{-- 2. Jalur: foto-foto berjajar menyamping, digulir lewat scroll vertikal --}}
     <section id="perjalanan" class="bj-rv-trail" data-rv-trail aria-label="{{ $isEnglish ? 'Journey' : 'Perjalanan' }}">
         <div class="bj-rv-trail__pin">

@@ -41,7 +41,7 @@ class GaleriUploadTest extends TestCase
             'file' => [UploadedFile::fake()->image('a.jpg', 40, 40)],
         ])->assertSessionHasNoErrors();
 
-        $this->assertSame(1, Galeri::count());
+        $this->assertSame(1, Galeri::wisata()->count());
     }
 
     public function test_unggah_lewat_ajax_mengembalikan_json(): void
@@ -62,6 +62,6 @@ class GaleriUploadTest extends TestCase
             'file' => [UploadedFile::fake()->create('a.pdf', 10, 'application/pdf')],
         ])->assertSessionHasErrors('file.0');
 
-        $this->assertSame(0, Galeri::count());
+        $this->assertSame(0, Galeri::wisata()->count());
     }
 }

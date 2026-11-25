@@ -12,8 +12,9 @@ class LandingController extends Controller
     {
         $galeri = Galeri::wisata()->latest()->get();
         $tiket = Tiket::aktif()->get();
+        $sejarahFoto = Galeri::sejarah()->orderBy('id_galeri')->get();
 
-        return view('wisatawan.landing', compact('galeri', 'tiket'));
+        return view('wisatawan.landing', compact('galeri', 'tiket', 'sejarahFoto'));
     }
 
     public function restoran()

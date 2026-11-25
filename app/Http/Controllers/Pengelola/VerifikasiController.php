@@ -117,11 +117,16 @@ class VerifikasiController extends Controller
 
                 DB::commit();
 
-                // Kirim email notifikasi
+                // Kirim e-tiket (kode + QR) langsung saat divalidasi; bila SMTP gagal, masuk antrean untuk dicoba ulang.
                 try {
-                    Mail::to($pemesanan->user->email)->send(new PembayaranValid($pemesanan));
-                } catch (\Exception $e) {
-                    \Log::warning('Mail enqueue failed.', ['exception_type' => get_class($e)]);
+                    Mail::to($pemesanan->user->email)->sendNow(new PembayaranValid($pemesanan));
+                } catch (\Throwable $e) {
+                    \Log::warning('Mail langsung gagal, dialihkan ke antrean.', ['exception_type' => get_class($e)]);
+                    try {
+                        Mail::to($pemesanan->user->email)->send(new PembayaranValid($pemesanan));
+                    } catch (\Throwable $e2) {
+                        \Log::warning('Mail enqueue failed.', ['exception_type' => get_class($e2)]);
+                    }
                 }
 
                 return redirect()->route('pengelola.verifikasi.index')

@@ -58,7 +58,7 @@ class DocumentedFeatureFlowTest extends TestCase
         $this->assertCount(2, $booking->detailPemesanan);
         $this->assertCount(2, $booking->detailPemesanan->pluck('kode_tiket')->unique());
         $this->assertSame('Pengunjung Dua', $booking->detailPemesanan->last()->nama_pengunjung);
-        Mail::assertQueued(PemesananBerhasil::class, fn ($mail) => $mail->connection === 'database' && $mail->afterCommit);
+        Mail::assertNotQueued(PemesananBerhasil::class);
         Mail::assertNothingSent();
         $this->get(route('wisatawan.pemesanan.riwayat'))->assertOk()->assertSee($booking->kode_booking);
         $this->post(route('wisatawan.pembayaran.store', $booking->id_pemesanan), [
@@ -73,7 +73,7 @@ class DocumentedFeatureFlowTest extends TestCase
             'action' => 'valid',
         ])->assertSessionHas('success');
         $this->assertTrue($booking->fresh()->isApproved());
-        Mail::assertQueued(PembayaranValid::class, fn ($mail) => $mail->connection === 'database');
+        Mail::assertSent(PembayaranValid::class);
         $code = $booking->detailPemesanan->first()->kode_tiket;
         $this->get(route('tiket.verifikasi', $code))->assertOk()->assertViewHas('valid', true);
         $this->post(route('pengelola.scan.gunakan'), ['kode' => $code])->assertSessionHas('success');

@@ -67,7 +67,7 @@ class BookingOperationsTest extends TestCase
         $this->assertSame(['created'], $booking->events->pluck('event')->all());
         $this->post(route('wisatawan.pemesanan.store-data-diri'), $payload)->assertRedirect(route('wisatawan.pemesanan.detail', $booking->id_pemesanan));
         $this->assertDatabaseCount('pemesanan', 1);
-        Mail::assertQueued(PemesananBerhasil::class, 1);
+        Mail::assertNotQueued(PemesananBerhasil::class);
         $this->get(route('wisatawan.pemesanan.detail', $booking->id_pemesanan))->assertSee('data-booking-countdown', false)->assertSee(__('operations.timeline'));
     }
 

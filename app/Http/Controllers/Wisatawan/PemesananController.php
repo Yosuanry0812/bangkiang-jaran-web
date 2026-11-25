@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Wisatawan;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingFilters;
-use App\Mail\PemesananBerhasil;
 use App\Models\Pemesanan;
 use App\Models\Tiket;
 use App\Services\BookingCheckout;
@@ -13,7 +12,6 @@ use App\Services\BookingLifecycle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class PemesananController extends Controller
@@ -136,13 +134,6 @@ class PemesananController extends Controller
         $pemesanan = app(BookingCheckout::class)->finish($flow, $request);
         session()->put('last_booking_id', $pemesanan->id_pemesanan);
         session()->forget('pemesanan_flow');
-        if ($pemesanan->wasRecentlyCreated) {
-            try {
-                Mail::to(Auth::user()->email)->send(new PemesananBerhasil($pemesanan));
-            } catch (\Throwable $e) {
-                \Log::warning('Booking mail enqueue failed.', ['exception_type' => get_class($e)]);
-            }
-        }
 
         return redirect()->route('wisatawan.pembayaran.create', $pemesanan->id_pemesanan)
             ->with('success', __('operations.booking_created'));
